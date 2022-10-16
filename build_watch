@@ -2,7 +2,7 @@
 echo "Initial build, just to be safe."
 make
 echo "Done! Build watch started."
-inotifywait -m ./source -e create -e moved_to |
+inotifywait -mq -e create -e modify -e delete -e move ./source |
     while read dir action file; do
         echo "The file '$file' appeared in directory '$dir' via '$action', running make..."
         make
