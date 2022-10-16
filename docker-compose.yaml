@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  build_watch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./bin:/project/bin
+      - ./data:/project/data
+      - ./source:/project/source
