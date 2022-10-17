@@ -17,5 +17,7 @@ Exit by signalling an interupt to docker-compose (CTRL+C).
 1. Never push directly to `main`.
 2. Please branch from `develop` with a branch name like `<your_name>/feature`.
 3. Finish your work, be sure it is working and clean.
-4. Make a pull-request to merge your branch into `main`. Somebody needs to approve it.
+4. Make a pull-request to merge your branch into `develop`. Somebody needs to approve it.
 5. Once merged, delete your branch.
+
+`develop` will be merged into `main` when deemed appropriate.
