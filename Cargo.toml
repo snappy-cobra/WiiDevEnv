@@ -1,0 +1,4 @@
+[lib]
+name = "game_lib.rs"
+crate-type = ["cdylib"]
+path = "source/game/lib.rs"
