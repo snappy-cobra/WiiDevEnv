@@ -6,9 +6,16 @@
 static void *xfb = NULL;
 static GXRModeObj *rmode = NULL;
 
+extern void rust_function();
+
+void c_function() {
+	printf("Hello Rust!");
+}
+
 //---------------------------------------------------------------------------------
 int main(int argc, char **argv) {
 //---------------------------------------------------------------------------------
+	rust_function();
 
 	// Initialise the video system
 	VIDEO_Init();
@@ -50,7 +57,7 @@ int main(int argc, char **argv) {
 	printf("\x1b[2;0H");
 
 
-	printf("Hello World!");
+	
 
 	while(1) {
 

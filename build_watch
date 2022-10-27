@@ -1,9 +1,21 @@
 #!/usr/bin/env bash
+
+# Load rust config vars
+source "$HOME/.cargo/env"
+
+# Build function
+build () {
+    cargo build --release -Z build-std=core --target powerpc-unknown-eabi.json
+    cp /project/target/powerpc-unknown-eabi/release/libgame.a /project/build/libgame.a
+    make
+}
+
+# Run script
 echo "Initial build, just to be safe."
-make
+build
 echo "Done! Build watch started."
-inotifywait -mq -e create -e modify -e delete -e move ./source |
+inotifywait -mq -r -e create -e modify -e delete -e move ./source |
     while read dir action file; do
-        echo "The file '$file' appeared in directory '$dir' via '$action', running make..."
-        make
+        echo "The file '$file' appeared in directory '$dir' via '$action', rebuilding..."
+        build
     done
