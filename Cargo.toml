@@ -10,4 +10,9 @@ path = "source/game/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[build-dependencies]
+bindgen = "0.61.0"
+regex = "1.5"
+
 [dependencies]
+libc = "0.2"

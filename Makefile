@@ -19,7 +19,7 @@ TARGET		:=	bin/$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES	:=	source
 DATA		:=	data
-INCLUDES	:=	#target/powerpc-unknown-eabi/release/libgame.a
+INCLUDES	:=	
 
 #---------------------------------------------------------------------------------
 # options for code generation
