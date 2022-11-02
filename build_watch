@@ -5,14 +5,17 @@ source "$HOME/.cargo/env"
 
 # Build function
 build () {
-    cargo build --release -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+    cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json --release
+    rm -rf bin/*
+    cp target/powerpc-unknown-eabi/release/rust-wii bin/boot.elf
+    cp bin/boot.elf bin/boot.dol
 }
 
 # Run script
 echo "Initial build, just to be safe."
 build
 echo "Done! Build watch started."
-inotifywait -mq -r -e create -e modify -e delete -e move ./source |
+inotifywait -mq -r -e create -e modify -e delete -e move ./src |
     while read dir action file; do
         echo "The file '$file' appeared in directory '$dir' via '$action', rebuilding..."
         build
