@@ -50,6 +50,8 @@ fn main() {
         dkp_path
     );
     println!("cargo:rustc-link-search=native={}/libogc/lib/wii", dkp_path);
+    println!("cargo:rustc-link-search=native={}/portlibs/wii/lib", dkp_path);
+    println!("cargo:rustc-link-search=native={}/portlibs/ppc/lib", dkp_path);
 
     println!("cargo:rustc-link-lib=static=c");
     println!("cargo:rustc-link-lib=static=sysbase");
@@ -57,11 +59,18 @@ fn main() {
     println!("cargo:rustc-link-lib=static=ogc");
     println!("cargo:rustc-link-lib=static=asnd");
     println!("cargo:rustc-link-lib=static=aesnd");
+    println!("cargo:rustc-link-lib=static=grrlib");
+    println!("cargo:rustc-link-lib=static=freetype");
+    println!("cargo:rustc-link-lib=static=bz2");
+    println!("cargo:rustc-link-lib=static=pngu");
+    println!("cargo:rustc-link-lib=static=png");
+    println!("cargo:rustc-link-lib=static=jpeg");
+    println!("cargo:rustc-link-lib=static=z");
+    println!("cargo:rustc-link-lib=static=fat");
 
     //Wiipad
     println!("cargo:rustc-link-lib=static=bte");
     println!("cargo:rustc-link-lib=static=wiiuse");
-
 
     println!("cargo:rerun-if-changed=wrapper.h");
     let bindings = bindgen::Builder::default()
@@ -84,6 +93,8 @@ fn main() {
             get_clang_version()
         ))
         .clang_arg(format!("-I{}/libogc/include", dkp_path))
+        .clang_arg(format!("-I{}/portlibs/wii/include", dkp_path))
+        .clang_arg(format!("-I{}/portlibs/ppc/include", dkp_path))
         .clang_arg("-mfloat-abi=hard")
         .clang_arg("-nostdinc")
         .clang_arg("-Wno-macro-redefined")
@@ -94,6 +105,6 @@ fn main() {
         .expect("Unable to generate bindings");
 
     bindings
-        .write_to_file("./src/ogc.rs")
+        .write_to_file("./src/grrlib.rs")
         .expect("Unable to write bindings to file");
 }
