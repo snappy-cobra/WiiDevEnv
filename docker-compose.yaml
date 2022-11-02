@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./bin:/project/bin
       - ./target:/project/target
       - ./data:/project/data
       - ./source:/project/source

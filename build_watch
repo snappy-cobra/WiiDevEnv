@@ -5,9 +5,7 @@ source "$HOME/.cargo/env"
 
 # Build function
 build () {
-    cargo build --release -Z build-std=core --target powerpc-unknown-eabi.json
-    cp /project/target/powerpc-unknown-eabi/release/libgame.a /project/build/libgame.a
-    make
+    cargo build --release -Z build-std=core,alloc --target powerpc-unknown-eabi.json
 }
 
 # Run script
