@@ -31,6 +31,7 @@ RUN mkdir /project/data
 
 COPY powerpc-unknown-eabi.json /project/powerpc-unknown-eabi.json
 COPY Cargo.toml /project/Cargo.toml
+COPY grrlib /project/grrlib
 
 # Install Rust Wii Dev environment
 COPY install_rust /project/install_rust

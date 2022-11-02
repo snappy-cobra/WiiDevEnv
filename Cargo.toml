@@ -13,3 +13,4 @@ release = { panic = "abort", lto = true, codegen-units = 1, strip = "symbols", o
 
 [dependencies]
 ogc-rs = {git = "https://github.com/rust-wii/ogc-rs.git"}
+grrlib = {path = "grrlib"}

@@ -1,0 +1,12 @@
+[package]
+name = "grrlib"
+version = "0.1.0"
+edition = "2021"
+description = "Rust bindings for GRRLIB"
+
+[dependencies]
+libc = "0.2"
+
+[build-dependencies]
+bindgen = "0.61"
+regex = "1.5"
