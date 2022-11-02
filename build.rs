@@ -64,6 +64,7 @@ fn main() {
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
+    println!("cargo:rerun-if-changed=/project/wrapper.h");
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate
         // bindings for.

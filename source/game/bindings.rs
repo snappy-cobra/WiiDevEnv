@@ -73,7 +73,6 @@ impl<T> ::core::cmp::PartialEq for __BindgenUnionField<T> {
     }
 }
 impl<T> ::core::cmp::Eq for __BindgenUnionField<T> {}
-pub const GRRLIB_VER_STRING: &[u8; 6usize] = b"4.4.1\0";
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
@@ -1454,6 +1453,7 @@ pub const RNC_HUF_DECODE_ERROR: i32 = -2;
 pub const RNC_FILE_SIZE_MISMATCH: i32 = -3;
 pub const RNC_PACKED_CRC_ERROR: i32 = -4;
 pub const RNC_UNPACKED_CRC_ERROR: i32 = -5;
+pub const GRRLIB_VER_STRING: &[u8; 6usize] = b"4.4.1\0";
 pub const M_MXFAST: u32 = 1;
 pub const M_NLBLKS: u32 = 2;
 pub const M_GRAIN: u32 = 3;
