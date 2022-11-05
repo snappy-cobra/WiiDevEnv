@@ -7,7 +7,7 @@ source "$HOME/.cargo/env"
 build () {
     cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json --release
     rm -rf bin/*
-    cp target/powerpc-unknown-eabi/release/rust-wii bin/boot.elf
+    cp target/powerpc-unknown-eabi/release/rust-wii.elf bin/boot.elf
     cp bin/boot.elf bin/boot.dol
 }
 

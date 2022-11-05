@@ -38,6 +38,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         // Main render loop
         loop {
             // Process input
+            GRRLIB_2dMode();
             PAD_ScanPads();
             if (PAD_ButtonsDown(0) as u32 & PAD_BUTTON_START) > 0 {break}
             if (PAD_ButtonsHeld(0) as u32 & PAD_BUTTON_A) > 0 {cubeZ += 1.0}
