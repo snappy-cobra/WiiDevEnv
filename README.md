@@ -2,6 +2,9 @@
 
 Simple docker setup with a file watch to allow for quick and easy Wii development.
 
+Programming is done in Rust. The `src` folder of this project shows a small demo application.
+The Rust environment is preconfigured to get you creating games as soon as possible.
+
 ## Requirements
 
 You need to have Docker and Docker-compose installed.
