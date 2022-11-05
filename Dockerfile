@@ -21,7 +21,7 @@ RUN sudo dkp-pacman --sync --needed --noconfirm libfat-ogc ppc-libpng ppc-freety
 RUN make clean all install
 WORKDIR /
 
-# Setup build folder structure and some required files
+# Setup build folder structure
 RUN mkdir /project
 RUN mkdir /project/target
 RUN mkdir /project/bin
@@ -29,17 +29,18 @@ RUN mkdir /project/build
 RUN mkdir /project/src
 RUN mkdir /project/data
 
-COPY powerpc-unknown-eabi.json /project/powerpc-unknown-eabi.json
-COPY Cargo.toml /project/Cargo.toml
-COPY grrlib /project/grrlib
-
 # Install Rust Wii Dev environment
+COPY Cargo.toml /project/Cargo.toml
 COPY install_rust /project/install_rust
 RUN chmod +x /project/install_rust
 WORKDIR /project
 RUN /project/install_rust
 
 # To ease docker build caching: add remaining files.
+COPY .cargo /project/.cargo
+COPY powerpc-unknown-eabi.json /project/powerpc-unknown-eabi.json
+COPY wrapper.h /project/wrapper.h
+COPY build.rs /project/build.rs
 COPY build_watch /project/build_watch
 RUN chmod +x /project/build_watch
 
