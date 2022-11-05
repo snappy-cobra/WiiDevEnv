@@ -1,4 +1,2 @@
-#include <ogcsys.h>
-#include <asndlib.h>
-#include <aesndlib.h>
+#define __wii__
 #include <grrlib.h>

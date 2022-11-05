@@ -55,10 +55,6 @@ fn main() {
 
     println!("cargo:rustc-link-lib=static=c");
     println!("cargo:rustc-link-lib=static=sysbase");
-    println!("cargo:rustc-link-lib=static=m");
-    println!("cargo:rustc-link-lib=static=ogc");
-    println!("cargo:rustc-link-lib=static=asnd");
-    println!("cargo:rustc-link-lib=static=aesnd");
     println!("cargo:rustc-link-lib=static=grrlib");
     println!("cargo:rustc-link-lib=static=freetype");
     println!("cargo:rustc-link-lib=static=bz2");
@@ -67,10 +63,12 @@ fn main() {
     println!("cargo:rustc-link-lib=static=jpeg");
     println!("cargo:rustc-link-lib=static=z");
     println!("cargo:rustc-link-lib=static=fat");
-
-    //Wiipad
-    println!("cargo:rustc-link-lib=static=bte");
     println!("cargo:rustc-link-lib=static=wiiuse");
+    println!("cargo:rustc-link-lib=static=bte");
+    println!("cargo:rustc-link-lib=static=ogc");
+    println!("cargo:rustc-link-lib=static=m");
+    println!("cargo:rustc-link-lib=static=asnd");
+    println!("cargo:rustc-link-lib=static=aesnd");    
 
     println!("cargo:rerun-if-changed=wrapper.h");
     let bindings = bindgen::Builder::default()

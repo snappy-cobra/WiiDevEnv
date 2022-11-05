@@ -17,7 +17,9 @@
         "gcc": [
             "-mrvl",
             "-meabi",
-            "-mhard-float"
+            "-mhard-float",
+            "-mcpu=750",
+            "-DGEKKO"
         ]
     },
     "panic-strategy": "abort",

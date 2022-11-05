@@ -10,6 +10,7 @@ RUN sudo ./install-devkitpro-pacman
 RUN sudo dkp-pacman --noconfirm -S wii-dev
 
 ENV DEVKITPRO=/opt/devkitpro
+ENV DEVKITARM="${DEVKITPRO}/devkitARM"
 ENV DEVKITPPC="${DEVKITPRO}/devkitPPC"
 ENV PATH="${PATH}:${DEVKITPPC}/bin/"
 

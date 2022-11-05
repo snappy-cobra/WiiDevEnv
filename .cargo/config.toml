@@ -1,5 +1,6 @@
 [build]
 target = "powerpc-unknown-eabi.json"
+rustflags = ["-C", "default_linker_libraries=y"]
 
 [unstable]
 build-std = ["core", "compiler_builtins", "alloc"]
