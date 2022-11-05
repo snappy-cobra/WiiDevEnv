@@ -4,7 +4,13 @@ use regex::Regex;
 use std::env;
 use std::process::Command;
 
- fn get_clang_version() -> String {
+/**
+ * Thanks to rust-wii for providing the base template of this build script!
+ * MIT licensed: Copyright (c) 2019-2021 rust-wii.
+ * Modifications: added support for compiling GRRLIB along with out code.
+ */
+
+fn get_clang_version() -> String {
     // Check if the clang version env variable exists.
     if env::var("CLANG_VERSION").is_err() {
         // Attempt to retrieve clang version through the command line.
