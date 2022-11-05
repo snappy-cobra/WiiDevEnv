@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 # Install Wii Dev environment
 WORKDIR /
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get upgrade -y --fix-missing
 RUN apt-get install -y sudo wget inotify-tools unzip build-essential clang libclang-dev
 COPY install-devkitpro-pacman install-devkitpro-pacman
 RUN chmod +x ./install-devkitpro-pacman

@@ -10,6 +10,7 @@
 
 extern crate alloc;
 use ogc_rs::prelude::*;
+use hecs::*;
 
 include!("grrlib.rs");
 
@@ -21,6 +22,8 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     let col: [u32; 3] = [0xFFFFFFFF, 0xAAAAAAFF, 0x666666FF];
     let mut a = 0.0;
     let mut cubeZ = 0.0;
+
+    let mut world = World::new();
 
     unsafe {
         // Initialize

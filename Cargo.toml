@@ -14,6 +14,7 @@ release = { panic = "abort", lto = true, codegen-units = 1, strip = "symbols", o
 [dependencies]
 ogc-rs = {git = "https://github.com/rust-wii/ogc-rs.git"}
 libc = "0.2"
+hecs = { version = "0.9.0", default-features = false }
 
 [build-dependencies]
 bindgen = "0.61"
