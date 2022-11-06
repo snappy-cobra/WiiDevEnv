@@ -109,6 +109,6 @@ fn main() {
         .expect("Unable to generate bindings");
 
     bindings
-        .write_to_file("./src/grrlib.rs")
+        .write_to_file("./src/renderer/grrlib.rs")
         .expect("Unable to write bindings to file");
 }
