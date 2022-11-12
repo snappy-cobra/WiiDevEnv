@@ -4,11 +4,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse:/dev/fuse"
+    privileged: true
     volumes:
       - ./bin:/project/bin
       - ./target:/project/target
       - ./data:/project/data
       - ./src:/project/src
+      - ./emulator/:/project/emulator
   emulator:
     image: 'andrewmackrodt/dolphin-emu-x11:5.0-r2002292233'
     depends_on:
@@ -29,7 +35,6 @@ services:
     volumes:
       - ./emulator/config:/config
       - ./emulator/data:/data
-      - './bin/sd.raw:/data/Wii/sd.raw'
       - ./bin:/wii:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:ro
       - /etc/machine-id:/etc/machine-id:ro

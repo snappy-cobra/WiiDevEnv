@@ -42,6 +42,7 @@ RUN /project/install_rust
 COPY .cargo /project/.cargo
 COPY powerpc-unknown-eabi.json /project/powerpc-unknown-eabi.json
 COPY wrapper.h /project/wrapper.h
+copy homebrew-channel /project/homebrew-channel
 COPY build.rs /project/build.rs
 COPY build_watch /project/build_watch
 RUN chmod +x /project/build_watch
