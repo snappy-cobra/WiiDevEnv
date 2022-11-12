@@ -2,8 +2,8 @@ FROM ubuntu:22.04
 
 # Install Wii Dev environment
 WORKDIR /
-RUN apt-get update && apt-get upgrade -y --fix-missing
-RUN apt-get install -y sudo wget inotify-tools unzip build-essential clang libclang-dev
+RUN apt-get update
+RUN apt-get install -y sudo wget inotify-tools unzip build-essential clang libclang-dev dosfstools
 COPY install-devkitpro-pacman install-devkitpro-pacman
 RUN chmod +x ./install-devkitpro-pacman
 RUN sudo ./install-devkitpro-pacman
@@ -29,6 +29,7 @@ RUN mkdir /project/bin
 RUN mkdir /project/build
 RUN mkdir /project/src
 RUN mkdir /project/data
+RUN mkdir /media/sdcard
 
 # Install Rust Wii Dev environment
 COPY Cargo.toml /project/Cargo.toml

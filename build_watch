@@ -3,20 +3,39 @@
 # Load rust config vars
 source "$HOME/.cargo/env"
 
+# Create Wii SD card to use with emulation.
+pre_build () {
+    rm -rf bin/*
+    RUN dd if=/dev/zero bs=1M count=2048 of=bin/sd.raw
+    RUN mkfs.fat -F 32 bin/sd.raw
+}
+
+# Update Wii SD card
+update_sd () {
+    sudo mount -o defaults,umask=000 bin/sd.raw /media/sdcard
+    rm -rf /media/sdcard/*
+    mkdir /media/sdcard/apps
+    cp bin/boot.elf /media/sdcard/apps/boot.elf
+    sudo umount /media/sdcard
+}
+
 # Build function
 build () {
     cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json --release
-    rm -rf bin/*
+    rm bin/boot.*
     cp target/powerpc-unknown-eabi/release/rust-wii.elf bin/boot.elf
     cp bin/boot.elf bin/boot.dol
 }
 
 # Run script
 echo "Initial build, just to be safe."
+pre_build
 build
+update_sd
 echo "Done! Build watch started."
 inotifywait -mq -r -e create -e modify -e delete -e move ./src |
     while read dir action file; do
         echo "The file '$file' appeared in directory '$dir' via '$action', rebuilding..."
         build
+        update_sd
     done

@@ -11,6 +11,8 @@ services:
       - ./src:/project/src
   emulator:
     image: 'andrewmackrodt/dolphin-emu-x11:5.0-r2002292233'
+    depends_on:
+      - build_watch
     security_opt:
       - seccomp:unconfined
     network_mode: "host"
@@ -27,6 +29,7 @@ services:
     volumes:
       - ./emulator/config:/config
       - ./emulator/data:/data
+      - './bin/sd.raw:/data/Wii/sd.raw'
       - ./bin:/wii:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:ro
       - /etc/machine-id:/etc/machine-id:ro
