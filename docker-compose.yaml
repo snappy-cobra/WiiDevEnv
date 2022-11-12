@@ -9,3 +9,31 @@ services:
       - ./target:/project/target
       - ./data:/project/data
       - ./src:/project/src
+  emulator:
+    image: 'andrewmackrodt/dolphin-emu-x11:5.0-r2002292233'
+    security_opt:
+      - seccomp:unconfined
+    network_mode: "host"
+    shm_size: '128M'
+    devices:
+      - "/dev/input:/dev/input"
+      - "/dev/snd:/dev/snd"
+      - "/dev/nvidia0:/dev/nvidia0"
+      - "/dev/nvidiactl:/dev/nvidiactl"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DISPLAY=unix${DISPLAY}
+    volumes:
+      - ./emulator/config:/config
+      - ./emulator/data:/data
+      - ./bin:/wii:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - ${HOME}/.config/pulse:/home/ubuntu/.config/pulse:ro
+      - ${XDG_RUNTIME_DIR}:/run/user/${PUID}/pulse:ro
+      - ${XDG_RUNTIME_DIR}/bus:${XDG_RUNTIME_DIR}/bus:ro
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
+      - /run/dbus:/run/dbus:ro
+      - /run/udev/data:/run/udev/data:ro
+      - /etc/localtime:/etc/localtime:ro

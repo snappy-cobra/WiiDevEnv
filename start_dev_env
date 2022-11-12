@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+export PUID=$(id -u)
+export PGID=$(id -g)
+
+# get the xdg runtime dir
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+docker-compose up
