@@ -15,8 +15,11 @@ use ogc_rs::input::*;
 
 use hecs::*;
 
-mod renderer;
-pub use renderer::*;
+pub mod renderer;
+use renderer::*;
+
+mod game;
+pub use game::*;
 
 #[start]
 /**
@@ -26,13 +29,17 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     WPad::init();
     let wii_mote = WPad::new(ControllerPort::One);
     let mut world = World::new();
+    batch_spawn_entities(&mut world, 5);
+    //let mut motion_query = PreparedQuery::<(&mut Vector3, &Vector3)>::default();
+    
     init_render();
     loop {
         WPad::update();
         if wii_mote.is_button_down(WPadButton::HOME) {
             break
         }
-        render_scene(&world);
+        //system_integrate_motion(&mut world, &mut motion_query);
+        render_world(&world);
     }
     close_render();
     return 0;

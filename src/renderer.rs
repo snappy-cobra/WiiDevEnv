@@ -4,6 +4,7 @@ mod inline;
 pub use inline::*;
 
 use hecs::*;
+use crate::Vector3;
 
 /**
  * Render the main cube.
@@ -98,17 +99,33 @@ pub fn close_render() {
 /**
  * Render the scene
  */
-pub fn render_scene(world: &World) {
-    let a = 0.0;
-    let cubeZ = 0.0;
+pub fn render_world(world: &World) {
+    // let a = 0.0;
+    // let cubeZ = 0.0;
+    // unsafe {
+    //     GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
+    //     GRRLIB_ObjectView(
+    //         0.0, 0.0, cubeZ, 
+    //         a, a*2.0, a*3.0,
+    //         1.0, 1.0, 1.0
+    //     );
+    //     render_cube();
+    //     GRRLIB_Render();
+    // }
+
+    for (_id, (position, _velocity)) in  &mut world.query::<(&Vector3, &Vector3)>()
+    {
+        unsafe {
+            GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
+            GRRLIB_ObjectView(
+                0.0, 0.0, 0.0, 
+                0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            );
+            render_cube();
+        }
+    }
     unsafe {
-        GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
-        GRRLIB_ObjectView(
-            0.0, 0.0, cubeZ, 
-            a, a*2.0, a*3.0,
-            1.0, 1.0, 1.0
-        );
-        render_cube();
         GRRLIB_Render();
     }
 }
