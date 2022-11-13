@@ -73,7 +73,6 @@ impl<T> ::core::cmp::PartialEq for __BindgenUnionField<T> {
     }
 }
 impl<T> ::core::cmp::Eq for __BindgenUnionField<T> {}
-pub const GRRLIB_VER_STRING: &[u8; 6usize] = b"4.4.1\0";
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
@@ -137,6 +136,11 @@ pub const LITTLE_ENDIAN: u32 = 3412;
 pub const BIG_ENDIAN: u32 = 1234;
 pub const BYTE_ORDER: u32 = 1234;
 pub const ARGV_MAGIC: u32 = 1600221799;
+pub const GDBSTUB_DEVICE_USB: u32 = 0;
+pub const GDBSTUB_DEVICE_TCP: u32 = 1;
+pub const GDBSTUB_DEF_CHANNEL: u32 = 0;
+pub const GDBSTUB_DEF_TCPPORT: u32 = 2828;
+pub const GRRLIB_VER_STRING: &[u8; 6usize] = b"4.4.1\0";
 pub const DSPTASK_INIT: u32 = 0;
 pub const DSPTASK_RUN: u32 = 1;
 pub const DSPTASK_YIELD: u32 = 2;
@@ -1546,6 +1550,32 @@ pub struct __argv {
 extern "C" {
     #[doc = "!\tDefault location for the system argv structure."]
     pub static mut __system_argv: *mut __argv;
+}
+extern "C" {
+    pub static mut tcp_localip: *const ::libc::c_char;
+}
+extern "C" {
+    pub static mut tcp_netmask: *const ::libc::c_char;
+}
+extern "C" {
+    pub static mut tcp_gateway: *const ::libc::c_char;
+}
+extern "C" {
+    #[doc = "\\fn void _break()"]
+    #[doc = " \\brief Stub function to insert the hardware break instruction. This function is used to enter the debug stub and to"]
+    #[doc = "        connect with the host. The developer is free to insert this function at any position in project's source code."]
+    #[doc = ""]
+    #[doc = " \\return none."]
+    pub fn _break();
+}
+extern "C" {
+    #[doc = "\\fn void DEBUG_Init(s32 device_type,s32 channel_port)"]
+    #[doc = " \\brief Performs the initialization of the debug stub."]
+    #[doc = " \\param[in] device_type type of device to use. can be either USB or TCP."]
+    #[doc = " \\param[in] channel_port depending on the used device this can be either the EXI channel or the TCP port."]
+    #[doc = ""]
+    #[doc = " \\return none."]
+    pub fn DEBUG_Init(device_type: s32, channel_port: s32);
 }
 #[doc = " \\typedef struct _dsp_task dsptask_t"]
 #[doc = "\\param state current task \\ref dsp_taskstate \"state\" set"]

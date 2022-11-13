@@ -25,7 +25,7 @@ pub fn batch_spawn_entities(world: &mut World, n: i32) {
             y: 0.0,
             z: 0.0
         };
-        //world.spawn((position, velocity));
+        world.spawn((position, velocity));
     };
 }
 

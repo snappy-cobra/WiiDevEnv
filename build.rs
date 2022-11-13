@@ -61,6 +61,7 @@ fn main() {
 
     println!("cargo:rustc-link-lib=static=c");
     println!("cargo:rustc-link-lib=static=sysbase");
+    println!("cargo:rustc-link-lib=static=db");    
     println!("cargo:rustc-link-lib=static=grrlib");
     println!("cargo:rustc-link-lib=static=freetype");
     println!("cargo:rustc-link-lib=static=bz2");
@@ -99,6 +100,7 @@ fn main() {
         .clang_arg(format!("-I{}/libogc/include", dkp_path))
         .clang_arg(format!("-I{}/portlibs/wii/include", dkp_path))
         .clang_arg(format!("-I{}/portlibs/ppc/include", dkp_path))
+        .clang_arg("-g")
         .clang_arg("-mfloat-abi=hard")
         .clang_arg("-nostdinc")
         .clang_arg("-Wno-macro-redefined")

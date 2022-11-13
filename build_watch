@@ -14,8 +14,8 @@ pre_build () {
 
 # Build function
 build () {
-    cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json --release
-    cp target/powerpc-unknown-eabi/release/rust-wii.elf bin/boot.elf
+    cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+    cp target/powerpc-unknown-eabi/debug/rust-wii.elf bin/boot.elf
     cp bin/boot.elf bin/boot.dol
     echo -e "\e[1;32m Binary build completed. \e[0m"
 }
