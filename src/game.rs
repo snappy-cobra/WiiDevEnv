@@ -58,15 +58,12 @@ pub fn system_bounce_bounds(
     for (_id, (position, velocity)) in query.query_mut(world) {
         const box_size : f32 = 5.0;
         if position.x > box_size || position.x < -1.0*box_size {
-            println!("X Velocity = {}", velocity.x);
             velocity.x = -1.0 * velocity.x;
         }
         if position.y > box_size || position.y < -1.0*box_size{
-            println!("Y Velocity = {}", velocity.y);
             velocity.y = -1.0 * velocity.y;
         }
         if position.z > box_size || position.z < -1.0*box_size {
-            println!("Z Velocity = {}", velocity.z);
             velocity.z = -1.0 * velocity.z;
         }
     }
