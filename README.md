@@ -28,8 +28,6 @@ The source currently contains a small demo of bouncing (overlapping) cubes. Pres
 4. Make a pull-request to merge your branch into `develop`. Somebody needs to approve it.
 5. Once merged, delete your branch.
 
-`develop` will be merged into `main` when deemed appropriate.
-
 # License
 
 This project is MIT licensed.
