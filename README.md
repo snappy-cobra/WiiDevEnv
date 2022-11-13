@@ -16,6 +16,10 @@ Simply call `start_dev_env` in the root folder of this repo. You could call `doc
 Changes in the source folder will automatically trigger a new build.
 Exit by signalling an interupt to docker-compose (CTRL+C).
 
+### Demo
+
+The source currently contains a small demo of bouncing (overlapping) cubes. Press `1` in the emulator to shake them up!
+
 ## How to contribute
 
 1. Never push directly to `main`.
