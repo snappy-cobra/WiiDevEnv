@@ -30,6 +30,7 @@ RUN mkdir /project/build
 RUN mkdir /project/src
 RUN mkdir /project/data
 RUN mkdir /media/sdcard
+RUN mkdir /project/wads
 
 # Install Rust Wii Dev environment
 COPY Cargo.toml /project/Cargo.toml
@@ -42,7 +43,7 @@ RUN /project/install_rust
 COPY .cargo /project/.cargo
 COPY powerpc-unknown-eabi.json /project/powerpc-unknown-eabi.json
 COPY wrapper.h /project/wrapper.h
-copy homebrew-channel /project/homebrew-channel
+COPY homebrew-channel /project/homebrew-channel
 COPY build.rs /project/build.rs
 COPY build_watch /project/build_watch
 RUN chmod +x /project/build_watch

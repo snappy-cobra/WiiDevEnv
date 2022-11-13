@@ -6,8 +6,9 @@ source "$HOME/.cargo/env"
 # Create Wii SD card to use with emulation.
 pre_build () {
     rm -rf bin/*
-    dd if=/dev/zero bs=1M count=2048 of=bin/sd.raw
+    dd if=/dev/zero bs=1M count=1024 of=bin/sd.raw
     mkfs.fat -F 32 bin/sd.raw
+    curl -L https://github.com/FIX94/hbc/releases/download/1.1.4-1/Homebrew.Channel.-.OHBC.wad > bin/OHBC.wad
     echo -e "\e[1;32m Build initialized. \e[0m"
 }
 
@@ -24,8 +25,9 @@ update_sd () {
     sudo mount -o defaults,umask=000 bin/sd.raw /media/sdcard
     rm -rf /media/sdcard/*
     mkdir /media/sdcard/apps
-    cp -r homebrew-channel/* /media/sdcard/apps/
-    cp bin/boot.elf /media/sdcard/apps/boot.elf
+    mkdir /media/sdcard/apps/game
+    cp -r homebrew-channel/* /media/sdcard/apps/game
+    cp bin/boot.elf /media/sdcard/apps/game/boot.elf
     sudo umount /media/sdcard
     echo -e "\e[1;32m Updated SD card. \e[0m"
 }

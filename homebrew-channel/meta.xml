@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+    <name>Rust-Wii</name>
+    <coder>Rustaceans</coder>
+    <version>rev00001</version>
+    <release_date>20221112000000</release_date>
+    <short_description>Wii game written in Rust.</short_description>
+    <long_description>Wii game written in Rust.
+    </long_description>
+</app>

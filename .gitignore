@@ -16,7 +16,7 @@ build/*
 # Built Visual Studio Code Extensions
 *.vsix
 
-# Ignore emulator data
+# Ignore emulator data 
 emulator/*
 
 # Added by cargo
