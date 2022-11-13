@@ -1,17 +1,18 @@
 # WiiDevEnv
 
-Simple docker setup with a file watch to allow for quick and easy Wii development.
+Docker setup with a file watch auto-build and debug emulator to allow for quick and easy Wii development.
 
 Programming is done in Rust. The `src` folder of this project shows a small demo application.
-The Rust environment is preconfigured to get you creating games as soon as possible.
+The Rust environment is pre-configured to get you creating games as soon as possible.
 
 ## Requirements
 
 You need to have Docker and Docker-compose installed.
+For emulation to work, you might need to make some tweaks: I only tested this on Ubuntu + NVidia GPU.
 
 ## Usage
 
-Simply call `docker-compose up` in the root folder of this repo.
+Simply call `start_dev_env` in the root folder of this repo. You could call `docker-compose up`, but the start script sets the right configurations.
 Changes in the source folder will automatically trigger a new build.
 Exit by signalling an interupt to docker-compose (CTRL+C).
 
