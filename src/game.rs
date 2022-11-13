@@ -2,7 +2,8 @@ use hecs::*;
 use rand::{Rng, SeedableRng};
 use rand::rngs::SmallRng;
 use rand::RngCore;
-use ogc_rs::{print, println};
+use ogc_rs::{print, println, prelude::Input};
+use num::clamp;
 
 pub struct Position {
     pub x: f32,
@@ -40,31 +41,70 @@ pub fn batch_spawn_entities(world: &mut World, n: i32) {
     };
 }
 
+/**
+ * Apply the velocity to the positions.
+ */
 pub fn system_integrate_motion(
     world: &mut World, 
-    query: &mut PreparedQuery<(&mut Position, &Velocity)>
+    query: &mut PreparedQuery<(&mut Position, &mut Velocity)>
 ) {
+    const drag : f32 = 1.001;
     for (_id, (position, velocity)) in query.query_mut(world) {
         position.x += velocity.x;
+        velocity.x = velocity.x / drag;
         position.y += velocity.y;
+        velocity.y = velocity.y / drag;
         position.z += velocity.z;
+        velocity.z = velocity.z / drag;
     }
 }
 
+/**
+ * Bounce the cubes against the bounds.
+ */
 pub fn system_bounce_bounds(
     world: &mut World, 
-    query: &mut PreparedQuery<(& Position, &mut Velocity)>
+    query: &mut PreparedQuery<(&mut Position, &mut Velocity)>
 ) {
     for (_id, (position, velocity)) in query.query_mut(world) {
         const box_size : f32 = 5.0;
-        if position.x > box_size || position.x < -1.0*box_size {
+        if position.x > box_size {
             velocity.x = -1.0 * velocity.x;
+            position.x = box_size;
+        } else if position.x < -1.0*box_size {
+            velocity.x = -1.0 * velocity.x;
+            position.x = -box_size;
         }
-        if position.y > box_size || position.y < -1.0*box_size{
+        if position.y > box_size {
             velocity.y = -1.0 * velocity.y;
+            position.y = box_size;
+        } else if position.y < -1.0*box_size {
+            velocity.y = -1.0 * velocity.y;
+            position.y = -box_size;
         }
-        if position.z > box_size || position.z < -1.0*box_size {
+        if position.z > box_size {
             velocity.z = -1.0 * velocity.z;
+            position.z = box_size;
+        } else if position.z < -1.0*box_size {
+            velocity.z = -1.0 * velocity.z;
+            position.z = -box_size;
         }
+        velocity.x = clamp(velocity.x, -0.5, 0.5);
+        velocity.y = clamp(velocity.y, -0.5, 0.5);
+        velocity.z = clamp(velocity.z, -0.5, 0.5);
+    }
+}
+
+/**
+ * Create velocity in random directions.
+ */
+pub fn system_shake_wii(
+    world: &mut World, 
+    query: &mut PreparedQuery<&mut Velocity>
+) {
+    let mut small_rng = SmallRng::seed_from_u64(10u64);
+    for (_id, velocity) in query.query_mut(world) {
+        velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
+        velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
     }
 }
