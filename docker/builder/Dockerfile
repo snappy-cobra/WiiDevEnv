@@ -4,9 +4,9 @@ FROM ubuntu:22.04
 WORKDIR /
 RUN apt-get update
 RUN apt-get install -y sudo wget inotify-tools unzip build-essential clang libclang-dev dosfstools
-COPY install-devkitpro-pacman install-devkitpro-pacman
-RUN chmod +x ./install-devkitpro-pacman
-RUN sudo ./install-devkitpro-pacman
+COPY install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
+RUN chmod +x ./install-devkitpro-pacman.sh
+RUN sudo ./install-devkitpro-pacman.sh
 RUN sudo dkp-pacman --noconfirm -S wii-dev
 
 ENV DEVKITPRO=/opt/devkitpro
@@ -23,30 +23,24 @@ RUN make clean all install
 WORKDIR /
 
 # Setup build folder structure
-RUN mkdir /project
-RUN mkdir /project/target
-RUN mkdir /project/bin
-RUN mkdir /project/build
-RUN mkdir /project/src
-RUN mkdir /project/data
-RUN mkdir /media/sdcard
-RUN mkdir /project/wads
+RUN mkdir /app
+RUN mkdir /app/src
+RUN mkdir /app/data
+RUN mkdir /build
+RUN mkdir /build/target
+RUN mkdir /build/bin
+
+# Make sure the target is set correctly.
+ENV CARGO_TARGET_DIR="/build/target"
 
 # Install Rust Wii Dev environment
-COPY Cargo.toml /project/Cargo.toml
-COPY install_rust /project/install_rust
-RUN chmod +x /project/install_rust
-WORKDIR /project
-RUN /project/install_rust
+COPY install_rust.sh /install_rust.sh
+RUN chmod +x /install_rust.sh
+RUN /install_rust.sh
 
 # To ease docker build caching: add remaining files.
-COPY .cargo /project/.cargo
-COPY powerpc-unknown-eabi.json /project/powerpc-unknown-eabi.json
-COPY wrapper.h /project/wrapper.h
-COPY homebrew-channel /project/homebrew-channel
-COPY build.rs /project/build.rs
-COPY build_watch /project/build_watch
-RUN chmod +x /project/build_watch
+COPY build_watch.sh /build_watch.sh
+RUN chmod +x /build_watch.sh
 
 # Go to the project and start the main script
-CMD ["./build_watch"]
+CMD ["/build_watch.sh"]
