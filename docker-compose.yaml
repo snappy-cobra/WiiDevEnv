@@ -1,18 +1,18 @@
 version: "3.9"
 services:
-  # builder:
-  #   build:
-  #     context: ./docker/builder
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./app:/app
-  #     - ./bin:/build/bin
+  builder:
+    build:
+      context: ./docker/builder
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
+      - ./bin:/build/bin
   emulator:
     build:
       context: ./docker/emulator
       dockerfile: Dockerfile
-    # depends_on:
-    #   - builder
+    depends_on:
+      - builder
     shm_size: '128M'
     network_mode: host
     environment:
