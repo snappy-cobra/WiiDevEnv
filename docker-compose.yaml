@@ -1,20 +1,25 @@
 version: "3.9"
 services:
-  builder:
-    build:
-      context: ./docker/builder
-      dockerfile: Dockerfile
-    volumes:
-      - ./app:/app
-      - ./bin:/build/bin
-  # emulator:
-  #   image: 'andrewmackrodt/dolphin-emu-x11:5.0-r2002292233'
-  #   depends_on:
-  #     - builder
-  #   network_mode: "host"
-  #   shm_size: '128M'
-  #   devices:
-  #     - "/dev/input:/dev/input"
-  #     - "/dev/snd:/dev/snd"
+  # builder:
+  #   build:
+  #     context: ./docker/builder
+  #     dockerfile: Dockerfile
   #   volumes:
-  #     - ./bin:/wii:ro
+  #     - ./app:/app
+  #     - ./bin:/build/bin
+  emulator:
+    build:
+      context: ./docker/emulator
+      dockerfile: Dockerfile
+    # depends_on:
+    #   - builder
+    shm_size: '128M'
+    network_mode: host
+    environment:
+      - DISPLAY=${DISPLAY}
+    devices:
+      - "/dev/input:/dev/input"
+      - "/dev/snd:/dev/snd"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./bin:/wii:ro
