@@ -7,19 +7,3 @@ services:
     volumes:
       - ./app:/app
       - ./bin:/build/bin
-  emulator:
-    build:
-      context: ./docker/emulator
-      dockerfile: Dockerfile
-    depends_on:
-      - builder
-    shm_size: '128M'
-    network_mode: host
-    environment:
-      - DISPLAY=${DISPLAY}
-    devices:
-      - "/dev/input:/dev/input"
-      - "/dev/snd:/dev/snd"
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./bin:/wii:ro
