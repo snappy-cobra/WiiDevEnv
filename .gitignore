@@ -1,6 +1,5 @@
 # Ignore binaries
 bin/*
-build/*
 
 # Ignore VSCode
 .vscode/*
@@ -16,10 +15,6 @@ build/*
 # Built Visual Studio Code Extensions
 *.vsix
 
-# Ignore emulator data 
-emulator/*
-
-# Added by cargo
-
-/target
-Cargo.lock
+# Rust ignores
+app/target
+app/Cargo.lock
