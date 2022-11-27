@@ -8,6 +8,7 @@ pub use model_factory::{ModelFactory};
 
 use hecs::*;
 use ogc_rs::print;
+use wavefront::Obj;
 use crate::{Position, Velocity};
 
 /**
@@ -27,6 +28,25 @@ impl Renderer {
     pub fn new() -> Renderer {
         Renderer {
             model_factory: ModelFactory::new()
+        }
+    }
+
+    /**
+     * Allows for rendering the given object.
+     */
+    fn render_mesh(object : & Obj) {
+        let col: [u32; 3] = [0xFFFFFFFF, 0xAAAAAAFF, 0x666666FF];
+        unsafe {
+            let vertex_count = (object.triangles().count() * 3) as u16;
+            GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, vertex_count);
+            for triangle in object.triangles() {
+                for vertex in triangle {
+                    let position = vertex.position();
+                    GX_Position3f32(position[0], position[1], position[2]);
+                    GX_Color1u32(col[0]);
+                }
+            }
+            GX_End();
         }
     }
 
@@ -125,6 +145,7 @@ impl Renderer {
      * Render the scene
      */
     pub fn render_world(&mut self, world: &World) {
+        let model = self.model_factory.get_model("Cartridge").unwrap();
         for (_id, (position, _velocity)) in  &mut world.query::<(&Position, &Velocity)>()
         {
             unsafe {
@@ -134,7 +155,7 @@ impl Renderer {
                     0.0, 0.0, 0.0,
                     1.0, 1.0, 1.0
                 );
-                self.render_cube();
+                Self::render_mesh(& model);
             }
         }
         unsafe {
