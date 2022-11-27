@@ -145,7 +145,7 @@ impl Renderer {
      * Render the scene
      */
     pub fn render_world(&mut self, world: &World) {
-        let model = self.model_factory.get_model("Cartridge").unwrap();
+        let model = self.model_factory.get_model("Suzanne").unwrap();
         for (_id, (position, _velocity)) in  &mut world.query::<(&Position, &Velocity)>()
         {
             unsafe {

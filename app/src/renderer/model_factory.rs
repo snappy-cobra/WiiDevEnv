@@ -1,3 +1,4 @@
+use ogc_rs::print;
 use wavefront::{Obj};
 use alloc::collections::BTreeMap;
 use alloc::str::from_utf8;
@@ -5,8 +6,9 @@ use alloc::str::from_utf8;
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const raw_model_data: [(&str, &'static[u8]); 1] = [
-    ("Cartridge", include_bytes!("../../data/Cartridge.obj"))
+const raw_model_data: [(&str, &'static[u8]); 2] = [
+    ("Teapot", include_bytes!("../../data/Teapot.obj")),
+    ("Suzanne", include_bytes!("../../data/Suzanne.obj"))
 ];
 
 /**
@@ -37,8 +39,14 @@ impl<'a> ModelFactory<'a> {
             let key = entry.0;
             let raw_data = entry.1;
             let string_data = from_utf8(raw_data).unwrap();
-            let value = Obj::from_lines(string_data.lines()).unwrap();
-            self.models.insert(key, value);
+            match Obj::from_lines(string_data.lines()) {
+                Ok(value) => {
+                    self.models.insert(key, value);
+                },
+                Err(error) =>{
+                    print!("Error loading model: {}", error);
+                }
+            }
         }
     }
 
