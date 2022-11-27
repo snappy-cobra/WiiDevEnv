@@ -10,11 +10,20 @@ use hecs::*;
 use ogc_rs::print;
 use crate::{Position, Velocity};
 
+/**
+ * Data structure for the renderer.
+ */
 pub struct Renderer {
     model_factory : ModelFactory<'static>
 }
 
+/**
+ * Renderer implementation: provides the main interface for rendering stuff in the game.
+ */
 impl Renderer {
+    /**
+     * Create a new renderer.
+     */
     pub fn new() -> Renderer {
         Renderer {
             model_factory: ModelFactory::new()
@@ -86,7 +95,7 @@ impl Renderer {
     }
 
     /**
-     * Initialize the renderer
+     * Initialize the renderer, which means GRRLIB and loading all models.
      */
     pub fn init_render(&mut self) {
         unsafe {
