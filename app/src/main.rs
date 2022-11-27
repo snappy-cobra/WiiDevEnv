@@ -42,7 +42,8 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
     
     // Kickstart main loop.
-    init_render();
+    let mut renderer = Renderer::new();
+    renderer.init_render();
     loop {
         Input::update(ControllerType::Wii);
         if wii_mote.is_button_down(Button::Home) {
@@ -54,8 +55,8 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         system_bounce_bounds(&mut world, &mut all_query);
         system_integrate_motion(&mut world, &mut all_query);
 
-        render_world(&world);
+        renderer.render_world(&world);
     }
-    close_render();
+    renderer.close_render();
     return 0;
 }
