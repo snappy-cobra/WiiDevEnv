@@ -7,6 +7,7 @@ RUN apt-get install -y sudo wget inotify-tools unzip build-essential clang libcl
 COPY install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
 RUN chmod +x ./install-devkitpro-pacman.sh
 RUN sudo ./install-devkitpro-pacman.sh
+RUN if [ ! -f /etc/mtab ]; then sudo ln -s /proc/self/mounts /etc/mtab; fi;
 RUN sudo dkp-pacman --noconfirm -S wii-dev
 
 ENV DEVKITPRO=/opt/devkitpro
