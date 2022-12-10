@@ -18,6 +18,10 @@ use hecs::*;
 pub mod renderer;
 use renderer::*;
 
+pub mod modulator;
+use modulator::*;
+use modulator::sources::*;
+
 mod game;
 pub use game::*;
 
@@ -27,6 +31,8 @@ pub use game::*;
  */
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
     println!("Hello Rust!");
+
+    let _modenv : ModulatorEnv<u32> = Default::default();
 
     // Setup the wiimote
     Input::init(ControllerType::Wii);
