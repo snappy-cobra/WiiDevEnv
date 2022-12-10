@@ -6,7 +6,6 @@ use alloc::boxed::Box;
 use core::time::Duration;
 use crate::alloc::string::{String, ToString};
 
-
 /// Modulators provide animated modulation. T is the generic type of the modulator value.
 pub trait Modulator<T> {
     /// Value of the modulator at the current time.
