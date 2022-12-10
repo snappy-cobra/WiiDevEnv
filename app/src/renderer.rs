@@ -39,26 +39,20 @@ impl Renderer {
      * Allows for rendering the given object.
      */
     fn render_mesh(object : & Obj) {
-        let col: [u32; 3] = [0xFFFFFFFF, 0xAAAAAAFF, 0x666666FF];
         unsafe {
             let vertex_count = (object.triangles().count() * 3) as u16;
-            // GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, vertex_count);
-            // for triangle in object.triangles() {
-            //     for vertex in triangle {
-            //         let position = vertex.position();
-            //         GX_Position3f32(position[0], position[1], position[2]);
-            //         GX_Color1u32(col[0]);
-            //     }
-            // }
-            // GX_End();
+
             let mut vertex_data = Vec::from(object.positions().flatten());
             GX_SetArray(GX_VA_POS, vertex_data.as_mut_ptr() as *mut c_void, (4 * 3) as u8);
             GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX8 as u8);
+            GX_SetVtxDesc(GX_VA_CLR0 as u8, GX_DIRECT as u8);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+            GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_CLR0, GX_CLR_RGB, GX_F32, 0);
+            
             GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, vertex_count);
             for index in 0..vertex_count {
                     GX_Position1x8(index as u8);
-                    GX_Color1u32(col[0]);
+                    GX_Color3f32(0.2, 0.2, 0.1);
             }
             GX_End();
         }
