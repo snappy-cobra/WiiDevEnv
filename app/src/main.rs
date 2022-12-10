@@ -32,7 +32,8 @@ pub use game::*;
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
     println!("Hello Rust!");
 
-    let _modenv : ModulatorEnv<u32> = Default::default();
+    let mut modenv : ModulatorEnv<f32> = Default::default();
+    modenv.take("myfancywave", Box::new(Wave::new(2.0, 0.5))); // start with 2.0 amplitude and 0.5Hz frequency)
 
     // Setup the wiimote
     Input::init(ControllerType::Wii);
@@ -46,11 +47,15 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     batch_spawn_entities(&mut world, 5);
     let mut velocity_query = PreparedQuery::<&mut Velocity>::default();
     let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
-    
+
     // Kickstart main loop.
     let mut renderer = Renderer::new();
     renderer.init_render();
+    let mut last_frame_time = ogc_rs::system::System::system_time();
     loop {
+        let now = ogc_rs::system::System::system_time();
+        let delta_time = now - last_frame_time;
+
         Input::update(ControllerType::Wii);
         if wii_mote.is_button_down(Button::Home) {
             break
@@ -61,7 +66,10 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         system_bounce_bounds(&mut world, &mut all_query);
         system_integrate_motion(&mut world, &mut all_query);
 
+        modenv.advance(delta_time);
+
         renderer.render_world(&world);
+        last_frame_time = ogc_rs::system::System::system_time();
     }
     renderer.close_render();
     return 0;

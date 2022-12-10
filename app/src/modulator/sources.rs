@@ -35,6 +35,34 @@ pub struct Wave {
     pub enabled: bool,
 }
 
+impl Wave {
+    /// Build a sin wave with given amplitude and frequency
+    pub fn new(amplitude: f32, frequency: f32) -> Self {
+        Wave {
+            amplitude,
+            frequency,
+
+            wave: Box::new(|_, _| 0.0),
+
+            time: 0,
+            value: 0.0,
+
+            enabled: true,
+        }
+    }
+
+    /// Builder: set the wave calculation closure
+    pub fn wave(mut self, wave: Box<dyn Fn(&Wave, f32) -> f32>) -> Self {
+        self.wave = wave;
+        self
+    }
+
+    /// Builder: set the wave calculation closure
+    pub fn set_wave(&mut self, wave: Box<dyn Fn(&Wave, f32) -> f32>) {
+        self.wave = wave;
+    }
+}
+
 
 impl Modulator<f32> for Wave {
     fn value(&self) -> f32 {
