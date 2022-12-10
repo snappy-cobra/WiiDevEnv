@@ -18,3 +18,4 @@ bin/*
 # Rust ignores
 app/target
 app/Cargo.lock
+*.DS_Store
