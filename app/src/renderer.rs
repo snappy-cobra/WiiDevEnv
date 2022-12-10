@@ -1,6 +1,7 @@
 include!("renderer/grrlib.rs");
 
 mod inline;
+
 pub use inline::*;
 
 mod model_factory;
@@ -8,8 +9,11 @@ pub use model_factory::{ModelFactory};
 
 use hecs::*;
 use ogc_rs::print;
-use wavefront::Obj;
+use wavefront::{Obj, Vertex};
 use crate::{Position, Velocity};
+
+use ogc_rs::prelude::Vec;
+use libc::c_void;
 
 /**
  * Data structure for the renderer.
@@ -38,13 +42,23 @@ impl Renderer {
         let col: [u32; 3] = [0xFFFFFFFF, 0xAAAAAAFF, 0x666666FF];
         unsafe {
             let vertex_count = (object.triangles().count() * 3) as u16;
+            // GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, vertex_count);
+            // for triangle in object.triangles() {
+            //     for vertex in triangle {
+            //         let position = vertex.position();
+            //         GX_Position3f32(position[0], position[1], position[2]);
+            //         GX_Color1u32(col[0]);
+            //     }
+            // }
+            // GX_End();
+            let mut vertex_data = Vec::from(object.positions().flatten());
+            GX_SetArray(GX_VA_POS, vertex_data.as_mut_ptr() as *mut c_void, (4 * 3) as u8);
+            GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX8 as u8);
+            GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
             GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, vertex_count);
-            for triangle in object.triangles() {
-                for vertex in triangle {
-                    let position = vertex.position();
-                    GX_Position3f32(position[0], position[1], position[2]);
+            for index in 0..vertex_count {
+                    GX_Position1x8(index as u8);
                     GX_Color1u32(col[0]);
-                }
             }
             GX_End();
         }

@@ -7,6 +7,7 @@
 #![allow(unused_imports)]
 #![no_std]
 #![feature(start)]
+#![feature(slice_flatten)]
 
 // Make sure the allocator is set.
 extern crate alloc;
