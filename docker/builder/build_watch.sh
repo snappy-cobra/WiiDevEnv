@@ -23,7 +23,7 @@ build () {
 echo -e "\e[1;34m Starting initial build... \e[0m"
 build
 echo -e "\e[1;34m Watch started. \e[0m"
-inotifywait -mq -r -e create -e modify -e delete -e move ./src |
+inotifywait -mq -r -e create -e modify -e delete -e move ./src ./data ./Cargo.toml ./build.rs ./wrapper.h ./powerpc-unknown-eabi.json |
     while read dir action file; do
         echo -e "\e[1;34m The file '$file' appeared in directory '$dir' via '$action', rebuilding... \e[0m"
         build
