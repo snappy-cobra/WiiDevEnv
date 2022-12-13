@@ -18,7 +18,7 @@ hecs = { version = "0.9.0", default-features = false }
 rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
 num = { version = "0.4.0", default-features = false}
 wavefront = { version = "0.2.3", default-features = false}
-rust-wii-lib = { path = "./lib", features = ["wii"]}
+rust-wii-lib = { path = "./lib", features = ["wii"], default-features = false }
 
 [build-dependencies]
 bindgen = "0.61"

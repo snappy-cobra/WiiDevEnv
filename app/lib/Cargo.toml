@@ -6,9 +6,12 @@ edition = "2021"
 [lib]
 name="rust_wii_lib"
 
-[dependencies]
-ogc-rs = {git = "https://github.com/rust-wii/ogc-rs.git", optional = true}
-
 [features]
 default = []
 wii = ["dep:ogc-rs"] # When enabled, build in 'wii mode', swapping the std out for ogc_rs
+
+[dependencies]
+ogc-rs = {git = "https://github.com/rust-wii/ogc-rs.git", optional = true}
+rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
+num = { version = "0.4.0", default-features = false}
+hecs = { version = "0.9.0", default-features = false }
