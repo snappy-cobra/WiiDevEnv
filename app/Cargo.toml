@@ -7,9 +7,14 @@ edition = "2021"
 name = "rust-wii"
 path = "src/main.rs"
 
+[features]
+run_integration_tests = []
+
 [profile]
 dev = { panic = "abort" }
+# test = { panic = "abort" }
 release = { panic = "abort", lto = true, codegen-units = 1, strip = "symbols", opt-level = "s" }
+# release = { lto = true, codegen-units = 1, strip = "symbols", opt-level = "s" }
 
 [dependencies]
 ogc-rs = {git = "https://github.com/rust-wii/ogc-rs.git"}
@@ -21,6 +26,11 @@ wavefront = { version = "0.2.3", default-features = false}
 hashbrown = "0.12"
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
 micromath = { version = "1.0.1" }
+inventory = "0.3.2"
+linkme = "0.3"
+
+[patch.crates-io]
+ctor = { path = "./rust-ctor/ctor/" }
 
 [build-dependencies]
 bindgen = "0.61"

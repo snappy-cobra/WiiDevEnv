@@ -1,9 +1,9 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 as dependencies
 
 # Install Wii Dev environment
 WORKDIR /
 RUN apt-get update
-RUN apt-get install -y sudo wget inotify-tools unzip build-essential clang libclang-dev dosfstools
+RUN apt-get install -y sudo wget inotify-tools unzip build-essential clang libclang-dev dosfstools jq
 COPY install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
 RUN chmod +x ./install-devkitpro-pacman.sh
 RUN sudo ./install-devkitpro-pacman.sh
@@ -23,6 +23,8 @@ RUN sudo dkp-pacman --sync --needed --noconfirm libfat-ogc ppc-libpng ppc-freety
 RUN make clean all install
 WORKDIR /
 
+FROM dependencies as rustinstall
+
 # Setup build folder structure
 RUN mkdir /app
 RUN mkdir /app/src
@@ -38,6 +40,8 @@ ENV CARGO_TARGET_DIR="/build/target"
 COPY install_rust.sh /install_rust.sh
 RUN chmod +x /install_rust.sh
 RUN /install_rust.sh
+
+FROM rustinstall as builder
 
 # To ease docker build caching: add remaining files.
 COPY build_watch.sh /build_watch.sh

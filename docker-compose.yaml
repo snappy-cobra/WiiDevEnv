@@ -6,4 +6,5 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./app:/app
+      - ./.cargo_build_cache:/root/.cargo/registry
       - ./bin:/build/bin

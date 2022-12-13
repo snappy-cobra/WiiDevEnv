@@ -19,3 +19,6 @@ bin/*
 app/target
 app/Cargo.lock
 *.DS_Store
+
+.cargo_build_cache/*
+!.cargo_build_cache/.keep

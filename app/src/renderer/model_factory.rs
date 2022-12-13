@@ -1,4 +1,5 @@
 use ogc_rs::print;
+use ogc_rs::prelude::*;
 use wavefront::{Obj};
 use alloc::collections::BTreeMap;
 use alloc::str::from_utf8;
@@ -57,3 +58,15 @@ impl<'a> ModelFactory<'a> {
         return self.models.get(key);
     }
 }
+
+
+use crate::IntegrationTest;
+
+fn basic_test() {
+    println!("Running basic test");
+}
+
+inventory::submit!(IntegrationTest {
+    name: "basic",
+    test_fn: basic_test
+});
