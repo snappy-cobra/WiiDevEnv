@@ -4,6 +4,8 @@ use rand::RngCore;
 use num::clamp;
 use hecs::{World, PreparedQuery};
 
+use crate::{print, println};
+
 #[derive(PartialEq, Debug)]
 pub struct Position {
     pub x: f32,
@@ -48,10 +50,10 @@ pub fn batch_spawn_entities(world: &mut World, n: i32) {
  */
 pub fn system_integrate_motion(
     world: &mut World, 
-    query: &mut PreparedQuery<(&mut Position, &mut Velocity)>
+    // query: &mut PreparedQuery<(&mut Position, &mut Velocity)>
 ) {
     const drag : f32 = 1.001;
-    for (_id, (position, velocity)) in query.query_mut(world) {
+    for (_id, (position, velocity)) in world.query_mut::<(&mut Position, &mut Velocity)>() {
         position.x += velocity.x;
         velocity.x = velocity.x / drag;
         position.y += velocity.y;
@@ -69,6 +71,7 @@ pub fn system_bounce_bounds(
     // query: &mut PreparedQuery<(&mut Position, &mut Velocity)>
 ) {
     for (_id, (position, velocity)) in world.query_mut::<(&mut Position, &mut Velocity)>() {
+        println!("{:?} {:?}", position, velocity);
         const box_size : f32 = 5.0;
         if position.x > box_size {
             velocity.x = -1.0 * velocity.x;

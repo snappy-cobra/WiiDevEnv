@@ -55,6 +55,7 @@ impl GameState {
         }
 
         game::system_bounce_bounds(&mut self.world);
+        game::system_integrate_motion(&mut self.world);
 
         self.input_state = new_inputs;
 
