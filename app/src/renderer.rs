@@ -1,6 +1,4 @@
-// Skip Clippy warnings for this module and nested modules:
-#[allow(clippy:all)]
-
+#[allow(clippy::all)]
 include!("renderer/grrlib.rs");
 
 mod inline;
