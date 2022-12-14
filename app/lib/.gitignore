@@ -16,12 +16,6 @@ bin/*
 *.vsix
 
 # Rust ignores
-app/target
-app/Cargo.lock
-
-# MacOS garbage:
+target
+Cargo.lock
 *.DS_Store
-
-# Cargo build caching, so changes in Docker build do not require re-indexing crates
-.cargo_build_cache/*
-!.cargo_build_cache/.keep

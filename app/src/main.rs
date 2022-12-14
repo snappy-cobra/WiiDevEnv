@@ -25,16 +25,23 @@ use modulator::sources::*;
 mod game;
 pub use game::*;
 
+mod target_tests;
+
 #[start]
 /**
  * Main entrypoint of the application.
  */
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
-    println!("Hello Rust!");
+    if cfg!(feature="run_target_tests") {
+        println!("Running the target test suite...");
+        target_tests::run_test_suite()
+    } else {
+        println!("Starting game!");
+        main_game()
+    }
+}
 
-    let mut modenv : ModulatorEnv<f32> = Default::default();
-    modenv.take("myfancywave", Box::new(Wave::new(2.0, 0.5))); // start with 2.0 amplitude and 0.5Hz frequency)
-
+fn main_game() -> isize {
     // Setup the wiimote
     Input::init(ControllerType::Wii);
     let wii_mote = Input::new(ControllerType::Wii, ControllerPort::One);
@@ -47,6 +54,10 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     batch_spawn_entities(&mut world, 5);
     let mut velocity_query = PreparedQuery::<&mut Velocity>::default();
     let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
+    
+    let mut modenv : ModulatorEnv<f32> = Default::default();
+    modenv.take("myfancywave", Box::new(Wave::new(2.0, 0.5))); // start with 2.0 amplitude and 0.5Hz frequency)
+
 
     // Kickstart main loop.
     let mut renderer = Renderer::new();
@@ -73,5 +84,5 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         last_frame_time = unsafe { gettime() };
     }
     renderer.close_render();
-    return 0;
+    0
 }
