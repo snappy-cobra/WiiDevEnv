@@ -8,9 +8,15 @@ cd /app
 
 # Build function
 build () {
+    echo -e "\e[1;34m Starting main build... \e[0m"
     cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
     cp /build/target/powerpc-unknown-eabi/debug/rust-wii.elf /build/bin/boot.elf
-    echo -e "\e[1;32m Binary build completed. \e[0m"
+    echo -e "\e[1;32m Binary main build completed. \e[0m"
+
+    echo -e "\e[1;34m Starting target-test build... \e[0m"
+    cargo +nightly build --features run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+    cp /build/target/powerpc-unknown-eabi/debug/rust-wii.elf /build/bin/boot-test.elf
+    echo -e "\e[1;32m Binary target-test build completed. \e[0m"
 }
 
 # Run script
