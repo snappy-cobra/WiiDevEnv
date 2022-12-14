@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Load rust config vars
-source "$HOME/.cargo/env"
-
 # Set the CWD to the app folder
 cd /app
 

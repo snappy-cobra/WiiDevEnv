@@ -7,4 +7,4 @@ services:
     volumes:
       - ./app:/app # source code input
       - ./bin:/build/bin # compiled result output
-      - ./.cargo_build_cache:/root/.cargo/registry # Cache Rust dependencies
+      - ./.cargo_build_cache:/usr/local/cargo/registry # Cache Rust dependencies
