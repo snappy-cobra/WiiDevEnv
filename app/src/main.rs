@@ -51,10 +51,11 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     // Kickstart main loop.
     let mut renderer = Renderer::new();
     renderer.init_render();
-    let mut last_frame_time = ogc_rs::system::System::system_time();
+    let mut last_frame_time = unsafe { gettime() };
     loop {
-        let now = ogc_rs::system::System::system_time();
+        let now = unsafe { gettime() };
         let delta_time = now - last_frame_time;
+        println!("delta_time: {}, now: {}", delta_time, now);
 
         Input::update(ControllerType::Wii);
         if wii_mote.is_button_down(Button::Home) {
@@ -69,7 +70,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         modenv.advance(delta_time);
 
         renderer.render_world(&world);
-        last_frame_time = ogc_rs::system::System::system_time();
+        last_frame_time = unsafe { gettime() };
     }
     renderer.close_render();
     return 0;
