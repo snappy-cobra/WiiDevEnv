@@ -1,10 +1,13 @@
+#![no_std]
+extern crate alloc;
+
 pub mod sources;
 
 use hashbrown::HashMap;
 use core::any::Any;
 use alloc::boxed::Box;
 use core::time::Duration;
-use crate::alloc::string::{String, ToString};
+use alloc::string::{String, ToString};
 
 /// Modulators provide animated modulation. T is the generic type of the modulator value.
 pub trait Modulator<T> {

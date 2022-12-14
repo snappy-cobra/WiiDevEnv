@@ -23,6 +23,7 @@ hashbrown = "0.12"
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
 micromath = { version = "1.0.1" }
 rust-wii-lib = { path = "./lib", features = ["wii"]}
+modulator = { path = "./modulator", features = []}
 
 [build-dependencies]
 bindgen = "0.61"

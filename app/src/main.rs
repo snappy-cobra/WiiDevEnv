@@ -18,7 +18,6 @@ use hecs::*;
 pub mod renderer;
 use renderer::*;
 
-pub mod modulator;
 use modulator::*;
 use modulator::sources::*;
 

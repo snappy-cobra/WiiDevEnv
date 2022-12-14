@@ -1,0 +1,12 @@
+[package]
+name = "modulator"
+version = "0.3.0"
+edition = "2021"
+description = "A somewhat modified version of the 'modulator' crate (https://github.com/apessino/modulator) to run in a no_std/ogc-rs environment."
+
+[dependencies]
+ogc-rs = { git = "https://github.com/rust-wii/ogc-rs.git" }
+rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
+hashbrown = "0.12"
+lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
+micromath = { version = "1.0.1" }

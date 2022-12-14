@@ -5,10 +5,9 @@ use ogc_rs::prelude::*;
 use ogc_rs::mutex::Mutex;
 use rand::{Rng, SeedableRng};
 use rand::rngs::SmallRng;
-use rand::RngCore;
 use lazy_static::lazy_static;
 
-use crate::modulator::{Modulator, ModulatorEnv};
+use crate::{Modulator, ModulatorEnv};
 
 lazy_static! {
     static ref GLOBAL_RNG: Mutex<SmallRng> = {
