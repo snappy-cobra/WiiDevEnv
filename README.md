@@ -21,6 +21,26 @@ The source currently contains a small demo of bouncing (overlapping) cubes. Pres
 
 ## Tests
 
+### Unit tests
+
+The unit test suite can be run by going to the `app/lib` directory and running
+
+```
+cargo +nightly test --target=x86_64-unknown-linux-gnu
+```
+
+or
+
+```
+cargo +nightly test --target=aarch64-apple-darwin
+```
+
+depending on your native computer architecture.
+
+This will run all (unit) tests in the `./app/lib` subcrate.
+In this subcrate, all testing features of Rust are available.
+The limitation is that not all functionality of `ogc_rs`/`grrrlib` is.
+
 ### On-target Integration Tests
 
 The build process will create a `boot.elf` and a `boot-test.elf`.
@@ -63,6 +83,7 @@ On failure, the exit code will be nonzero and the output will look like:
 ```
 
 _Dolphin hangs on panic. The `timeout` command is used to transform this in a non-zero exit. If the test suite becomes large/slow, the timeout might need to be made longer._
+
 
 ## How to contribute
 
