@@ -8,13 +8,18 @@ cd /app
 
 # Build function
 build () {
+    echo -e "\e[1;34m Running Rust formatter... \e[0m"
+    cargo +nightly fmt
+    echo -e "\e[1;34m Showing Clippy warnings... \e[0m"
+    cargo +nightly clippy --fix --allow-no-vcs --target=powerpc-unknown-eabi.json --color=always
+
     echo -e "\e[1;34m Starting main build... \e[0m"
-    cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+    cargo +nightly build -Z build-std=core,alloc --target=powerpc-unknown-eabi.json --color=always
     cp /build/target/powerpc-unknown-eabi/debug/rust-wii.elf /build/bin/boot.elf
     echo -e "\e[1;32m Binary main build completed. \e[0m"
 
     echo -e "\e[1;34m Starting target-test build... \e[0m"
-    cargo +nightly build --features run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+    cargo +nightly build --features run_target_tests -Z build-std=core,alloc --target=powerpc-unknown-eabi.json --color=always
     cp /build/target/powerpc-unknown-eabi/debug/rust-wii.elf /build/bin/boot-test.elf
     echo -e "\e[1;32m Binary target-test build completed. \e[0m"
 }
