@@ -6,7 +6,6 @@ pub use ogc_rs::{print, println};
 #[cfg(not(feature = "wii"))]
 pub use std::{print, println};
 
-
 fn foo() -> bool {
     println!("Hello, world!");
     true
