@@ -1,6 +1,10 @@
 VERSION 0.6
 FROM ghcr.io/rust-lang/rust:nightly-slim
 
+# Portable build environment, containing
+# - Rust
+# - DevkitPro + its wii-dev package
+# - Grrlib
 build-env:
   WORKDIR /
   COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
@@ -37,22 +41,29 @@ build-env:
   ENV CARGO_TARGET_DIR="/build/target"
   RUN rustup component add rust-src --toolchain nightly
 
+# Build the main game Wii ROM
 build:
   FROM +build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
-  SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL /build/bin/boot.elf
+  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
+      --mount=type=cache,target=/usr/local/cargo/registry/cache \
+      --mount=type=cache,target=/usr/local/cargo/git/db \
+      cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
 
+# Build a Wii ROM that runs the on-target-device integration test suite.
 build-integration-test:
   FROM +build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
-  SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL /build/bin/boot-test.elf
+  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
+      --mount=type=cache,target=/usr/local/cargo/registry/cache \
+      --mount=type=cache,target=/usr/local/cargo/git/db \
+      cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
 
+# Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
 unit-test:
   FROM ghcr.io/rust-lang/rust:nightly-slim
   RUN rustup +nightly component add rust-src
@@ -61,26 +72,30 @@ unit-test:
   RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
       --mount=type=cache,target=/usr/local/cargo/registry/cache \
       --mount=type=cache,target=/usr/local/cargo/git/db \
-      cargo +nightly test
+      cargo +nightly test --color=always
 
+headless-dolphin:
+  FROM ubuntu:bionic
+  RUN apt update
+  RUN apt install -y software-properties-common gpg xvfb xdg-utils alsa-utils
+  RUN apt-add-repository ppa:dolphin-emu/ppa
+  RUN apt update
+  RUN apt install -y dolphin-emu-master
+  RUN mkdir /root/.config
 
-# Tiny Docker image only containing the Dolphin emulator
-# Based on https://github.com/rmzi/dolphin-docker/
-# WIP
-dolphin-docker:
-  FROM debian:slim
-  RUN apt-get update \
-  && apt-get install dolphin-emu \
-  && apt-get autoremove \
-  && rm -rf /var/lib/apt/lists/* \
-
-# TODO
 integration-test:
-  FROM +dolphin-docker
-  RUN mkdir /build/bin
-  COPY +build-integration-test/rust-wii.elf /build/bin/rust-wii.elf
-  RUN timeout 5s /usr/games/dolphin-emu --batch --exec=/build/bin/rust-wii.elf
+  FROM +headless-dolphin
+  RUN mkdir /build
+  COPY +build-integration-test/rust-wii.elf /build/rust-wii.elf
+  # ENV QT_QPA_PLATFORM=linuxfb # Disable rendering
+  RUN xvfb-run \
+      /usr/games/dolphin-emu-nogui --exec=/build/rust-wii.elf
+  # RUN xvfb-run \
+  #       \
+  #     which dolphin-emu-master --version # --batch --exec=/wii/rust-wii.elf
 
+
+# Run all tests and sanity checks
 test:
   BUILD +build # Normal compilation should work without problems
   BUILD +unit-test # Unit test suite
