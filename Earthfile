@@ -41,25 +41,46 @@ build:
   FROM +build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL /build/bin/boot.elf
 
 build-integration-test:
   FROM +build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL /build/bin/boot-test.elf
-
-test:
-  FROM +build-env
-  WORKDIR app/
-  COPY ./app/ ./
-  WORKDIR app/lib/
-  RUN cargo test
 
 unit-test:
   FROM ghcr.io/rust-lang/rust:nightly-slim
+  RUN rustup component add rust-src
   COPY ./app/ /app/
   WORKDIR /app/lib/
-  RUN cargo test -Zbuild-std
+  RUN --mount=type=cache,target=/usr/local/cargo/registry \
+  cargo +nightly test -Zbuild-std --target=x86_64-unknown-linux-gnu
+
+
+# Tiny Docker image only containing the Dolphin emulator
+# Based on https://github.com/rmzi/dolphin-docker/
+# WIP
+dolphin-docker:
+  FROM debian:slim
+  RUN apt-get update \
+  && apt-get install dolphin-emu \
+  && apt-get autoremove \
+  && rm -rf /var/lib/apt/lists/* \
+
+# TODO
+integration-test:
+  FROM +dolphin-docker
+  RUN mkdir /build/bin
+  COPY +build-integration-test/rust-wii.elf /build/bin/rust-wii.elf
+  RUN timeout 5s /usr/games/dolphin-emu --batch --exec=/build/bin/rust-wii.elf
+
+test:
+  BUILD +build # Normal compilation should work without problems
+  BUILD +unit-test # Unit test suite
+  BUILD +integration-test
+  # TODO Clippy?
