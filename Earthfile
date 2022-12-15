@@ -74,22 +74,35 @@ unit-test:
       --mount=type=cache,target=/usr/local/cargo/git/db \
       cargo +nightly test --color=always
 
+# headless-dolphin:
+#   FROM ubuntu:bionic
+#   RUN apt update
+#   RUN apt install -y software-properties-common gpg xvfb xdg-utils alsa-utils
+#   RUN apt-add-repository ppa:dolphin-emu/ppa
+#   RUN apt update
+#   RUN apt install -y dolphin-emu-master
+#   RUN mkdir /root/.config
+
 headless-dolphin:
-  FROM ubuntu:bionic
-  RUN apt update
-  RUN apt install -y software-properties-common gpg xvfb xdg-utils alsa-utils
-  RUN apt-add-repository ppa:dolphin-emu/ppa
-  RUN apt update
-  RUN apt install -y dolphin-emu-master
-  RUN mkdir /root/.config
+  FROM debian:bullseye-slim
+  RUN apt update \
+   && apt install -y --no-install-recommends xvfb xauth alsa-utils git ca-certificates qtbase5-dev qtbase5-private-dev git cmake make gcc g++ pkg-config libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libxi-dev libxrandr-dev libudev-dev libevdev-dev libsfml-dev libminiupnpc-dev libmbedtls-dev libcurl4-openssl-dev libhidapi-dev libsystemd-dev libbluetooth-dev libasound2-dev libpulse-dev libpugixml-dev libbz2-dev libzstd-dev liblzo2-dev libpng-dev libusb-1.0-0-dev gettext \
+    && apt autoremove
+  RUN git clone https://github.com/dolphin-emu/dolphin.git ./dolphin-emu
+  WORKDIR ./dolphin-emu
+  RUN git submodule update --init --recursive
+  RUN mkdir Build && cd Build && cmake .. && make -j$(nproc) && make install
+
 
 integration-test:
   FROM +headless-dolphin
   RUN mkdir /build
   COPY +build-integration-test/rust-wii.elf /build/rust-wii.elf
   # ENV QT_QPA_PLATFORM=linuxfb # Disable rendering
-  RUN xvfb-run \
-      /usr/games/dolphin-emu-nogui --exec=/build/rust-wii.elf
+  # RUN modprobe snd-dummy # Enable dummy sound driver
+  # RUN xvfb-run --server-args="-screen 0, 1920x1080x24" \
+  #     dolphin-emu -v=null --exec=/build/rust-wii.elf
+      RUN dolphin-emu -v=null --exec=/build/rust-wii.elf
   # RUN xvfb-run \
   #       \
   #     which dolphin-emu-master --version # --batch --exec=/wii/rust-wii.elf
