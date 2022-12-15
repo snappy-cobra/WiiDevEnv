@@ -55,11 +55,13 @@ build-integration-test:
 
 unit-test:
   FROM ghcr.io/rust-lang/rust:nightly-slim
-  RUN rustup component add rust-src
-  COPY ./app/ /app/
+  RUN rustup +nightly component add rust-src
+  COPY ./app/lib/ /app/lib/
   WORKDIR /app/lib/
-  RUN --mount=type=cache,target=/usr/local/cargo/registry \
-  cargo +nightly test -Zbuild-std --target=x86_64-unknown-linux-gnu
+  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
+      --mount=type=cache,target=/usr/local/cargo/registry/cache \
+      --mount=type=cache,target=/usr/local/cargo/git/db \
+      cargo +nightly test
 
 
 # Tiny Docker image only containing the Dolphin emulator
