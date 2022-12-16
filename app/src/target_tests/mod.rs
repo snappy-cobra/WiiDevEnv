@@ -1,12 +1,10 @@
-use ogc_rs::*;
 use hashbrown::HashMap;
+use ogc_rs::*;
 
 pub fn tests() -> HashMap<&'static str, fn()> {
     let mut tests: HashMap<&'static str, fn()> = HashMap::new();
 
-    tests.insert("Trivial test", || {
-        assert!(true)
-    });
+    tests.insert("Trivial test", || assert!(true));
 
     // tests.insert("Problematic test", || {
     //     assert!(1 == 0)
@@ -14,7 +12,6 @@ pub fn tests() -> HashMap<&'static str, fn()> {
 
     tests
 }
-
 
 pub fn run_test_suite() -> isize {
     println!("Running tests...");
