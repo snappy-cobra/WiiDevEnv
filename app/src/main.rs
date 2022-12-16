@@ -25,9 +25,12 @@ pub use game::*;
 /**
  * Main entrypoint of the application.
  */
+
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
     println!("Hello Rust!");
-
+    let power_callback_function_pointer: unsafe extern "C" fn() = power_callback;
+    let s = Some(power_callback_function_pointer);
+    unsafe { SYS_SetPowerCallback(s) };
     // Setup the wiimote
     Input::init(ControllerType::Wii);
     let wii_mote = Input::new(ControllerType::Wii, ControllerPort::One);
@@ -42,6 +45,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
     
     // Kickstart main loop.
+
     let mut renderer = Renderer::new();
     renderer.init_render();
     loop {
@@ -59,4 +63,9 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     }
     renderer.close_render();
     return 0;
+}
+
+pub unsafe extern "C" fn power_callback() {
+    println!("Another function.");
+
 }
