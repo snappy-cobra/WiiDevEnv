@@ -11,7 +11,7 @@ build () {
     echo -e "\e[1;34m Running Rust formatter... \e[0m"
     cargo +nightly fmt
     echo -e "\e[1;34m Showing Clippy warnings... \e[0m"
-    cargo +nightly clippy --fix --allow-no-vcs --target=powerpc-unknown-eabi.json --color=always
+    cargo +nightly clippy --target=powerpc-unknown-eabi.json --color=always
 
     echo -e "\e[1;34m Starting main build... \e[0m"
     cargo +nightly build -Z build-std=core,alloc --target=powerpc-unknown-eabi.json --color=always
