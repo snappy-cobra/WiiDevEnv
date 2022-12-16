@@ -1,3 +1,4 @@
+#![allow(clippy::all)]
 include!("renderer/grrlib.rs");
 
 mod inline;

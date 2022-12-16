@@ -22,13 +22,23 @@ use renderer::*;
 mod game;
 pub use game::*;
 
+mod target_tests;
+
 #[start]
 /**
  * Main entrypoint of the application.
  */
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
-    println!("Hello Rust!");
+    if cfg!(feature="run_target_tests") {
+        println!("Running the target test suite...");
+        target_tests::run_test_suite()
+    } else {
+        println!("Starting game!");
+        main_game()
+    }
+}
 
+fn main_game() -> isize {
     // Setup the wiimote
     Input::init(ControllerType::Wii);
     let wii_mote = Input::new(ControllerType::Wii, ControllerPort::One);
@@ -59,5 +69,5 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         renderer.render_world(&world);
     }
     renderer.close_render();
-    return 0;
+    0
 }
