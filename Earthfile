@@ -117,7 +117,8 @@ integration-test-runner:
 
   # Copy ROM into image:
   RUN mkdir /build
-  COPY +build-integration-test/rust-wii.elf /build/boot.elf
+  # COPY +build-integration-test/rust-wii.elf /build/boot.elf
+  COPY ./bin/boot-test.elf /build/boot.elf
 
   # Run rest of the commands as unprivileged user:
   RUN adduser --disabled-password --gecos '' user
@@ -153,7 +154,7 @@ integration-test-runner:
 
 
 integration-test:
-  FROM --platform=linux/amd64 earthly/dind:alpine
+  FROM earthly/dind:alpine
   WITH DOCKER --load=+integration-test-runner
     RUN docker run --shm-size=8G itr
   END
