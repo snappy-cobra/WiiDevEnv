@@ -1,4 +1,4 @@
-name: Normal (non-test) Build
+name: Continuous Integration
 
 on:
   push:
