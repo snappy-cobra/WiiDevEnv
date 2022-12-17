@@ -1,4 +1,4 @@
-name: Integration Test
+name: Unit Test
 
 on:
   push:
@@ -27,4 +27,4 @@ jobs:
     - name: Earthly version
       run: earthly --version
     - name: Run build
-      run: earthly --ci --push --allow-privileged +integration-test
+      run: earthly --ci --push +unit-test
