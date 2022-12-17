@@ -1,4 +1,4 @@
-VERSION 0.6
+VERSION --use-cache-command 0.6
 
 # Portable build environment, containing
 # - Rust
@@ -40,17 +40,17 @@ build-env:
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
   RUN rustup component add rust-src --toolchain nightly
-  SAVE IMAGE build-env
+  SAVE IMAGE --cache-from=ghcr.io/qqwy/wii-rust-build-env:latest wii-rust-build-env:latest
 
 # Build the main game Wii ROM
 build:
   FROM +build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
-      --mount=type=cache,target=/usr/local/cargo/registry/cache \
-      --mount=type=cache,target=/usr/local/cargo/git/db \
-      cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
+  RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
 
 # Build a Wii ROM that runs the on-target-device integration test suite.
@@ -58,10 +58,10 @@ build-integration-test:
   FROM +build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
-      --mount=type=cache,target=/usr/local/cargo/registry/cache \
-      --mount=type=cache,target=/usr/local/cargo/git/db \
-      cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
+  RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
 
 # Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
@@ -99,7 +99,8 @@ dolphin:
 
   # Build Dolphin:
   RUN mkdir Build && cd Build && cmake .. && make -j$(nproc) && make install
-  SAVE IMAGE --push dolphin
+  # SAVE IMAGE --push ghcr.io/qqwy/dolphin:latest
+  SAVE IMAGE --cache-from=ghcr.io/qqwy/dolphin:latest dolphin:latest
 
 # IMAGE RUNNING THE ROM ON DOLPHIN
 # Actually running the ROM is kept as CMD
