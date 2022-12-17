@@ -5,7 +5,7 @@ VERSION --use-cache-command 0.6
 # - DevkitPro + its wii-dev package
 # - Grrlib
 build-env:
-  FROM --platform=linux/arm64 ghcr.io/rust-lang/rust:nightly-slim
+  FROM --platform=linux/amd64 ghcr.io/rust-lang/rust:nightly-slim
   CACHE /usr/local/cargo/registry/index
   CACHE /usr/local/cargo/registry/cache
   CACHE /usr/local/cargo/git/db
@@ -48,7 +48,7 @@ build-env:
 # Build the main game Wii ROM
 build:
   # FROM +build-env
-  FROM --platform=linux/arm64 ghcr.io/qqwy/wii-rust-build-env
+  FROM --platform=linux/amd64 ghcr.io/qqwy/wii-rust-build-env
   COPY ./app/ /app/
   WORKDIR /app/
   RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
@@ -57,7 +57,7 @@ build:
 # Build a Wii ROM that runs the on-target-device integration test suite.
 build-integration-test:
   # FROM +build-env
-  FROM --platform=linux/arm64 ghcr.io/qqwy/wii-rust-build-env
+  FROM --platform=linux/amd64 ghcr.io/qqwy/wii-rust-build-env
   COPY ./app/ /app/
   WORKDIR /app/
   RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
@@ -65,7 +65,7 @@ build-integration-test:
 
 # Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
 unit-test:
-  FROM --platform=linux/arm64 ghcr.io/rust-lang/rust:nightly-slim
+  FROM --platform=linux/amd64 ghcr.io/rust-lang/rust:nightly-slim
   RUN rustup +nightly component add rust-src
   COPY ./app/lib/ /app/lib/
   WORKDIR /app/lib/
@@ -77,7 +77,7 @@ unit-test:
 # BASE IMAGE CONTAINING DOLPHIN
 # -----------------------------
 dolphin:
-  FROM --platform=linux/arm64 debian:bullseye-slim
+  FROM --platform=linux/amd64 debian:bullseye-slim
 
   # Install dependencies for building Dolphin
   # As well as `xvfb` and `xauth` to fake a display
@@ -112,7 +112,7 @@ dolphin:
 integration-test-runner:
   # For speed in CI, we use a prior built image rather than depending on the target from within this Earthfile
   # FROM +dolphin
-  FROM --platform=linux/arm64 ghcr.io/qqwy/dolphin:latest
+  FROM --platform=linux/amd64 ghcr.io/qqwy/dolphin:latest
 
 
   # Copy ROM into image:
@@ -153,7 +153,7 @@ integration-test-runner:
 
 
 integration-test:
-  FROM --platform=linux/arm64 earthly/dind:alpine
+  FROM --platform=linux/amd64 earthly/dind:alpine
   WITH DOCKER --load=+integration-test-runner
     RUN docker run --shm-size=8G itr
   END
