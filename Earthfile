@@ -74,39 +74,81 @@ unit-test:
       --mount=type=cache,target=/usr/local/cargo/git/db \
       cargo +nightly test --color=always
 
-# headless-dolphin:
-#   FROM ubuntu:bionic
-#   RUN apt update
-#   RUN apt install -y software-properties-common gpg xvfb xdg-utils alsa-utils
-#   RUN apt-add-repository ppa:dolphin-emu/ppa
-#   RUN apt update
-#   RUN apt install -y dolphin-emu-master
-#   RUN mkdir /root/.config
-
+# BASE IMAGE CONTAINING DOLPHIN
+# -----------------------------
 headless-dolphin:
-  FROM debian:bullseye-slim
+  FROM debian:bullseye-slim AS dolphin
+
+  # Install dependencies for building Dolphin
+  # As well as `xvfb` and `xauth` to fake a display
+  # `xdg-utils` to fix a warning related to mime-types
+  # and `alsa-utils` to fake sound drivers
   RUN apt update \
-   && apt install -y --no-install-recommends xvfb xauth alsa-utils git ca-certificates qtbase5-dev qtbase5-private-dev git cmake make gcc g++ pkg-config libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libxi-dev libxrandr-dev libudev-dev libevdev-dev libsfml-dev libminiupnpc-dev libmbedtls-dev libcurl4-openssl-dev libhidapi-dev libsystemd-dev libbluetooth-dev libasound2-dev libpulse-dev libpugixml-dev libbz2-dev libzstd-dev liblzo2-dev libpng-dev libusb-1.0-0-dev gettext \
-    && apt autoremove
+  && apt install -y --no-install-recommends \
+  xvfb xauth xdg-utils alsa-utils \
+  git ca-certificates qtbase5-dev qtbase5-private-dev git cmake make gcc g++ pkg-config libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libxi-dev libxrandr-dev libudev-dev libevdev-dev libsfml-dev libminiupnpc-dev libmbedtls-dev libcurl4-openssl-dev libhidapi-dev libsystemd-dev libbluetooth-dev libasound2-dev libpulse-dev libpugixml-dev libbz2-dev libzstd-dev liblzo2-dev libpng-dev libusb-1.0-0-dev gettext \
+  && apt autoremove \
+  && apt purge -y \
+  && rm -rf /var/lib/apt/lists/*
+
+  # Download + initialize the newest dev version of Dolphin:
   RUN git clone https://github.com/dolphin-emu/dolphin.git ./dolphin-emu
   WORKDIR ./dolphin-emu
   RUN git submodule update --init --recursive
+
+  # Build Dolphin:
   RUN mkdir Build && cd Build && cmake .. && make -j$(nproc) && make install
+
+# IMAGE RUNNING THE ROM ON DOLPHIN
+# Actually running the ROM is kept as CMD
+# This is necessary because we need to specify
+# a custom large `--shm-size` to `docker run`
+# if we do not want Dolphin to crash.
+# --------------------------------
+integration-test-runner:
+  FROM dolphin
+
+  # Copy ROM into image:
+  RUN mkdir /build
+  COPY ./boot.elf /build/boot.elf
+
+  RUN adduser --disabled-password --gecos '' user
+  USER user
+
+  # Configuration to redirect sound output to the 'null' sound card:
+  RUN echo "pcm.!default null\nctl.!default null\n" > ~/.asoundrc
+
+  # Dolphin configuration settings:
+  # RUN mkdir ~/.dolphin-emu
+  COPY --chown=user:user ./dolphin-emu /home/user/.dolphin-emu
+  WORKDIR /home/user/
+
+  # Run Dolphin using a fake display:
+  # This command should work fine but crashes with a 'Bus error'.
+  # RUN xvfb-run dolphin-emu --batch --exec=/build/boot.elf
+  # CMD xvfb-run dolphin-emu --exec=/build/boot.elf --batch
+  # Alternative version that hangs without logging output ever appearing:
+  # RUN QT_QPA_PLATFORM=offscreen dolphin-emu --exec=/build/boot.elf
+
+  # # Desired command we really would like to run.
+  # # Explanation:
+  # # xvfb-run: With a fake display
+  # # timeout 5s: Dolphin hangs on panic. This converts a hang to a non-zero exit code
+  # # dolphin-emu-nogui: Run Dolphin
+  # # 2>&1: Redirect stderr (which Dolphin logs to) to stdout
+  # # grep: Look in the log output only for lines containing 'OSREPORT_HLE' as those are where print statements and panics end up.
+  CMD xvfb-run \
+      timeout 5s \
+      dolphin-emu-nogui --platform=headless --exec=/build/boot.elf \
+      2>&1 | grep "OSREPORT_HLE"
+  SAVE IMAGE integration-test-runner:latest
 
 
 integration-test:
-  FROM +headless-dolphin
-  RUN mkdir /build
-  COPY +build-integration-test/rust-wii.elf /build/rust-wii.elf
-  # ENV QT_QPA_PLATFORM=linuxfb # Disable rendering
-  # RUN modprobe snd-dummy # Enable dummy sound driver
-  # RUN xvfb-run --server-args="-screen 0, 1920x1080x24" \
-  #     dolphin-emu -v=null --exec=/build/rust-wii.elf
-      RUN dolphin-emu -v=null --exec=/build/rust-wii.elf
-  # RUN xvfb-run \
-  #       \
-  #     which dolphin-emu-master --version # --batch --exec=/wii/rust-wii.elf
-
+  FROM earthly/dind:alpine
+  WITH DOCKER --load +integration-test-runner:latest=+integration-test-runner
+    RUN docker run --shm-size=8G integration-test-runner:latest
+  END
 
 # Run all tests and sanity checks
 test:
