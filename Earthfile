@@ -109,7 +109,10 @@ dolphin:
 # if we do not want Dolphin to crash.
 # --------------------------------
 integration-test-runner:
-  FROM +dolphin
+  # For speed in CI, we use a prior built image rather than depending on the target from within this Earthfile
+  # FROM +dolphin
+  FROM ghcr.io/qqwy/dolphin:latest
+
 
   # Copy ROM into image:
   RUN mkdir /build
