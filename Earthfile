@@ -1,11 +1,11 @@
 VERSION 0.6
-FROM ghcr.io/rust-lang/rust:nightly-slim
 
 # Portable build environment, containing
 # - Rust
 # - DevkitPro + its wii-dev package
 # - Grrlib
 build-env:
+  FROM ghcr.io/rust-lang/rust:nightly-slim@sha256:80eda9bfe3b6bb361bb7a1e10adada5ec6d1e3418dda3cc445cdbd5eb01595b0
   WORKDIR /
   COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
   RUN chmod +x ./install-devkitpro-pacman.sh
@@ -40,6 +40,7 @@ build-env:
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
   RUN rustup component add rust-src --toolchain nightly
+  SAVE IMAGE build-env
 
 # Build the main game Wii ROM
 build:
@@ -76,7 +77,7 @@ unit-test:
 
 # BASE IMAGE CONTAINING DOLPHIN
 # -----------------------------
-headless-dolphin:
+dolphin:
   FROM debian:bullseye-slim
 
   # Install dependencies for building Dolphin
@@ -92,12 +93,13 @@ headless-dolphin:
   && rm -rf /var/lib/apt/lists/*
 
   # Download + initialize the newest dev version of Dolphin:
-  RUN git clone https://github.com/dolphin-emu/dolphin.git ./dolphin-emu
+  GIT CLONE https://github.com/dolphin-emu/dolphin.git ./dolphin-emu
   WORKDIR ./dolphin-emu
   RUN git submodule update --init --recursive
 
   # Build Dolphin:
   RUN mkdir Build && cd Build && cmake .. && make -j$(nproc) && make install
+  SAVE IMAGE --push dolphin
 
 # IMAGE RUNNING THE ROM ON DOLPHIN
 # Actually running the ROM is kept as CMD
@@ -106,7 +108,7 @@ headless-dolphin:
 # if we do not want Dolphin to crash.
 # --------------------------------
 integration-test-runner:
-  FROM +headless-dolphin
+  FROM +dolphin
 
   # Copy ROM into image:
   RUN mkdir /build
@@ -139,7 +141,7 @@ integration-test-runner:
   # # 2>&1: Redirect stderr (which Dolphin logs to) to stdout
   # # grep: Look in the log output only for lines containing 'OSREPORT_HLE' as those are where print statements and panics end up.
   CMD xvfb-run \
-      timeout 5s \
+      timeout 1m \
       dolphin-emu-nogui --platform=headless --exec=/build/boot.elf \
       2>&1 | grep "OSREPORT_HLE"
   SAVE IMAGE itr
