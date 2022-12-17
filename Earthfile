@@ -156,7 +156,7 @@ integration-test-runner:
 integration-test:
   FROM earthly/dind:alpine
   WITH DOCKER --load=+integration-test-runner --platform=linux/amd64
-    RUN docker run --shm-size=8G itr
+    RUN docker run --shm-size=4G itr
   END
 
 # Run all tests and sanity checks
