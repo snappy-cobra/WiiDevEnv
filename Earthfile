@@ -69,10 +69,10 @@ unit-test:
   RUN rustup +nightly component add rust-src
   COPY ./app/lib/ /app/lib/
   WORKDIR /app/lib/
-  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
-      --mount=type=cache,target=/usr/local/cargo/registry/cache \
-      --mount=type=cache,target=/usr/local/cargo/git/db \
-      cargo +nightly test --color=always
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
+  RUN cargo +nightly test --color=always
 
 # BASE IMAGE CONTAINING DOLPHIN
 # -----------------------------
