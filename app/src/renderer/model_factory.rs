@@ -1,21 +1,21 @@
-use ogc_rs::print;
-use wavefront::{Obj};
 use alloc::collections::BTreeMap;
 use alloc::str::from_utf8;
+use ogc_rs::print;
+use wavefront::Obj;
 
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const raw_model_data: [(&str, &'static[u8]); 2] = [
+const raw_model_data: [(&str, &'static [u8]); 2] = [
     ("Teapot", include_bytes!("../../data/Teapot.obj")),
-    ("Suzanne", include_bytes!("../../data/Suzanne.obj"))
+    ("Suzanne", include_bytes!("../../data/Suzanne.obj")),
 ];
 
 /**
  * Data structure for the model factory.
  */
 pub struct ModelFactory<'a> {
-    models : BTreeMap<&'a str, Obj>
+    models: BTreeMap<&'a str, Obj>,
 }
 
 /**
@@ -27,7 +27,7 @@ impl<'a> ModelFactory<'a> {
      */
     pub fn new() -> ModelFactory<'a> {
         ModelFactory {
-            models: BTreeMap::new()
+            models: BTreeMap::new(),
         }
     }
 
@@ -42,8 +42,8 @@ impl<'a> ModelFactory<'a> {
             match Obj::from_lines(string_data.lines()) {
                 Ok(value) => {
                     self.models.insert(key, value);
-                },
-                Err(error) =>{
+                }
+                Err(error) => {
                     print!("Error loading model: {}", error);
                 }
             }

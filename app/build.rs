@@ -56,12 +56,18 @@ fn main() {
         dkp_path
     );
     println!("cargo:rustc-link-search=native={}/libogc/lib/wii", dkp_path);
-    println!("cargo:rustc-link-search=native={}/portlibs/wii/lib", dkp_path);
-    println!("cargo:rustc-link-search=native={}/portlibs/ppc/lib", dkp_path);
+    println!(
+        "cargo:rustc-link-search=native={}/portlibs/wii/lib",
+        dkp_path
+    );
+    println!(
+        "cargo:rustc-link-search=native={}/portlibs/ppc/lib",
+        dkp_path
+    );
 
     println!("cargo:rustc-link-lib=static=c");
     println!("cargo:rustc-link-lib=static=sysbase");
-    println!("cargo:rustc-link-lib=static=db");    
+    println!("cargo:rustc-link-lib=static=db");
     println!("cargo:rustc-link-lib=static=grrlib");
     println!("cargo:rustc-link-lib=static=freetype");
     println!("cargo:rustc-link-lib=static=bz2");
@@ -75,7 +81,7 @@ fn main() {
     println!("cargo:rustc-link-lib=static=ogc");
     println!("cargo:rustc-link-lib=static=m");
     println!("cargo:rustc-link-lib=static=asnd");
-    println!("cargo:rustc-link-lib=static=aesnd");    
+    println!("cargo:rustc-link-lib=static=aesnd");
 
     println!("cargo:rerun-if-changed=wrapper.h");
     let bindings = bindgen::Builder::default()
@@ -92,7 +98,10 @@ fn main() {
         .blocklist_type("f(32|64)")
         .clang_arg("--target=powerpc-none-eabi")
         .clang_arg(format!("--sysroot={}/devkitPPC/powerpc-eabi", dkp_path))
-        .clang_arg(format!("-isystem/{}/devkitPPC/powerpc-eabi/include", dkp_path))
+        .clang_arg(format!(
+            "-isystem/{}/devkitPPC/powerpc-eabi/include",
+            dkp_path
+        ))
         .clang_arg(format!(
             "-isystem/usr/lib/clang/{}/include",
             get_clang_version()
