@@ -11,6 +11,18 @@ const raw_model_data: [(&str, &'static[u8]); 2] = [
     ("Suzanne", include_bytes!("../../data/Suzanne.obj"))
 ];
 
+// /**
+//  * Generate indexed model data at compile time.
+//  */
+// const fn gen_indexed_data() -> [(&str, &'static[u8]); 2] {
+
+// }
+
+// pub struct ConstModel {
+//     vertices: [f32],
+//     indices: [u8]
+// }
+
 /**
  * Data structure for the model factory.
  */
