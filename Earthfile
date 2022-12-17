@@ -142,12 +142,12 @@ integration-test-runner:
   # # Explanation:
   # # xvfb-run: With a fake display
   # # timeout 5s: Dolphin hangs on panic. This converts a hang to a non-zero exit code
-  # # dolphin-emu-nogui: Run Dolphin
+  # # dolphin-emu: Run Dolphin
   # # 2>&1: Redirect stderr (which Dolphin logs to) to stdout
   # # grep: Look in the log output only for lines containing 'OSREPORT_HLE' as those are where print statements and panics end up.
   CMD xvfb-run \
       timeout 1m \
-      dolphin-emu-nogui --platform=headless --exec=/build/boot.elf \
+      dolphin-emu --batch --exec=/build/boot.elf \
       2>&1 | grep "OSREPORT_HLE"
   SAVE IMAGE itr
 
