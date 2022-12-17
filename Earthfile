@@ -117,8 +117,8 @@ integration-test-runner:
 
   # Copy ROM into image:
   RUN mkdir /build
-  # COPY +build-integration-test/rust-wii.elf /build/boot.elf
-  COPY ./bin/boot-test.elf /build/boot.elf
+  COPY +build-integration-test/rust-wii.elf /build/boot.elf
+  # COPY ./bin/boot-test.elf /build/boot.elf
 
   # Run rest of the commands as unprivileged user:
   RUN adduser --disabled-password --gecos '' user
