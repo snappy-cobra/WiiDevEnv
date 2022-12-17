@@ -77,7 +77,7 @@ unit-test:
 # BASE IMAGE CONTAINING DOLPHIN
 # -----------------------------
 headless-dolphin:
-  FROM debian:bullseye-slim AS dolphin
+  FROM debian:bullseye-slim
 
   # Install dependencies for building Dolphin
   # As well as `xvfb` and `xauth` to fake a display
@@ -106,12 +106,13 @@ headless-dolphin:
 # if we do not want Dolphin to crash.
 # --------------------------------
 integration-test-runner:
-  FROM dolphin
+  FROM +headless-dolphin
 
   # Copy ROM into image:
   RUN mkdir /build
-  COPY ./boot.elf /build/boot.elf
+  COPY +build-integration-test/rust-wii.elf /build/boot.elf
 
+  # Run rest of the commands as unprivileged user:
   RUN adduser --disabled-password --gecos '' user
   USER user
 
@@ -146,7 +147,7 @@ integration-test-runner:
 
 integration-test:
   FROM earthly/dind:alpine
-  WITH DOCKER --load +integration-test-runner:latest=+integration-test-runner
+  WITH DOCKER --load integration-test-runner:latest=+integration-test-runner
     RUN docker run --shm-size=8G integration-test-runner:latest
   END
 
