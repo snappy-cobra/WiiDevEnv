@@ -6,6 +6,9 @@ VERSION --use-cache-command 0.6
 # - Grrlib
 build-env:
   FROM ghcr.io/rust-lang/rust:nightly-slim@sha256:80eda9bfe3b6bb361bb7a1e10adada5ec6d1e3418dda3cc445cdbd5eb01595b0
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
   WORKDIR /
   COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
   RUN chmod +x ./install-devkitpro-pacman.sh
@@ -47,9 +50,6 @@ build:
   FROM +build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  CACHE /usr/local/cargo/registry/index
-  CACHE /usr/local/cargo/registry/cache
-  CACHE /usr/local/cargo/git/db
   RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
 
@@ -58,9 +58,6 @@ build-integration-test:
   FROM +build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  CACHE /usr/local/cargo/registry/index
-  CACHE /usr/local/cargo/registry/cache
-  CACHE /usr/local/cargo/git/db
   RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
 
@@ -92,13 +89,15 @@ dolphin:
   && apt purge -y \
   && rm -rf /var/lib/apt/lists/*
 
-  # Download + initialize the newest dev version of Dolphin:
-  GIT CLONE https://github.com/dolphin-emu/dolphin.git ./dolphin-emu
-  WORKDIR ./dolphin-emu
-  RUN git submodule update --init --recursive
+  # Download, initialize and build the newest dev version of Dolphin:
+  # And clean up afterwards (all in the same layer!) to keep Docker image smaller.
+  RUN git clone https://github.com/dolphin-emu/dolphin.git ./dolphin-emu && \
+      cd ./dolphin-emu && \
+      git submodule update --init --recursive && \
+      mkdir Build && cd Build && cmake .. && make -j$(nproc) && make install && cd ../ && \
+      cd ../ && \
+      rm -rf ./dolphin-emu
 
-  # Build Dolphin:
-  RUN mkdir Build && cd Build && cmake .. && make -j$(nproc) && make install
   # SAVE IMAGE --push ghcr.io/qqwy/dolphin:latest
   SAVE IMAGE --cache-from=ghcr.io/qqwy/dolphin:latest dolphin:latest
 
