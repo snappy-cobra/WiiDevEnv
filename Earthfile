@@ -142,13 +142,13 @@ integration-test-runner:
       timeout 5s \
       dolphin-emu-nogui --platform=headless --exec=/build/boot.elf \
       2>&1 | grep "OSREPORT_HLE"
-  SAVE IMAGE integration-test-runner:latest
+  SAVE IMAGE itr
 
 
 integration-test:
   FROM earthly/dind:alpine
-  WITH DOCKER --load integration-test-runner:latest=+integration-test-runner
-    RUN docker run --shm-size=8G integration-test-runner:latest
+  WITH DOCKER --load=+integration-test-runner
+    RUN docker run --shm-size=8G itr
   END
 
 # Run all tests and sanity checks
