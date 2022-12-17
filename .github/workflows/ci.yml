@@ -29,4 +29,4 @@ jobs:
     - name: Earthly version
       run: earthly --version
     - name: Run build
-      run: earthly --ci --push +integration-test
+      run: earthly --ci --push --allow-privileged +integration-test
