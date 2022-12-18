@@ -1,13 +1,14 @@
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 
-const ENTRY_COUNT: usize = 1;
-
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const RAW_DATA_LIST: [(&str, &'static[u8]); ENTRY_COUNT] = [
-    ("Suzanne", include_bytes!("../data/Suz.obj"))
+const RAW_DATA_LIST: [(&str, &'static[u8]); 4] = [
+    ("Suzanne", include_bytes!("../data/Suz.obj")),
+    ("Suzanne_mat", include_bytes!("../data/Suz.mtl")),
+    ("Triangle", include_bytes!("../data/Tri.obj")),
+    ("Triangle_mat", include_bytes!("../data/Tri.mtl")),
 ];
 
 /**
@@ -46,12 +47,5 @@ impl RawDataStore {
      */
     pub fn get(&mut self, key: &'static str) -> Option<&&'static [u8]> {
         return self.raw_data_map.get(key);
-    }
-
-    /**
-     * Return all raw models.
-     */
-    pub fn entries() -> Vec<(&'static str, &'static[u8])> {
-        return RAW_DATA_LIST.to_vec();
     }
 }

@@ -39,27 +39,6 @@ impl Renderer {
     }
 
     /**
-     * Allows for rendering the given object.
-     */
-    fn render_mesh(model : &mut IndexedModel) {
-        unsafe {
-            GX_SetArray(GX_VA_POS, model.vertices.as_mut_ptr() as *mut c_void, (4 * 3) as u8);
-            GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX16 as u8);
-            GX_SetVtxDesc(GX_VA_CLR0 as u8, GX_DIRECT as u8);
-            GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-            GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_CLR0, GX_CLR_RGB, GX_F32, 0);
-            
-            GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, model.indices.len() as u16);
-            let mut indices_copy = model.indices.to_vec();
-            for index in indices_copy {
-                    GX_Position1x16(index);
-                    GX_Color3f32(0.0, 1.0, 1.0);
-            }
-            GX_End();
-        }
-    }
-
-    /**
      * Initialize the renderer, which means GRRLIB and loading all models.
      */
     pub fn init_render(&mut self) {
@@ -105,6 +84,27 @@ impl Renderer {
         }
         unsafe {
             GRRLIB_Render();
+        }
+    }
+
+    /**
+     * Allows for rendering the given object.
+     */
+    fn render_mesh(model : &mut IndexedModel) {
+        unsafe {
+            GX_SetArray(GX_VA_POS, model.vertices.as_mut_ptr() as *mut c_void, (4 * 3) as u8);
+            GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX16 as u8);
+            GX_SetVtxDesc(GX_VA_CLR0 as u8, GX_DIRECT as u8);
+            GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+            GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_CLR0, GX_CLR_RGB, GX_F32, 0);
+            
+            GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, model.indices.len() as u16);
+            let indices_copy = model.indices.to_vec();
+            for index in indices_copy {
+                    GX_Position1x16(index);
+                    GX_Color3f32(1.0, 1.0, 1.0);
+            }
+            GX_End();
         }
     }
 }

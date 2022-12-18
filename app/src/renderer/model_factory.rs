@@ -9,6 +9,13 @@ use crate::raw_data_store::RawDataStore;
 use super::indexed_model::IndexedModel;
 
 /**
+ * All models must be defined in this list, which is filled at compile time.
+ */
+const MODEL_KEYS: [&str; 1] = [
+    "Suzanne"
+];
+
+/**
  * Data structure for the model factory.
  */
 pub struct ModelFactory {
@@ -32,9 +39,9 @@ impl ModelFactory {
      * Load all models.
      */
     pub fn load_models(&mut self) {
-        for entry in RawDataStore::entries() {
-            let key = entry.0;
-            let raw_data = entry.1;
+        let mut store = RawDataStore::new();
+        for key in MODEL_KEYS {
+            let raw_data = store.get(key).unwrap();
             let string_data = from_utf8(raw_data).unwrap();
             match Obj::from_lines(string_data.lines()) {
                 Ok(object) => {
