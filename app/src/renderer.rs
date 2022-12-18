@@ -6,8 +6,9 @@ mod inline;
 pub use inline::*;
 
 mod model_factory;
-mod indexed_model_factory;
-use indexed_model_factory::{IndexedModelFactory, IndexedModel};
+mod indexed_model;
+use indexed_model::IndexedModel;
+use model_factory::ModelFactory;
 
 use hecs::*;
 use ogc_rs::{print, println};
@@ -21,7 +22,7 @@ use libc::c_void;
  * Data structure for the renderer.
  */
 pub struct Renderer {
-    model_factory : IndexedModelFactory
+    model_factory : ModelFactory
 }
 
 /**
@@ -33,28 +34,25 @@ impl Renderer {
      */
     pub fn new() -> Renderer {
         Renderer {
-            model_factory: IndexedModelFactory::new()
+            model_factory: ModelFactory::new()
         }
     }
 
     /**
      * Allows for rendering the given object.
      */
-    fn render_mesh(model : & IndexedModel) {
-        let mut vertices = model.vertices.to_vec();
-        let indices = model.indices.to_vec();
-        println!("Vertices: {:?},  Indices: {:?}", vertices.len(), indices.len());
+    fn render_mesh(model : &mut IndexedModel) {
         unsafe {
-            GX_SetArray(GX_VA_POS, vertices.as_mut_ptr() as *mut c_void, (4 * 3) as u8);
+            GX_SetArray(GX_VA_POS, model.vertices.as_mut_ptr() as *mut c_void, (4 * 3) as u8);
             GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX16 as u8);
             GX_SetVtxDesc(GX_VA_CLR0 as u8, GX_DIRECT as u8);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_CLR0, GX_CLR_RGB, GX_F32, 0);
             
-            GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, model.vertices.len() as u16);
-            for index in indices {
+            GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, model.indices.len() as u16);
+            for index in model.indices.to_vec().into_iter(){
                     GX_Position1x16(index);
-                    GX_Color3f32(0.2, 0.2, 0.1);
+                    GX_Color3f32(0.0, 1.0, 1.0);
             }
             GX_End();
         }
@@ -155,7 +153,7 @@ impl Renderer {
      * Render the scene
      */
     pub fn render_world(&mut self, world: &World) {
-        let model = self.model_factory.get_model("Suzanne").unwrap();
+        let mut model = self.model_factory.get_model("Suzanne").unwrap();
         for (_id, (position, _velocity)) in  &mut world.query::<(&Position, &Velocity)>()
         {
             unsafe {
@@ -165,7 +163,7 @@ impl Renderer {
                     0.0, 0.0, 0.0,
                     1.0, 1.0, 1.0
                 );
-                Self::render_mesh(& model);
+                Self::render_mesh(&mut model);
             }
         }
         unsafe {

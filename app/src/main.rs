@@ -22,6 +22,8 @@ use renderer::*;
 mod game;
 pub use game::*;
 
+mod raw_data_store;
+
 mod target_tests;
 
 #[start]

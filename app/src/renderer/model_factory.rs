@@ -1,24 +1,18 @@
 use alloc::vec::Vec;
 use ogc_rs::print;
-use wavefront::{Obj};
 use alloc::collections::BTreeMap;
 use alloc::str::from_utf8;
+use wavefront::Obj;
 
-const MODEL_COUNT: usize = 2;
+use crate::raw_data_store::RawDataStore;
 
-/**
- * All models must be defined in this list, which is filled at compile time.
- */
-const RAW_MODEL_DATA: [(&str, &'static[u8]); MODEL_COUNT] = [
-    ("Teapot", include_bytes!("../../data/Teapot.obj")),
-    ("Suzanne", include_bytes!("../../data/Suzanne.obj"))
-];
+use super::indexed_model::IndexedModel;
 
 /**
  * Data structure for the model factory.
  */
 pub struct ModelFactory {
-    models : BTreeMap<&'static str, Obj>
+    models : BTreeMap<&'static str, IndexedModel>
 }
 
 /**
@@ -38,13 +32,13 @@ impl ModelFactory {
      * Load all models.
      */
     pub fn load_models(&mut self) {
-        for entry in RAW_MODEL_DATA {
+        for entry in RawDataStore::entries() {
             let key = entry.0;
             let raw_data = entry.1;
             let string_data = from_utf8(raw_data).unwrap();
             match Obj::from_lines(string_data.lines()) {
-                Ok(value) => {
-                    self.models.insert(key, value);
+                Ok(object) => {
+                    self.models.insert(key, IndexedModel::new(&object));
                 },
                 Err(error) =>{
                     print!("Error loading model: {}", error);
@@ -56,7 +50,7 @@ impl ModelFactory {
     /**
      * Return the given model.
      */
-    pub fn get_model(&mut self, key: &'static str) -> Option<&wavefront::Obj> {
-        return self.models.get(key);
+    pub fn get_model(&mut self, key: &'static str) -> Option<&mut IndexedModel> {
+        return self.models.get_mut(key);
     }
 }
