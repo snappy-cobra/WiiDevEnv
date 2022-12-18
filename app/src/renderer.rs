@@ -6,10 +6,11 @@ mod inline;
 pub use inline::*;
 
 mod model_factory;
-pub use model_factory::{ModelFactory};
+mod indexed_model_factory;
+use indexed_model_factory::{IndexedModelFactory, IndexedModel};
 
 use hecs::*;
-use ogc_rs::print;
+use ogc_rs::{print, println};
 use wavefront::{Obj, Vertex};
 use crate::{Position, Velocity};
 
@@ -20,7 +21,7 @@ use libc::c_void;
  * Data structure for the renderer.
  */
 pub struct Renderer {
-    model_factory : ModelFactory<'static>
+    model_factory : IndexedModelFactory
 }
 
 /**
@@ -32,27 +33,27 @@ impl Renderer {
      */
     pub fn new() -> Renderer {
         Renderer {
-            model_factory: ModelFactory::new()
+            model_factory: IndexedModelFactory::new()
         }
     }
 
     /**
      * Allows for rendering the given object.
      */
-    fn render_mesh(object : & Obj) {
+    fn render_mesh(model : & IndexedModel) {
+        let mut vertices = model.vertices.to_vec();
+        let indices = model.indices.to_vec();
+        println!("Vertices: {:?},  Indices: {:?}", vertices.len(), indices.len());
         unsafe {
-            let vertex_count = (object.triangles().count() * 3) as u16;
-
-            let mut vertex_data = Vec::from(object.positions().flatten());
-            GX_SetArray(GX_VA_POS, vertex_data.as_mut_ptr() as *mut c_void, (4 * 3) as u8);
+            GX_SetArray(GX_VA_POS, vertices.as_mut_ptr() as *mut c_void, (4 * 3) as u8);
             GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX16 as u8);
             GX_SetVtxDesc(GX_VA_CLR0 as u8, GX_DIRECT as u8);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_CLR0, GX_CLR_RGB, GX_F32, 0);
             
-            GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, vertex_count);
-            for index in 0..vertex_count {
-                    GX_Position1x16(index as u16);
+            GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, model.vertices.len() as u16);
+            for index in indices {
+                    GX_Position1x16(index);
                     GX_Color3f32(0.2, 0.2, 0.1);
             }
             GX_End();

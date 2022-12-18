@@ -8,6 +8,7 @@ extern crate alloc;
 #[cfg(not(feature = "wii"))]
 pub use std::{print, println};
 
+#[allow(dead_code)]
 fn foo() -> bool {
     println!("Hello, world!");
     true
