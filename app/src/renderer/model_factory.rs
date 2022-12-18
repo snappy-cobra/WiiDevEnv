@@ -1,7 +1,7 @@
-use alloc::vec::Vec;
-use ogc_rs::print;
 use alloc::collections::BTreeMap;
 use alloc::str::from_utf8;
+use alloc::vec::Vec;
+use ogc_rs::print;
 use wavefront::Obj;
 
 use crate::raw_data_store::RawDataStore;
@@ -11,15 +11,13 @@ use super::indexed_model::IndexedModel;
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const MODEL_KEYS: [&str; 1] = [
-    "Suzanne"
-];
+const MODEL_KEYS: [&str; 1] = ["Suzanne"];
 
 /**
  * Data structure for the model factory.
  */
 pub struct ModelFactory {
-    models : BTreeMap<&'static str, IndexedModel>
+    models: BTreeMap<&'static str, IndexedModel>,
 }
 
 /**
@@ -31,7 +29,7 @@ impl ModelFactory {
      */
     pub fn new() -> ModelFactory {
         ModelFactory {
-            models: BTreeMap::new()
+            models: BTreeMap::new(),
         }
     }
 
@@ -46,8 +44,8 @@ impl ModelFactory {
             match Obj::from_lines(string_data.lines()) {
                 Ok(object) => {
                     self.models.insert(key, IndexedModel::new(&object));
-                },
-                Err(error) =>{
+                }
+                Err(error) => {
                     print!("Error loading model: {}", error);
                 }
             }

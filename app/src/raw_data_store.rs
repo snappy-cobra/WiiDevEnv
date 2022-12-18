@@ -1,10 +1,10 @@
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const RAW_DATA_LIST: [(&str, &'static[u8]); 4] = [
+const RAW_DATA_LIST: [(&str, &'static [u8]); 4] = [
     ("Suzanne", include_bytes!("../data/Suz.obj")),
     ("Suzanne_mat", include_bytes!("../data/Suz.mtl")),
     ("Triangle", include_bytes!("../data/Tri.obj")),
@@ -15,7 +15,7 @@ const RAW_DATA_LIST: [(&str, &'static[u8]); 4] = [
  * Data structure for the raw data store
  */
 pub struct RawDataStore {
-    raw_data_map : BTreeMap<&'static str, &'static[u8]>
+    raw_data_map: BTreeMap<&'static str, &'static [u8]>,
 }
 
 /**
@@ -27,7 +27,7 @@ impl RawDataStore {
      */
     pub fn new() -> RawDataStore {
         let mut store = RawDataStore {
-            raw_data_map: BTreeMap::new()
+            raw_data_map: BTreeMap::new(),
         };
         store.load_references();
         return store;

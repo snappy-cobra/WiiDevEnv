@@ -1,13 +1,13 @@
 use alloc::vec::Vec;
 use ogc_rs::{print, println};
-use wavefront::{Vertex, Obj};
+use wavefront::{Obj, Vertex};
 
 /**
  * Our representation of a model.
  */
 pub struct IndexedModel {
     pub vertices: Vec<f32>,
-    pub indices: Vec<u16>
+    pub indices: Vec<u16>,
 }
 
 /**
@@ -22,7 +22,10 @@ impl IndexedModel {
         let mut positions: Vec<f32> = Vec::new();
         let mut indices: Vec<u16> = Vec::new();
         for vertex in object.vertices() {
-            match vertex_map.iter().position(|check_vertex| check_vertex.position_index() == vertex.position_index()) {
+            match vertex_map
+                .iter()
+                .position(|check_vertex| check_vertex.position_index() == vertex.position_index())
+            {
                 Some(index) => indices.push(index as u16),
                 None => {
                     indices.push(vertex_map.len() as u16);
@@ -34,6 +37,9 @@ impl IndexedModel {
             }
         }
         println!("Loaded: {:?}, {:?}", positions, indices);
-        return IndexedModel {vertices: positions, indices};
+        return IndexedModel {
+            vertices: positions,
+            indices,
+        };
     }
 }
