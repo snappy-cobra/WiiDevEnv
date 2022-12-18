@@ -59,70 +59,6 @@ impl Renderer {
     }
 
     /**
-     * Render the main cube.
-     */
-    pub fn render_cube(&mut self) {
-        let col: [u32; 3] = [0xFFFFFFFF, 0xAAAAAAFF, 0x666666FF];
-        unsafe {
-            GX_Begin(GX_QUADS as u8, GX_VTXFMT0 as u8, 24u16);
-                GX_Position3f32(-1.0, 1.0, -1.0);
-                GX_Color1u32(col[0]);
-                GX_Position3f32(-1.0,-1.0,-1.0);
-                GX_Color1u32(col[0]);
-                GX_Position3f32(1.0,-1.0,-1.0);
-                GX_Color1u32(col[0]);
-                GX_Position3f32(1.0,1.0,-1.0);
-                GX_Color1u32(col[0]);
-
-                GX_Position3f32(-1.0,1.0,1.0);
-                GX_Color1u32(col[0]);
-                GX_Position3f32(-1.0,-1.0,1.0);
-                GX_Color1u32(col[0]);
-                GX_Position3f32(1.0,-1.0,1.0);
-                GX_Color1u32(col[0]);
-                GX_Position3f32(1.0,1.0,1.0);
-                GX_Color1u32(col[0]);
-
-                GX_Position3f32(-1.0,1.0,1.0);
-                GX_Color1u32(col[1]);
-                GX_Position3f32(1.0,1.0,1.0);
-                GX_Color1u32(col[1]);
-                GX_Position3f32(1.0,1.0,-1.0);
-                GX_Color1u32(col[1]);
-                GX_Position3f32(-1.0,1.0,-1.0);
-                GX_Color1u32(col[1]);
-
-                GX_Position3f32(-1.0,-1.0,1.0);
-                GX_Color1u32(col[1]);
-                GX_Position3f32(1.0,-1.0,1.0);
-                GX_Color1u32(col[1]);
-                GX_Position3f32(1.0,-1.0,-1.0);
-                GX_Color1u32(col[1]);
-                GX_Position3f32(-1.0,-1.0,-1.0);
-                GX_Color1u32(col[1]);
-
-                GX_Position3f32(-1.0,1.0,1.0);
-                GX_Color1u32(col[2]);
-                GX_Position3f32(-1.0,1.0,-1.0);
-                GX_Color1u32(col[2]);
-                GX_Position3f32(-1.0,-1.0,-1.0);
-                GX_Color1u32(col[2]);
-                GX_Position3f32(-1.0,-1.0,1.0);
-                GX_Color1u32(col[2]);
-
-                GX_Position3f32(1.0,1.0,1.0);
-                GX_Color1u32(col[2]);
-                GX_Position3f32(1.0,1.0,-1.0);
-                GX_Color1u32(col[2]);
-                GX_Position3f32(1.0,-1.0,-1.0);
-                GX_Color1u32(col[2]);
-                GX_Position3f32(1.0,-1.0,1.0);
-                GX_Color1u32(col[2]);
-            GX_End();
-        }
-    }
-
-    /**
      * Initialize the renderer, which means GRRLIB and loading all models.
      */
     pub fn init_render(&mut self) {
@@ -169,5 +105,5 @@ impl Renderer {
         unsafe {
             GRRLIB_Render();
         }
-    }   
+    }
 }
