@@ -7,7 +7,7 @@ const ENTRY_COUNT: usize = 1;
  * All models must be defined in this list, which is filled at compile time.
  */
 const RAW_DATA_LIST: [(&str, &'static[u8]); ENTRY_COUNT] = [
-    ("Suzanne", include_bytes!("../data/Suzanne.obj"))
+    ("Suzanne", include_bytes!("../data/Suz.obj"))
 ];
 
 /**

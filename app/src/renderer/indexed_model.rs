@@ -1,4 +1,5 @@
 use alloc::vec::Vec;
+use ogc_rs::{print, println};
 use wavefront::{Vertex, Obj};
 
 /**
@@ -24,6 +25,7 @@ impl IndexedModel {
             match vertex_map.iter().position(|check_vertex| check_vertex.position_index() == vertex.position_index()) {
                 Some(index) => indices.push(index as u16),
                 None => {
+                    indices.push(vertex_map.len() as u16);
                     vertex_map.push(vertex);
                     positions.push(vertex.position()[0]);
                     positions.push(vertex.position()[1]);
@@ -31,6 +33,7 @@ impl IndexedModel {
                 }
             }
         }
+        println!("Loaded: {:?}, {:?}", positions, indices);
         return IndexedModel {vertices: positions, indices};
     }
 }

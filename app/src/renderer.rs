@@ -50,7 +50,8 @@ impl Renderer {
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_CLR0, GX_CLR_RGB, GX_F32, 0);
             
             GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, model.indices.len() as u16);
-            for index in model.indices.to_vec().into_iter(){
+            let mut indices_copy = model.indices.to_vec();
+            for index in indices_copy {
                     GX_Position1x16(index);
                     GX_Color3f32(0.0, 1.0, 1.0);
             }
