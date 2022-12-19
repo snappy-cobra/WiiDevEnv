@@ -9,6 +9,8 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       FORCE_COLOR: 1
+      EARTHLY_PUSH: true
+      EARTHLY_MAX_REMOTE_CACHE: true
     steps:
     - uses: actions/checkout@v3
     - name: Toggle earthly push mode
@@ -38,6 +40,8 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       FORCE_COLOR: 1
+      EARTHLY_PUSH: true
+      EARTHLY_MAX_REMOTE_CACHE: true
     steps:
     - uses: actions/checkout@v3
     - name: Toggle earthly push mode
@@ -67,6 +71,8 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       FORCE_COLOR: 1
+      EARTHLY_PUSH: true
+      EARTHLY_MAX_REMOTE_CACHE: true
     steps:
     - uses: actions/checkout@v3
     - name: Toggle earthly push mode
