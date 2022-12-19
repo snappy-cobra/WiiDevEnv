@@ -70,8 +70,11 @@ build-prepare:
   COPY +unit-test-deps/recipe.json ./
   COPY ./app/powerpc-unknown-eabi.json ./
   RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
   # Only copy the rest of /app/lib afterwards:
   COPY ./app/lib/ ./
+  SAVE IMAGE --cache-hint
 
   WORKDIR /app/
 
@@ -79,6 +82,7 @@ build-prepare:
   COPY ./app/powerpc-unknown-eabi.json ./
   COPY +build-deps/recipe.json ./
   RUN cargo +nightly chef cook --no-std --recipe-path recipe.json -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
 
   COPY ./app/ .
 
