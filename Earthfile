@@ -85,18 +85,22 @@ build-prepare:
   SAVE IMAGE --cache-hint
 
   COPY ./app/ .
+  SAVE IMAGE --cache-hint
 
 build:
   FROM +build-prepare
   RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
+  SAVE IMAGE --cache-hint
 
 # Build a Wii ROM that runs the on-target-device integration test suite.
 build-integration-test:
   FROM +build-prepare
   RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
+  SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
+  SAVE IMAGE --cache-hint
 
 rust-cargo-chef:
   FROM qqwy/wii-rust-build-env
