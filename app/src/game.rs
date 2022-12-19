@@ -5,6 +5,7 @@ use rand::RngCore;
 use ogc_rs::{print, println, prelude::Input};
 use num::clamp;
 
+#[derive(Debug)]
 pub struct Position {
     pub x: f32,
     pub y: f32,
