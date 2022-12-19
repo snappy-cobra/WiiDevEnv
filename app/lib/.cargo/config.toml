@@ -1,11 +1,3 @@
-[build]
-target = "powerpc-unknown-eabi.json"
-rustflags = ["-C", "default_linker_libraries=y"]
-
-[unstable]
-build-std = ["core", "compiler_builtins", "alloc"]
-build-std-features = ["compiler-builtins-mem"]
-
 [net]
 # This option fixes an issue where when doing cross-platform emulation,
 # (such as aarch64 emulating amd64, or vice-versa)
