@@ -27,7 +27,7 @@ jobs:
     - name: Earthly version
       run: earthly --version
     - name: Compile main project
-      run: earthly --ci --push --no-output +build
+      run: earthly --ci --no-output +build
   unit-test:
     runs-on: ubuntu-latest
     env:
@@ -48,7 +48,7 @@ jobs:
     - name: Earthly version
       run: earthly --version
     - name: Run unit test suite
-      run: earthly --ci --push --no-output --remote-cache=qqwy/snappy_cobra_wii_dev_env:cache +unit-test
+      run: earthly --ci --no-output --remote-cache=qqwy/snappy_cobra_wii_dev_env:cache +unit-test
   integration-test:
     runs-on: ubuntu-latest
     env:
@@ -69,4 +69,4 @@ jobs:
     - name: Earthly version
       run: earthly --version
     - name: Run integration test suite
-      run: earthly --push --use-inline-cache --save-inline-cache --no-output --remote-cache=qqwy/snappy_cobra_wii_dev_env:cache +integration-test
+      run: earthly --use-inline-cache --save-inline-cache --no-output --remote-cache=qqwy/snappy_cobra_wii_dev_env:cache +integration-test
