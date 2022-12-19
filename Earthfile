@@ -43,7 +43,7 @@ build-env:
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
   RUN rustup component add rust-src --toolchain nightly
-  SAVE IMAGE --cache-from=qqwy/wii-rust-build-env:latest --push qqwy/wii-rust-build-env:latest
+  SAVE IMAGE --push=qqwy/wii-rust-build-env:latest
 
 build-env-all-platforms:
   BUILD --platform=linux/arm64 --platform=linux/amd64 +build-env
@@ -64,7 +64,7 @@ build:
 # Build a Wii ROM that runs the on-target-device integration test suite.
 build-integration-test:
   # FROM +build-env
-  FROM --platform=linux/amd64 qqwy/wii-rust-build-env
+  FROM qqwy/wii-rust-build-env
   COPY ./app/ /app/
   WORKDIR /app/
   RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
@@ -109,8 +109,7 @@ dolphin:
       cd ../ && \
       rm -rf ./dolphin-emu
 
-  # SAVE IMAGE --push ghcr.io/qqwy/dolphin:latest
-  SAVE IMAGE --cache-from=ghcr.io/qqwy/dolphin:latest dolphin:latest
+  SAVE IMAGE --push=qqwy/dolphin-emu:latest
 
 # IMAGE RUNNING THE ROM ON DOLPHIN
 # Actually running the ROM is kept as CMD
@@ -121,7 +120,8 @@ dolphin:
 integration-test-runner:
   # For speed in CI, we use a prior built image rather than depending on the target from within this Earthfile
   # FROM +dolphin
-  FROM --platform=linux/amd64 ghcr.io/qqwy/dolphin:latest
+  # FROM --platform=linux/amd64 ghcr.io/qqwy/dolphin:latest
+  FROM qqwy/dolphin:latest
 
 
   # Copy ROM into image:
@@ -163,8 +163,8 @@ integration-test-runner:
 
 integration-test:
   LOCALLY
-  WITH DOCKER --load="integration-test-runner:latest=+integration-test-runner" --platform=linux/amd64
-    RUN docker run --platform=linux/amd64 --shm-size=4G integration-test-runner:latest
+  WITH DOCKER --load="integration-test-runner:latest=+integration-test-runner"
+    RUN docker run --shm-size=4G integration-test-runner:latest
   END
 
 # Run all tests and sanity checks
