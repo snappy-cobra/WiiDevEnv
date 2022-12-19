@@ -84,7 +84,7 @@ build-prepare:
 
 build:
   FROM +build-prepare
-  RUN cargo +nightly build --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
 
@@ -99,7 +99,7 @@ rust-cargo-chef:
   CACHE /usr/local/cargo/registry/
   CACHE /usr/local/cargo/git/
   CACHE /build/target
-  RUN cargo install cargo-chef
+  RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
   RUN rustup +nightly component add rust-src
   SAVE IMAGE --cache-hint
 
