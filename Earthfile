@@ -126,6 +126,7 @@ unit-test:
   WORKDIR /app/lib/
   COPY +unit-test-deps/recipe.json ./
   RUN cargo +nightly chef cook --recipe-path recipe.json
+  SAVE IMAGE --cache-hint
 
   # Build and test app:
   COPY ./app/lib/ ./
