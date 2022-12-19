@@ -46,7 +46,8 @@ build-env:
 
   # Install cargo chef because we want it later
   RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
-  SAVE IMAGE --push=qqwy/wii-rust-build-env:latest
+
+  SAVE IMAGE --push qqwy/wii-rust-build-env:latest
 
 build-env-all-platforms:
   BUILD --platform=linux/arm64 --platform=linux/amd64 +build-env
@@ -173,7 +174,7 @@ dolphin:
       cd ../ && \
       rm -rf ./dolphin-emu
 
-  SAVE IMAGE --push=qqwy/dolphin-emu:latest
+  SAVE IMAGE --push qqwy/dolphin-emu:latest
 
 # IMAGE RUNNING THE ROM ON DOLPHIN
 # Actually running the ROM is kept as CMD
