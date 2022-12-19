@@ -6,9 +6,6 @@ VERSION --use-cache-command 0.6
 # - Grrlib
 build-env:
   FROM --platform=linux/amd64 ghcr.io/rust-lang/rust:nightly-slim
-  CACHE /usr/local/cargo/registry/index
-  CACHE /usr/local/cargo/registry/cache
-  CACHE /usr/local/cargo/git/db
   WORKDIR /
   COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
   RUN chmod +x ./install-devkitpro-pacman.sh
@@ -42,7 +39,10 @@ build-env:
 
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
-  RUN rustup component add rust-src --toolchain nightly
+  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
+  --mount=type=cache,target=/usr/local/cargo/registry/cache \
+  --mount=type=cache,target=/usr/local/cargo/git/db \
+  rustup component add rust-src --toolchain nightly
   SAVE IMAGE --cache-from=ghcr.io/qqwy/wii-rust-build-env:latest wii-rust-build-env:latest
 
 # Build the main game Wii ROM
@@ -51,7 +51,10 @@ build:
   FROM --platform=linux/amd64 ghcr.io/qqwy/wii-rust-build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
+  --mount=type=cache,target=/usr/local/cargo/registry/cache \
+  --mount=type=cache,target=/usr/local/cargo/git/db \
+  cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
 
 # Build a Wii ROM that runs the on-target-device integration test suite.
@@ -60,19 +63,25 @@ build-integration-test:
   FROM --platform=linux/amd64 ghcr.io/qqwy/wii-rust-build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
+  --mount=type=cache,target=/usr/local/cargo/registry/cache \
+  --mount=type=cache,target=/usr/local/cargo/git/db \
+  cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
 
 # Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
 unit-test:
   FROM --platform=linux/amd64 ghcr.io/rust-lang/rust:nightly-slim
-  RUN rustup +nightly component add rust-src
+  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
+  --mount=type=cache,target=/usr/local/cargo/registry/cache \
+  --mount=type=cache,target=/usr/local/cargo/git/db \
+  rustup +nightly component add rust-src
   COPY ./app/lib/ /app/lib/
   WORKDIR /app/lib/
-  CACHE /usr/local/cargo/registry/index
-  CACHE /usr/local/cargo/registry/cache
-  CACHE /usr/local/cargo/git/db
-  RUN cargo +nightly test --color=always
+  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
+  --mount=type=cache,target=/usr/local/cargo/registry/cache \
+  --mount=type=cache,target=/usr/local/cargo/git/db \
+  cargo +nightly test --color=always
 
 # BASE IMAGE CONTAINING DOLPHIN
 # -----------------------------
@@ -147,16 +156,16 @@ integration-test-runner:
   # # 2>&1: Redirect stderr (which Dolphin logs to) to stdout
   # # grep: Look in the log output only for lines containing 'OSREPORT_HLE' as those are where print statements and panics end up.
   CMD xvfb-run \
-      timeout 1m \
+      timeout 15s \
       dolphin-emu --batch --exec=/build/boot.elf \
-      2>&1 | grep "OSREPORT_HLE"
-  SAVE IMAGE itr
+      2>&1
+  SAVE IMAGE itr integration-test-runner:latest
 
 
 integration-test:
-  FROM earthly/dind:alpine
-  WITH DOCKER --load=+integration-test-runner --platform=linux/amd64
-    RUN docker run --shm-size=4G itr
+  LOCALLY
+  WITH DOCKER --load="integration-test-runner:latest=+integration-test-runner" --platform=linux/amd64
+    RUN docker run --platform=linux/amd64 --shm-size=4G integration-test-runner:latest
   END
 
 # Run all tests and sanity checks
