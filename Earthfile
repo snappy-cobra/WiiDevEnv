@@ -79,9 +79,9 @@ build-integration-test:
 # Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
 unit-test:
   FROM ghcr.io/rust-lang/rust:nightly-slim
-  CACHE /usr/local/cargo/registry/index
-  CACHE /usr/local/cargo/registry/cache
-  CACHE /usr/local/cargo/git/db
+  CACHE /usr/local/cargo/registry/
+  CACHE /usr/local/cargo/git/
+  CACHE /build/target
   # RUN apt update && apt install -y git
   RUN rustup +nightly component add rust-src
   COPY ./app/lib/ /app/lib/
