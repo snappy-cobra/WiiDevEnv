@@ -151,12 +151,12 @@ integration-test-runner:
   # # Desired command we really would like to run.
   # # Explanation:
   # # xvfb-run: With a fake display
-  # # timeout 5s: Dolphin hangs on panic. This converts a hang to a non-zero exit code
+  # # timeout 5s: Dolphin hangs on panic. This converts a hang to a non-zero exit code.
   # # dolphin-emu: Run Dolphin
   # # 2>&1: Redirect stderr (which Dolphin logs to) to stdout
   # # grep: Look in the log output only for lines containing 'OSREPORT_HLE' as those are where print statements and panics end up.
   CMD xvfb-run \
-      timeout 15s \
+      timeout --signal=KILL 15s \
       dolphin-emu --batch --exec=/build/boot.elf \
       2>&1
   SAVE IMAGE itr integration-test-runner:latest
