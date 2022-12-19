@@ -69,4 +69,4 @@ jobs:
     - name: Earthly version
       run: earthly --version
     - name: Run integration test suite
-      run: earthly --ci --push --allow-privileged +integration-test
+      run: earthly --push --allow-privileged --use-inline-cache --save-inline-cache --no-output +integration-test
