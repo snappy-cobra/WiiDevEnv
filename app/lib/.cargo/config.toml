@@ -1,2 +1,7 @@
 [net]
+# This option fixes an issue where when doing cross-platform emulation,
+# (such as aarch64 emulating amd64, or vice-versa)
+# `cargo update` (and commands running this internally)
+# would use up all available RAM.
+# c.f. https://github.com/rust-lang/cargo/issues/10583#issuecomment-1347394731
 git-fetch-with-cli = true
