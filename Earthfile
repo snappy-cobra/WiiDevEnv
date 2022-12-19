@@ -52,6 +52,7 @@ build-env-all-platforms:
 build:
   # FROM +build-env
   FROM ghcr.io/qqwy/wii-rust-build-env
+  RUN apt update && apt install -y git
   COPY ./app/ /app/
   WORKDIR /app/
   RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
@@ -153,7 +154,7 @@ integration-test-runner:
   # # 2>&1: Redirect stderr (which Dolphin logs to) to stdout
   # # grep: Look in the log output only for lines containing 'OSREPORT_HLE' as those are where print statements and panics end up.
   CMD xvfb-run \
-      timeout --signal=KILL 15s \
+      timeout --signal=KILL 1m \
       dolphin-emu --batch --exec=/build/boot.elf \
       2>&1
   SAVE IMAGE itr integration-test-runner:latest
@@ -167,7 +168,7 @@ integration-test:
 
 # Run all tests and sanity checks
 test:
-  BUILD +build # Normal compilation should work without problems
+  # BUILD +build # Normal compilation should work without problems
   BUILD +unit-test # Unit test suite
   BUILD +integration-test
   # TODO Clippy?
@@ -175,8 +176,9 @@ test:
 
 watch:
   LOCALLY
-  RUN fswatch --one-per-batch --recursive ./app/src ./app/data ./app/Cargo.toml ./app/build.rs ./app/wrapper.h ./app/powerpc-unknown-eabi.json | \
+  RUN fswatch --one-per-batch --recursive ./app/lib ./app/modulator ./app/src ./app/data ./app/Cargo.toml ./app/build.rs ./app/wrapper.h ./app/powerpc-unknown-eabi.json | \
     while read dir action file; do \
       echo -e "\e[1;34m The file '$file' appeared in directory '$dir' via '$action', rebuilding and retesting... \e[0m"; \
-      FORCE_COLOR=1 earthly --use-inline-cache +build; \
+      FORCE_COLOR=1 earthly --use-inline-cache +build && \
+      earthly --use-inline-cache +test; \
     done
