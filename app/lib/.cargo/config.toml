@@ -4,4 +4,4 @@
 # `cargo update` (and commands running this internally)
 # would use up all available RAM.
 # c.f. https://github.com/rust-lang/cargo/issues/10583#issuecomment-1347394731
-git-fetch-with-cli = true
+# git-fetch-with-cli = true

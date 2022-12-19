@@ -55,7 +55,6 @@ dolphin-all-platforms:
 build:
   # FROM +build-env
   FROM qqwy/wii-rust-build-env
-  RUN apt update && apt install -y git
   COPY ./app/ /app/
   WORKDIR /app/
   RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
@@ -73,11 +72,11 @@ build-integration-test:
 
 # Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
 unit-test:
-  FROM --platform=linux/amd64 ghcr.io/rust-lang/rust:nightly-slim
+  FROM ghcr.io/rust-lang/rust:nightly-slim
   CACHE /usr/local/cargo/registry/index
   CACHE /usr/local/cargo/registry/cache
   CACHE /usr/local/cargo/git/db
-  RUN apt update && apt install -y git
+  # RUN apt update && apt install -y git
   RUN rustup +nightly component add rust-src
   COPY ./app/lib/ /app/lib/
   WORKDIR /app/lib/
