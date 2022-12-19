@@ -51,15 +51,33 @@ build-env-all-platforms:
 dolphin-all-platforms:
   BUILD --platform=linux/arm64 --platform=linux/amd64 +dolphin
 
-# Build the main game Wii ROM
-build:
-  # FROM +build-env
+build-env-with-chef:
   FROM qqwy/wii-rust-build-env
   CACHE /usr/local/cargo/registry/index
   CACHE /usr/local/cargo/registry/cache
   CACHE /usr/local/cargo/git/db
-  COPY ./app/ /app/
+  RUN cargo install cargo-chef
+
+build-env-planner:
+  FROM +build-env-with-chef
+  COPY ./app/Cargo.* ./app/lib/ ./app/powerpc-unknown-eabi.json /app/
   WORKDIR /app/
+  RUN cargo chef prepare --recipe-path recipe.json
+  SAVE ARTIFACT recipe.json
+
+# Build the main game Wii ROM
+build:
+  # FROM +build-env
+  # FROM qqwy/wii-rust-build-env
+  FROM +build-env-with-chef
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
+  WORKDIR /app/
+  COPY +build-env-planner/recipe.json ./
+  COPY ./app/Cargo.* ./app/powerpc-unknown-eabi.json /app/
+  RUN cargo +nightly chef cook -Z build-std=core,alloc --target powerpc-unknown-eabi.json --recipe-path recipe.json
+  COPY ./app/ .
   RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
@@ -67,10 +85,13 @@ build:
 # Build a Wii ROM that runs the on-target-device integration test suite.
 build-integration-test:
   # FROM +build-env
-  FROM qqwy/wii-rust-build-env
+  # FROM qqwy/wii-rust-build-env
+  FROM +build-env-with-chef
   CACHE /usr/local/cargo/registry/index
   CACHE /usr/local/cargo/registry/cache
   CACHE /usr/local/cargo/git/db
+  COPY +build-env-planner/recipe.json
+  RUN cargo +nightly chef cook --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json --recipe-path recipe.json
   COPY ./app/ /app/
   WORKDIR /app/
   RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
