@@ -6,6 +6,9 @@ VERSION --use-cache-command 0.6
 # - Grrlib
 build-env:
   FROM ghcr.io/rust-lang/rust:nightly-slim
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
   WORKDIR /
   COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
   RUN chmod +x ./install-devkitpro-pacman.sh
@@ -39,10 +42,7 @@ build-env:
 
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
-  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
-  --mount=type=cache,target=/usr/local/cargo/registry/cache \
-  --mount=type=cache,target=/usr/local/cargo/git/db \
-  rustup component add rust-src --toolchain nightly
+  RUN rustup component add rust-src --toolchain nightly
   SAVE IMAGE --cache-from=ghcr.io/qqwy/wii-rust-build-env:latest wii-rust-build-env:latest
 
 build-env-all-platforms:
@@ -54,10 +54,7 @@ build:
   FROM ghcr.io/qqwy/wii-rust-build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
-  --mount=type=cache,target=/usr/local/cargo/registry/cache \
-  --mount=type=cache,target=/usr/local/cargo/git/db \
-  cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
 
@@ -67,25 +64,19 @@ build-integration-test:
   FROM --platform=linux/amd64 ghcr.io/qqwy/wii-rust-build-env
   COPY ./app/ /app/
   WORKDIR /app/
-  RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
-  --mount=type=cache,target=/usr/local/cargo/registry/cache \
-  --mount=type=cache,target=/usr/local/cargo/git/db \
-  cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
 
 # Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
 unit-test:
   FROM --platform=linux/amd64 ghcr.io/rust-lang/rust:nightly-slim
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
   RUN apt update && apt install -y git
-  # RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
-  # --mount=type=cache,target=/usr/local/cargo/registry/cache \
-  # --mount=type=cache,target=/usr/local/cargo/git/db \
   RUN rustup +nightly component add rust-src
   COPY ./app/lib/ /app/lib/
   WORKDIR /app/lib/
-  # RUN --mount=type=cache,target=/usr/local/cargo/registry/index \
-  # --mount=type=cache,target=/usr/local/cargo/registry/cache \
-  # --mount=type=cache,target=/usr/local/cargo/git/db \
   RUN cargo +nightly test --color=always
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/lib/Cargo.lock
 
