@@ -221,7 +221,7 @@ watch:
   RUN fswatch --one-per-batch --recursive ./app/lib ./app/modulator ./app/src ./app/data ./app/Cargo.toml ./app/build.rs ./app/wrapper.h ./app/powerpc-unknown-eabi.json | \
     while read dir action file; do \
       echo -e "\e[1;34m The file '$file' appeared in directory '$dir' via '$action', rebuilding and retesting... \e[0m"; \
-      FORCE_COLOR=1 earthly --use-inline-cache +build && \
-      earthly --use-inline-cache +test; \
+      FORCE_COLOR=1 earthly +build && \
+      FORCE_COLOR=1 earthly +test; \
     done
 
