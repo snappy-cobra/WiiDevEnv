@@ -77,7 +77,7 @@ build-prepare:
   SAVE IMAGE --cache-hint
 
   # Only copy the rest of /app/lib afterwards:
-  COPY ./app/lib/ ./
+  COPY ./app/lib/ .
   SAVE IMAGE --cache-hint
 
   WORKDIR /app/
