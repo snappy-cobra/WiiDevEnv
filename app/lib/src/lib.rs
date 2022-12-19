@@ -9,7 +9,7 @@ extern crate alloc;
 pub use std::{print, println};
 
 fn foo() -> bool {
-    println!("Hello, world!");
+    println!("Hello, world :-)!");
     true
 }
 
