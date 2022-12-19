@@ -6,9 +6,9 @@ VERSION --use-cache-command 0.6
 # - Grrlib
 build-env:
   FROM ghcr.io/rust-lang/rust:nightly-slim
-  CACHE /usr/local/cargo/registry/index
-  CACHE /usr/local/cargo/registry/cache
-  CACHE /usr/local/cargo/git/db
+  CACHE --sharing=shared /usr/local/cargo/registry/index
+  CACHE --sharing=shared /usr/local/cargo/registry/cache
+  CACHE --sharing=shared /usr/local/cargo/git/db
   WORKDIR /
   COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
   RUN chmod +x ./install-devkitpro-pacman.sh
@@ -43,6 +43,9 @@ build-env:
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
   RUN rustup component add rust-src --toolchain nightly
+
+  # Install cargo chef because we want it later
+  RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
   SAVE IMAGE --push=qqwy/wii-rust-build-env:latest
 
 build-env-all-platforms:
@@ -78,6 +81,10 @@ build-prepare:
 
   WORKDIR /app/
 
+
+build:
+  FROM +build-prepare
+
   # Build only dependencies, cacheable:
   COPY ./app/powerpc-unknown-eabi.json ./
   COPY +build-deps/recipe.json ./
@@ -87,8 +94,6 @@ build-prepare:
   COPY ./app/ .
   SAVE IMAGE --cache-hint
 
-build:
-  FROM +build-prepare
   RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
@@ -97,6 +102,16 @@ build:
 # Build a Wii ROM that runs the on-target-device integration test suite.
 build-integration-test:
   FROM +build-prepare
+
+  # Build only dependencies, cacheable:
+  COPY ./app/powerpc-unknown-eabi.json ./
+  COPY +build-deps/recipe.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  COPY ./app/ .
+  SAVE IMAGE --cache-hint
+
   RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
@@ -104,11 +119,10 @@ build-integration-test:
 
 rust-cargo-chef:
   FROM qqwy/wii-rust-build-env
-  CACHE /usr/local/cargo/registry/
-  CACHE /usr/local/cargo/git/
-  CACHE /build/target
+  CACHE --sharing=shared /usr/local/cargo/registry/
+  CACHE --sharing=shared /usr/local/cargo/git/
+  CACHE --sharing=shared /build/target
   RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
-  RUN rustup +nightly component add rust-src
   SAVE IMAGE --cache-hint
 
 unit-test-deps:
@@ -116,8 +130,8 @@ unit-test-deps:
   WORKDIR /app/lib/
   COPY ./app/lib/Cargo.* ./
   RUN cargo +nightly chef prepare  --recipe-path recipe.json
-  SAVE ARTIFACT recipe.json
   SAVE IMAGE --cache-hint
+  SAVE ARTIFACT recipe.json
 
 # Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
 unit-test:
