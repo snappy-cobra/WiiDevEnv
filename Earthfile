@@ -76,16 +76,33 @@ build-integration-test:
   RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
 
-# Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
-unit-test:
+unit-test-chef:
   FROM ghcr.io/rust-lang/rust:nightly-slim
   CACHE /usr/local/cargo/registry/
   CACHE /usr/local/cargo/git/
   CACHE /build/target
-  # RUN apt update && apt install -y git
+  RUN cargo install cargo-chef
   RUN rustup +nightly component add rust-src
-  COPY ./app/lib/ /app/lib/
+  SAVE IMAGE --cache-hint
+
+unit-test-deps:
+  FROM +unit-test-chef
   WORKDIR /app/lib/
+  COPY ./app/lib/Cargo.* ./
+  RUN cargo chef prepare  --recipe-path recipe.json
+  SAVE ARTIFACT recipe.json
+  SAVE IMAGE --cache-hint
+
+# Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
+unit-test:
+  FROM +unit-test-chef
+  # Build only dependencies, cacheable:
+  WORKDIR /app/lib/
+  COPY +unit-test-deps/recipe.json ./
+  RUN cargo chef cook --release --recipe-path recipe.json
+
+  # Build and test app:
+  COPY ./app/lib/ ./
   RUN cargo +nightly test --color=always
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/lib/Cargo.lock
 
