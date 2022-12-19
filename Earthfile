@@ -13,7 +13,7 @@ build-env:
   COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
   RUN chmod +x ./install-devkitpro-pacman.sh
   RUN apt-get update && \
-    apt-get install -y sudo wget inotify-tools unzip build-essential clang libclang-dev dosfstools && \
+    apt-get install -y git sudo wget inotify-tools unzip build-essential clang libclang-dev dosfstools && \
     sudo ./install-devkitpro-pacman.sh && \
     apt-get purge -y && \
     rm -rf /var/lib/apt/lists/*
@@ -43,10 +43,13 @@ build-env:
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
   RUN rustup component add rust-src --toolchain nightly
-  SAVE IMAGE --cache-from=ghcr.io/qqwy/wii-rust-build-env:latest wii-rust-build-env:latest
+  SAVE IMAGE --cache-from=ghcr.io/qqwy/wii-rust-build-env:latest --push qqwy/wii-rust-build-env:latest
 
 build-env-all-platforms:
-  BUILD --platform=linux/arm64 --platform=linux/amd64 +build
+  BUILD --platform=linux/arm64 --platform=linux/amd64 +build-env
+
+dolphin-all-platforms:
+  BUILD --platform=linux/arm64 --platform=linux/amd64 +dolphin
 
 # Build the main game Wii ROM
 build:
@@ -124,8 +127,7 @@ integration-test-runner:
 
   # Copy ROM into image:
   RUN mkdir /build
-  # COPY +build-integration-test/rust-wii.elf /build/boot.elf
-  COPY ./bin/boot-test.elf /build/boot.elf
+  COPY +build-integration-test/rust-wii.elf /build/boot.elf
 
   # Run rest of the commands as unprivileged user:
   RUN adduser --disabled-password --gecos '' user
