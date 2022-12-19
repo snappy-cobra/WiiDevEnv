@@ -123,7 +123,7 @@ rust-cargo-chef:
   CACHE --sharing=shared /usr/local/cargo/registry/
   CACHE --sharing=shared /usr/local/cargo/git/
   CACHE --sharing=shared /build/target
-  RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
+  # RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
   SAVE IMAGE --cache-hint
 
 unit-test-deps:
