@@ -189,3 +189,4 @@ watch:
       FORCE_COLOR=1 earthly --use-inline-cache +build && \
       earthly --use-inline-cache +test; \
     done
+
