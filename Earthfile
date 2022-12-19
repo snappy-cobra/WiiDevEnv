@@ -55,6 +55,9 @@ dolphin-all-platforms:
 build:
   # FROM +build-env
   FROM qqwy/wii-rust-build-env
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
   COPY ./app/ /app/
   WORKDIR /app/
   RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
@@ -65,6 +68,9 @@ build:
 build-integration-test:
   # FROM +build-env
   FROM qqwy/wii-rust-build-env
+  CACHE /usr/local/cargo/registry/index
+  CACHE /usr/local/cargo/registry/cache
+  CACHE /usr/local/cargo/git/db
   COPY ./app/ /app/
   WORKDIR /app/
   RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
