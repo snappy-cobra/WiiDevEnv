@@ -103,3 +103,5 @@ Thanks to the [rust-wii](https://github.com/rust-wii) project, without their wor
 Thanks to the [Rosalina](https://github.com/ProfElements/rosalina) project, which was a great source of inspiration.
 Thanks to [GRRLIB](https://github.com/GRRLIB/GRRLIB) which makes Wii development a bit more fun.
 Finally, a big thanks to [DevkitPro](https://github.com/devkitPro), which makes all the homebrew possible in the first place.
+
+

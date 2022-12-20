@@ -6,9 +6,9 @@ VERSION --use-cache-command 0.6
 # - Grrlib
 build-env:
   FROM ghcr.io/rust-lang/rust:nightly-slim
-  CACHE /usr/local/cargo/registry/index
-  CACHE /usr/local/cargo/registry/cache
-  CACHE /usr/local/cargo/git/db
+  CACHE --sharing=shared /usr/local/cargo/registry/index
+  CACHE --sharing=shared /usr/local/cargo/registry/cache
+  CACHE --sharing=shared /usr/local/cargo/git/db
   WORKDIR /
   COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
   RUN chmod +x ./install-devkitpro-pacman.sh
@@ -43,7 +43,11 @@ build-env:
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
   RUN rustup component add rust-src --toolchain nightly
-  SAVE IMAGE --push=qqwy/wii-rust-build-env:latest
+
+  # Install cargo chef because we want it later
+  RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
+
+  SAVE IMAGE --push qqwy/wii-rust-build-env:latest
 
 build-env-all-platforms:
   BUILD --platform=linux/arm64 --platform=linux/amd64 +build-env
@@ -51,55 +55,93 @@ build-env-all-platforms:
 dolphin-all-platforms:
   BUILD --platform=linux/arm64 --platform=linux/amd64 +dolphin
 
-# Build the main game Wii ROM
-build:
-  # FROM +build-env
-  FROM qqwy/wii-rust-build-env
-  CACHE /usr/local/cargo/registry
-  CACHE /usr/local/cargo/git
-  CACHE /build/target
-  COPY ./app/ /app/
+
+build-deps:
+  FROM +rust-cargo-chef
   WORKDIR /app/
-  RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
-  SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
-  SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
-
-# Build a Wii ROM that runs the on-target-device integration test suite.
-build-integration-test:
-  # FROM +build-env
-  FROM qqwy/wii-rust-build-env
-  CACHE /usr/local/cargo/registry/
-  CACHE /usr/local/cargo/git/
-  CACHE /build/target
-  COPY ./app/ /app/
-  WORKDIR /app/
-  RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
-  SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
-
-unit-test-chef:
-  FROM ghcr.io/rust-lang/rust:nightly-slim
-  CACHE /usr/local/cargo/registry/
-  CACHE /usr/local/cargo/git/
-  CACHE /build/target
-  RUN cargo install cargo-chef
-  RUN rustup +nightly component add rust-src
-  SAVE IMAGE --cache-hint
-
-unit-test-deps:
-  FROM +unit-test-chef
-  WORKDIR /app/lib/
-  COPY ./app/lib/Cargo.* ./
-  RUN cargo chef prepare  --recipe-path recipe.json
+  COPY ./app/Cargo.* ./app/powerpc-unknown-eabi.json ./
+  RUN cargo +nightly chef prepare --recipe-path recipe.json
   SAVE ARTIFACT recipe.json
   SAVE IMAGE --cache-hint
 
+# Build the main game Wii ROM
+build-prepare:
+  # FROM +build-env
+  FROM +rust-cargo-chef
+
+  # Build only lib/ dependencies, cacheable:
+  WORKDIR /app/lib/
+  COPY +unit-test-deps/recipe.json ./
+  COPY ./app/powerpc-unknown-eabi.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  # Only copy the rest of /app/lib afterwards:
+  COPY ./app/lib/ .
+  SAVE IMAGE --cache-hint
+
+  WORKDIR /app/
+
+
+build:
+  FROM +build-prepare
+
+  # Build only dependencies, cacheable:
+  COPY ./app/powerpc-unknown-eabi.json ./
+  COPY +build-deps/recipe.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  COPY ./app/ .
+  SAVE IMAGE --cache-hint
+
+  RUN cargo +nightly build -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot.elf
+  SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
+  SAVE IMAGE --cache-hint
+
+# Build a Wii ROM that runs the on-target-device integration test suite.
+build-integration-test:
+  FROM +build-prepare
+
+  # Build only dependencies, cacheable:
+  COPY ./app/powerpc-unknown-eabi.json ./
+  COPY +build-deps/recipe.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  COPY ./app/ .
+  SAVE IMAGE --cache-hint
+
+  RUN cargo +nightly build --features=run_target_tests -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE ARTIFACT /build/target/powerpc-unknown-eabi/debug/rust-wii.elf AS LOCAL ./bin/boot-test.elf
+  SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
+  SAVE IMAGE --cache-hint
+
+rust-cargo-chef:
+  FROM qqwy/wii-rust-build-env
+  CACHE --sharing=shared /usr/local/cargo/registry/
+  CACHE --sharing=shared /usr/local/cargo/git/
+  CACHE --sharing=shared /build/target
+  # RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
+  SAVE IMAGE --cache-hint
+
+unit-test-deps:
+  FROM +rust-cargo-chef
+  WORKDIR /app/lib/
+  COPY ./app/lib/Cargo.* ./
+  RUN cargo +nightly chef prepare  --recipe-path recipe.json
+  SAVE IMAGE --cache-hint
+  SAVE ARTIFACT recipe.json
+
 # Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
 unit-test:
-  FROM +unit-test-chef
+  FROM +rust-cargo-chef
   # Build only dependencies, cacheable:
   WORKDIR /app/lib/
   COPY +unit-test-deps/recipe.json ./
-  RUN cargo chef cook --release --recipe-path recipe.json
+  RUN cargo +nightly chef cook --recipe-path recipe.json
+  SAVE IMAGE --cache-hint
 
   # Build and test app:
   COPY ./app/lib/ ./
@@ -132,7 +174,7 @@ dolphin:
       cd ../ && \
       rm -rf ./dolphin-emu
 
-  SAVE IMAGE --push=qqwy/dolphin-emu:latest
+  SAVE IMAGE --push qqwy/dolphin-emu:latest
 
 # IMAGE RUNNING THE ROM ON DOLPHIN
 # Actually running the ROM is kept as CMD
@@ -203,7 +245,7 @@ watch:
   RUN fswatch --one-per-batch --recursive ./app/lib ./app/modulator ./app/src ./app/data ./app/Cargo.toml ./app/build.rs ./app/wrapper.h ./app/powerpc-unknown-eabi.json | \
     while read dir action file; do \
       echo -e "\e[1;34m The file '$file' appeared in directory '$dir' via '$action', rebuilding and retesting... \e[0m"; \
-      FORCE_COLOR=1 earthly --use-inline-cache +build && \
-      earthly --use-inline-cache +test; \
+      FORCE_COLOR=1 earthly +build && \
+      FORCE_COLOR=1 earthly +test; \
     done
 

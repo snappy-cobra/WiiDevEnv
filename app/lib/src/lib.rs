@@ -9,7 +9,7 @@ extern crate alloc;
 pub use std::{print, println};
 
 fn foo() -> bool {
-    println!("Hello, world :-)!");
+    println!("Hello, world!");
     true
 }
 
@@ -17,8 +17,8 @@ fn foo() -> bool {
 mod tests {
     #[test]
     fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+        let result = 2 + 3;
+        assert_eq!(result, 5);
     }
 
     #[test]
