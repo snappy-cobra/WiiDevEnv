@@ -51,6 +51,8 @@ build-env:
   # Make sure the target is set correctly.
   ENV CARGO_TARGET_DIR="/build/target"
   RUN rustup component add rust-src --toolchain nightly
+  RUN rustup component add clippy --toolchain nightly
+  RUN rustup component add rustfmt --toolchain nightly
 
   # Install cargo chef because we want it later
   RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
@@ -63,7 +65,11 @@ rust-cargo-chef:
   CACHE --sharing=shared /usr/local/cargo/registry/
   CACHE --sharing=shared /usr/local/cargo/git/
   CACHE --sharing=shared /build/target
-  # RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
+
+  # These can be removed once the `wii-rust-build-env` image has been rebuilt with them included:
+  RUN rustup component add clippy --toolchain nightly
+  RUN rustup component add rustfmt --toolchain nightly
+
   SAVE IMAGE --cache-hint
 
 
