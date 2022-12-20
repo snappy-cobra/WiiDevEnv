@@ -66,10 +66,6 @@ rust-cargo-chef:
   CACHE --sharing=shared /usr/local/cargo/git/
   CACHE --sharing=shared /build/target
 
-  # These can be removed once the `wii-rust-build-env` image has been rebuilt with them included:
-  RUN rustup component add clippy --toolchain nightly
-  RUN rustup component add rustfmt --toolchain nightly
-
   SAVE IMAGE --cache-hint
 
 
