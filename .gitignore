@@ -23,5 +23,5 @@ app/Cargo.lock
 *.DS_Store
 
 # Cargo build caching, so changes in Docker build do not require re-indexing crates
-.cargo_build_cache/*
-!.cargo_build_cache/.keep
+docker/.cargo_build_cache/*
+!docker/.cargo_build_cache/.keep

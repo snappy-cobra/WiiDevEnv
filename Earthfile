@@ -202,7 +202,7 @@ integration-test-runner:
 
   # Dolphin configuration settings:
   # RUN mkdir ~/.dolphin-emu
-  COPY --chown=user:user ./dolphin-emu /home/user/.dolphin-emu
+  COPY --chown=user:user ./docker/dolphin-emu /home/user/.dolphin-emu
   WORKDIR /home/user/
 
   # Run Dolphin using a fake display:
@@ -249,3 +249,20 @@ watch:
       FORCE_COLOR=1 earthly +test; \
     done
 
+build-watch-builder:
+  FROM qqwy/wii-rust-build-env
+  COPY docker/builder/build_watch.sh /
+  RUN chmod +x /build_watch.sh
+  WORKDIR /app/
+  CMD ["/build_watch.sh"]
+
+
+build-watch:
+  LOCALLY
+  WITH DOCKER --load="build-watch-builder=+build-watch-builder"
+    RUN docker run \
+        --mount type=bind,src=$(pwd)/app,dst=/app \
+        --mount type=bind,src=$(pwd)/bin,dst=/build/bin \
+        --mount type=bind,src=$(pwd)/docker/.cargo_build_cache,dst=/usr/local/cargo/registry \
+        build-watch-builder
+  END
