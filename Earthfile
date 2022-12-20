@@ -10,7 +10,7 @@ build-env:
   CACHE --sharing=shared /usr/local/cargo/registry/cache
   CACHE --sharing=shared /usr/local/cargo/git/db
   WORKDIR /
-  COPY ./docker/builder/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
+  COPY ./docker/devkitpro/install-devkitpro-pacman.sh /install-devkitpro-pacman.sh
   RUN chmod +x ./install-devkitpro-pacman.sh
   RUN apt-get update && \
     apt-get install -y git sudo wget inotify-tools unzip build-essential clang libclang-dev dosfstools && \
@@ -201,24 +201,16 @@ integration-test-runner:
   RUN echo "pcm.!default null\nctl.!default null\n" > ~/.asoundrc
 
   # Dolphin configuration settings:
-  # RUN mkdir ~/.dolphin-emu
-  COPY --chown=user:user ./docker/dolphin-emu /home/user/.dolphin-emu
+  COPY --chown=user:user ./docker/headless_dolphin/dolphin-emu /home/user/.dolphin-emu
   WORKDIR /home/user/
 
-  # Run Dolphin using a fake display:
-  # This command should work fine but crashes with a 'Bus error'.
-  # RUN xvfb-run dolphin-emu --batch --exec=/build/boot.elf
-  # CMD xvfb-run dolphin-emu --exec=/build/boot.elf --batch
-  # Alternative version that hangs without logging output ever appearing:
-  # RUN QT_QPA_PLATFORM=offscreen dolphin-emu --exec=/build/boot.elf
-
-  # # Desired command we really would like to run.
-  # # Explanation:
-  # # xvfb-run: With a fake display
-  # # timeout 5s: Dolphin hangs on panic. This converts a hang to a non-zero exit code.
-  # # dolphin-emu: Run Dolphin
-  # # 2>&1: Redirect stderr (which Dolphin logs to) to stdout
-  # # grep: Look in the log output only for lines containing 'OSREPORT_HLE' as those are where print statements and panics end up.
+  # Desired command we really would like to run.
+  # Explanation:
+  # xvfb-run: With a fake display
+  # timeout 1m: Dolphin hangs on panic. This converts a hang to a non-zero exit code.
+  # dolphin-emu: Run Dolphin
+  # 2>&1: Redirect stderr (which Dolphin logs to) to stdout
+  # grep: Look in the log output only for lines containing 'OSREPORT_HLE' as those are where print statements and panics end up.
   CMD xvfb-run \
       timeout --signal=KILL 1m \
       dolphin-emu --batch --exec=/build/boot.elf \
@@ -251,7 +243,7 @@ watch:
 
 build-watch-builder:
   FROM qqwy/wii-rust-build-env
-  COPY docker/builder/build_watch.sh /
+  COPY docker/build_watch/build_watch.sh /
   RUN chmod +x /build_watch.sh
   WORKDIR /app/
   CMD ["/build_watch.sh"]
@@ -263,6 +255,6 @@ build-watch:
     RUN docker run \
         --mount type=bind,src=$(pwd)/app,dst=/app \
         --mount type=bind,src=$(pwd)/bin,dst=/build/bin \
-        --mount type=bind,src=$(pwd)/docker/.cargo_build_cache,dst=/usr/local/cargo/registry \
+        --mount type=bind,src=$(pwd)/docker/build_watch/.cargo_build_cache,dst=/usr/local/cargo/registry \
         build-watch-builder
   END
