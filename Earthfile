@@ -1,9 +1,17 @@
 VERSION --use-cache-command 0.6
 
-# Portable build environment, containing
+build-env-all-platforms:
+  BUILD --platform=linux/arm64 --platform=linux/amd64 +build-env
+
+dolphin-all-platforms:
+  BUILD --platform=linux/arm64 --platform=linux/amd64 +dolphin
+
+# Portable 'Rust on Wii' build environment, containing
+# -----------------------------
 # - Rust
 # - DevkitPro + its wii-dev package
 # - Grrlib
+# - cargo chef
 build-env:
   FROM ghcr.io/rust-lang/rust:nightly-slim
   CACHE --sharing=shared /usr/local/cargo/registry/index
@@ -49,13 +57,17 @@ build-env:
 
   SAVE IMAGE --push qqwy/wii-rust-build-env:latest
 
-build-env-all-platforms:
-  BUILD --platform=linux/arm64 --platform=linux/amd64 +build-env
+# Base image for all Rust building images
+rust-cargo-chef:
+  FROM qqwy/wii-rust-build-env
+  CACHE --sharing=shared /usr/local/cargo/registry/
+  CACHE --sharing=shared /usr/local/cargo/git/
+  CACHE --sharing=shared /build/target
+  # RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
+  SAVE IMAGE --cache-hint
 
-dolphin-all-platforms:
-  BUILD --platform=linux/arm64 --platform=linux/amd64 +dolphin
 
-
+# Extract dependencies from main project using 'cargo chef'
 build-deps:
   FROM +rust-cargo-chef
   WORKDIR /app/
@@ -64,14 +76,13 @@ build-deps:
   SAVE ARTIFACT recipe.json
   SAVE IMAGE --cache-hint
 
-# Build the main game Wii ROM
+# The common steps of 'build' and 'build-integration-test'
 build-prepare:
-  # FROM +build-env
   FROM +rust-cargo-chef
 
-  # Build only lib/ dependencies, cacheable:
+  # Build only app/lib/ dependencies, cacheable:
   WORKDIR /app/lib/
-  COPY +unit-test-deps/recipe.json ./
+  COPY +app-lib-deps/recipe.json ./
   COPY ./app/powerpc-unknown-eabi.json ./
   RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE IMAGE --cache-hint
@@ -82,7 +93,7 @@ build-prepare:
 
   WORKDIR /app/
 
-
+# Build the main game Wii ROM
 build:
   FROM +build-prepare
 
@@ -118,15 +129,8 @@ build-integration-test:
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
   SAVE IMAGE --cache-hint
 
-rust-cargo-chef:
-  FROM qqwy/wii-rust-build-env
-  CACHE --sharing=shared /usr/local/cargo/registry/
-  CACHE --sharing=shared /usr/local/cargo/git/
-  CACHE --sharing=shared /build/target
-  # RUN cargo install --git=https://github.com/Qqwy/cargo-chef.git --branch=trim_target_suffix
-  SAVE IMAGE --cache-hint
-
-unit-test-deps:
+# Extract dependencies from the app/lib subproject using 'cargo chef'
+app-lib-deps:
   FROM +rust-cargo-chef
   WORKDIR /app/lib/
   COPY ./app/lib/Cargo.* ./
@@ -139,18 +143,18 @@ unit-test:
   FROM +rust-cargo-chef
   # Build only dependencies, cacheable:
   WORKDIR /app/lib/
-  COPY +unit-test-deps/recipe.json ./
+  COPY +app-lib-deps/recipe.json ./
   RUN cargo +nightly chef cook --recipe-path recipe.json
   SAVE IMAGE --cache-hint
 
-  # Build and test app:
+  # Build the app/lib project itself and execute the test runner:
   COPY ./app/lib/ ./
   RUN cargo +nightly test --color=always
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/lib/Cargo.lock
 
 # BASE IMAGE CONTAINING DOLPHIN
 # -----------------------------
-dolphin:
+dolphin-emu:
   FROM debian:bullseye-slim
 
   # Install dependencies for building Dolphin
@@ -180,14 +184,13 @@ dolphin:
 # Actually running the ROM is kept as CMD
 # This is necessary because we need to specify
 # a custom large `--shm-size` to `docker run`
-# if we do not want Dolphin to crash.
+# if we do not want Dolphin to crash with a 'Bus error'.
 # --------------------------------
+# This image sets up a fake display driver and a null audio sound card
 integration-test-runner:
   # For speed in CI, we use a prior built image rather than depending on the target from within this Earthfile
   # FROM +dolphin
-  # FROM --platform=linux/amd64 ghcr.io/qqwy/dolphin:latest
-  FROM qqwy/dolphin:latest
-
+  FROM qqwy/dolphin-emu:latest
 
   # Copy ROM into image:
   RUN mkdir /build
@@ -217,30 +220,23 @@ integration-test-runner:
       2>&1
   SAVE IMAGE itr integration-test-runner:latest
 
-
+# Runs the integration test suite on the local image
+# `LOCALLY` is used to not incur the overhead of running 'docker in docker'.
+# Separating this from the build process is necessary
+# because we need to supply the image with enough shared memory.
+# (Otherwise, Dolphin will crash with a 'Bus error')
 integration-test:
   LOCALLY
   WITH DOCKER --load="integration-test-runner:latest=+integration-test-runner"
     RUN docker run --shm-size=4G integration-test-runner:latest
   END
 
-# Run all tests and sanity checks
+# Run both test suites
 test:
-  # BUILD +build # Normal compilation should work without problems
   BUILD +unit-test # Unit test suite
   BUILD +integration-test
-  # TODO Clippy?
 
-
-watch:
-  LOCALLY
-  RUN fswatch --one-per-batch --recursive ./app/lib ./app/modulator ./app/src ./app/data ./app/Cargo.toml ./app/build.rs ./app/wrapper.h ./app/powerpc-unknown-eabi.json | \
-    while read dir action file; do \
-      echo -e "\e[1;34m The file '$file' appeared in directory '$dir' via '$action', rebuilding and retesting... \e[0m"; \
-      FORCE_COLOR=1 earthly +build && \
-      FORCE_COLOR=1 earthly +test; \
-    done
-
+# Image rebuilding the project as soon as anything changes
 build-watch-builder:
   FROM qqwy/wii-rust-build-env
   COPY docker/build_watch/build_watch.sh /
@@ -248,7 +244,11 @@ build-watch-builder:
   WORKDIR /app/
   CMD ["/build_watch.sh"]
 
-
+# The 'build-watch-builder' is executed here,
+# with local folders being bound so results are immediately written back.
+# 'app/' is bound so source changes are picked up
+# 'bin/' is bound as this is where the built binaries are stored
+# 'docker/build_watch/.cargo_build_cache' is cached to make sure that crates don't need to be redownloaded (even across restarts)
 build-watch:
   LOCALLY
   WITH DOCKER --load="build-watch-builder=+build-watch-builder"
