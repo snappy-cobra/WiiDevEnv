@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Load rust config vars
-source "$HOME/.cargo/env"
-
 # Set the CWD to the app folder
 cd /app
 
@@ -17,11 +14,6 @@ build () {
     cargo +nightly build -Z build-std=core,alloc --target=powerpc-unknown-eabi.json --color=always
     cp /build/target/powerpc-unknown-eabi/debug/rust-wii.elf /build/bin/boot.elf
     echo -e "\e[1;32m Binary main build completed. \e[0m"
-
-    echo -e "\e[1;34m Starting target-test build... \e[0m"
-    cargo +nightly build --features run_target_tests -Z build-std=core,alloc --target=powerpc-unknown-eabi.json --color=always
-    cp /build/target/powerpc-unknown-eabi/debug/rust-wii.elf /build/bin/boot-test.elf
-    echo -e "\e[1;32m Binary target-test build completed. \e[0m"
 }
 
 # Run script
