@@ -11795,7 +11795,7 @@ extern "C" {
     pub fn _calloc_r(arg1: *mut _reent, arg2: usize, arg3: usize) -> *mut ::libc::c_void;
 }
 extern "C" {
-    pub fn memalign(arg1: ::libc::c_ulong, arg2: ::libc::c_ulong) -> *mut ::libc::c_void;
+    pub fn memalign(arg1: usize, arg2: usize) -> *mut ::libc::c_void;
 }
 extern "C" {
     pub fn _memalign_r(arg1: *mut _reent, arg2: usize, arg3: usize) -> *mut ::libc::c_void;
@@ -11862,7 +11862,7 @@ extern "C" {
     pub fn bcmp(
         arg1: *const ::libc::c_void,
         arg2: *const ::libc::c_void,
-        arg3: ::libc::c_ulong,
+        arg3: usize,
     ) -> ::libc::c_int;
 }
 extern "C" {
@@ -12070,7 +12070,7 @@ extern "C" {
         arg1: *mut ::libc::c_void,
         arg2: *const ::libc::c_void,
         arg3: ::libc::c_int,
-        arg4: ::libc::c_ulong,
+        arg4: usize,
     ) -> *mut ::libc::c_void;
 }
 extern "C" {

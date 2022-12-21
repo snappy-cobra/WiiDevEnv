@@ -5,6 +5,7 @@ use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::{Rng, SeedableRng};
 
+#[derive(Debug)]
 pub struct Position {
     pub x: f32,
     pub y: f32,
