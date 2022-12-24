@@ -7,6 +7,7 @@ pub use inline::*;
 
 mod indexed_model;
 mod model_factory;
+use crate::raw_data_store::ModelName;
 use indexed_model::IndexedModel;
 use model_factory::ModelFactory;
 
@@ -65,7 +66,7 @@ impl Renderer {
      * Render the scene
      */
     pub fn render_world(&mut self, world: &World) {
-        let mut model = self.model_factory.get_model("Suzanne").unwrap();
+        let mut model = self.model_factory.get_model(ModelName::Suzanne).unwrap();
         for (_id, (position, _velocity)) in &mut world.query::<(&Position, &Velocity)>() {
             unsafe {
                 GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);

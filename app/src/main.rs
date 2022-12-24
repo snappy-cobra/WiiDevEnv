@@ -7,6 +7,7 @@
 #![no_std]
 #![feature(start)]
 #![feature(slice_flatten)]
+#![feature(const_for)]
 
 // Make sure the allocator is set.
 extern crate alloc;
