@@ -9,14 +9,13 @@ mod indexed_model;
 mod texture;
 mod textured_model;
 mod model_factory;
-use indexed_model::IndexedModel;
-use model_factory::ModelFactory;
 
+use textured_model::TexturedModel;
+use model_factory::ModelFactory;
 use crate::{Position, Velocity};
 use hecs::*;
 use ogc_rs::{print, println};
 use wavefront::{Obj, Vertex};
-
 use libc::c_void;
 use ogc_rs::prelude::Vec;
 
@@ -87,7 +86,7 @@ impl Renderer {
     /**
      * Allows for rendering the given object.
      */
-    fn render_mesh(model: &mut IndexedModel) {
+    fn render_mesh(model: &mut TexturedModel) {
         unsafe {
             // Pass the data to the GPU
             GX_SetArray(
@@ -106,6 +105,9 @@ impl Renderer {
             GX_SetVtxDesc(GX_VA_TEX0 as u8, GX_INDEX16 as u8);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+
+            // Set the repeating texture.
+            model.texture.set_active(true);
 
             // Provide all the indices (wii really wants this in direct mode it seems)
             GX_Begin(

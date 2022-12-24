@@ -6,9 +6,9 @@ use alloc::vec::Vec;
  */
 const RAW_DATA_LIST: [(&str, &'static [u8]); 4] = [
     ("Suzanne", include_bytes!("../data/Suz.obj")),
-    ("Suzanne_mat", include_bytes!("../data/Suz.mtl")),
+    ("Suzanne_TEX", include_bytes!("../data/Suz.png")),
     ("Triangle", include_bytes!("../data/Tri.obj")),
-    ("Triangle_mat", include_bytes!("../data/Tri.mtl")),
+    ("Triangle_TEX", include_bytes!("../data/Tri.png")),
 ];
 
 /**
