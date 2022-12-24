@@ -35,11 +35,14 @@ impl IndexedModel {
                     vertex_map.push(vertex);
                     
                     // Add the position coords
-                    positions.append(vertex.position());
+                    positions.push(vertex.position()[0]);
+                    positions.push(vertex.position()[1]);
+                    positions.push(vertex.position()[2]);
                     
                     // Add the texture coords (we only use the UV/ST coords, no 3D textures).
                     let uv = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
-                    tex_coords.append(uv[0..2]);
+                    tex_coords.push(uv[0]);
+                    tex_coords.push(uv[1]);
                 }
             }
         }
