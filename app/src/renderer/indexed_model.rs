@@ -23,6 +23,7 @@ impl IndexedModel {
         let mut positions: Vec<f32> = Vec::new();
         let mut tex_coords: Vec<f32> = Vec::new();
         let mut indices: Vec<u16> = Vec::new();
+
         for vertex in object.vertices() {
             match vertex_map
                 .iter()
@@ -46,10 +47,11 @@ impl IndexedModel {
                 }
             }
         }
+
         return IndexedModel {
             vertices: positions,
             indices,
-            tex_coords
+            tex_coords,
         };
     }
 }

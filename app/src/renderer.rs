@@ -6,6 +6,8 @@ mod inline;
 pub use inline::*;
 
 mod indexed_model;
+mod texture;
+mod textured_model;
 mod model_factory;
 use indexed_model::IndexedModel;
 use model_factory::ModelFactory;
