@@ -28,9 +28,11 @@ impl ModelFactory {
      * Create a new factory.
      */
     pub fn new() -> ModelFactory {
-        ModelFactory {
+        let mut res = ModelFactory {
             models: BTreeMap::new(),
-        }
+        };
+        res.load_models();
+        res
     }
 
     /**
@@ -45,7 +47,7 @@ impl ModelFactory {
                     self.models.insert(model, IndexedModel::new(&object));
                 }
                 Err(error) => {
-                    print!("Error loading model: {}", error);
+                    println!("Error loading model: {}", error);
                 }
             }
         }

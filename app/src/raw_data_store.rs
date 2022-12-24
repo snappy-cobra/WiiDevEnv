@@ -15,7 +15,7 @@ impl ModelName {
     ///
     /// Internally, `include_bytes!` is used
     /// so each of the files in the ../data directory is included at compile time.
-    pub fn to_data(&self) -> &'static [u8] {
+    pub const fn to_data(&self) -> &'static [u8] {
         match self {
             ModelName::Suzanne => include_bytes!("../data/Suz.obj"),
             ModelName::SuzanneMaterial => include_bytes!("../data/Suz.mtl"),
