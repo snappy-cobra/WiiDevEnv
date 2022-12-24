@@ -6,6 +6,7 @@
 #![allow(unused_imports)]
 #![no_std]
 #![feature(start)]
+#![feature(slice_flatten)]
 
 // Make sure the allocator is set.
 extern crate alloc;
@@ -19,6 +20,8 @@ use renderer::*;
 
 mod game;
 pub use game::*;
+
+mod raw_data_store;
 
 mod target_tests;
 

@@ -2,21 +2,27 @@
 include!("renderer/grrlib.rs");
 
 mod inline;
+
 pub use inline::*;
 
+mod indexed_model;
 mod model_factory;
-pub use model_factory::ModelFactory;
+use indexed_model::IndexedModel;
+use model_factory::ModelFactory;
 
 use crate::{Position, Velocity};
 use hecs::*;
-use ogc_rs::print;
-use wavefront::Obj;
+use ogc_rs::{print, println};
+use wavefront::{Obj, Vertex};
+
+use libc::c_void;
+use ogc_rs::prelude::Vec;
 
 /**
  * Data structure for the renderer.
  */
 pub struct Renderer {
-    model_factory: ModelFactory<'static>,
+    model_factory: ModelFactory,
 }
 
 /**
@@ -29,89 +35,6 @@ impl Renderer {
     pub fn new() -> Renderer {
         Renderer {
             model_factory: ModelFactory::new(),
-        }
-    }
-
-    /**
-     * Allows for rendering the given object.
-     */
-    fn render_mesh(object: &Obj) {
-        let col: [u32; 3] = [0xFFFFFFFF, 0xAAAAAAFF, 0x666666FF];
-        unsafe {
-            let vertex_count = (object.triangles().count() * 3) as u16;
-            GX_Begin(GX_TRIANGLES as u8, GX_VTXFMT0 as u8, vertex_count);
-            for triangle in object.triangles() {
-                for vertex in triangle {
-                    let position = vertex.position();
-                    GX_Position3f32(position[0], position[1], position[2]);
-                    GX_Color1u32(col[0]);
-                }
-            }
-            GX_End();
-        }
-    }
-
-    /**
-     * Render the main cube.
-     */
-    pub fn render_cube(&mut self) {
-        let col: [u32; 3] = [0xFFFFFFFF, 0xAAAAAAFF, 0x666666FF];
-        unsafe {
-            GX_Begin(GX_QUADS as u8, GX_VTXFMT0 as u8, 24u16);
-            GX_Position3f32(-1.0, 1.0, -1.0);
-            GX_Color1u32(col[0]);
-            GX_Position3f32(-1.0, -1.0, -1.0);
-            GX_Color1u32(col[0]);
-            GX_Position3f32(1.0, -1.0, -1.0);
-            GX_Color1u32(col[0]);
-            GX_Position3f32(1.0, 1.0, -1.0);
-            GX_Color1u32(col[0]);
-
-            GX_Position3f32(-1.0, 1.0, 1.0);
-            GX_Color1u32(col[0]);
-            GX_Position3f32(-1.0, -1.0, 1.0);
-            GX_Color1u32(col[0]);
-            GX_Position3f32(1.0, -1.0, 1.0);
-            GX_Color1u32(col[0]);
-            GX_Position3f32(1.0, 1.0, 1.0);
-            GX_Color1u32(col[0]);
-
-            GX_Position3f32(-1.0, 1.0, 1.0);
-            GX_Color1u32(col[1]);
-            GX_Position3f32(1.0, 1.0, 1.0);
-            GX_Color1u32(col[1]);
-            GX_Position3f32(1.0, 1.0, -1.0);
-            GX_Color1u32(col[1]);
-            GX_Position3f32(-1.0, 1.0, -1.0);
-            GX_Color1u32(col[1]);
-
-            GX_Position3f32(-1.0, -1.0, 1.0);
-            GX_Color1u32(col[1]);
-            GX_Position3f32(1.0, -1.0, 1.0);
-            GX_Color1u32(col[1]);
-            GX_Position3f32(1.0, -1.0, -1.0);
-            GX_Color1u32(col[1]);
-            GX_Position3f32(-1.0, -1.0, -1.0);
-            GX_Color1u32(col[1]);
-
-            GX_Position3f32(-1.0, 1.0, 1.0);
-            GX_Color1u32(col[2]);
-            GX_Position3f32(-1.0, 1.0, -1.0);
-            GX_Color1u32(col[2]);
-            GX_Position3f32(-1.0, -1.0, -1.0);
-            GX_Color1u32(col[2]);
-            GX_Position3f32(-1.0, -1.0, 1.0);
-            GX_Color1u32(col[2]);
-
-            GX_Position3f32(1.0, 1.0, 1.0);
-            GX_Color1u32(col[2]);
-            GX_Position3f32(1.0, 1.0, -1.0);
-            GX_Color1u32(col[2]);
-            GX_Position3f32(1.0, -1.0, -1.0);
-            GX_Color1u32(col[2]);
-            GX_Position3f32(1.0, -1.0, 1.0);
-            GX_Color1u32(col[2]);
-            GX_End();
         }
     }
 
@@ -142,18 +65,47 @@ impl Renderer {
      * Render the scene
      */
     pub fn render_world(&mut self, world: &World) {
-        let model = self.model_factory.get_model("Suzanne").unwrap();
+        let mut model = self.model_factory.get_model("Suzanne").unwrap();
         for (_id, (position, _velocity)) in &mut world.query::<(&Position, &Velocity)>() {
             unsafe {
                 GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
                 GRRLIB_ObjectView(
                     position.x, position.y, position.z, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0,
                 );
-                Self::render_mesh(&model);
+                Self::render_mesh(&mut model);
             }
         }
         unsafe {
             GRRLIB_Render();
+        }
+    }
+
+    /**
+     * Allows for rendering the given object.
+     */
+    fn render_mesh(model: &mut IndexedModel) {
+        unsafe {
+            GX_SetArray(
+                GX_VA_POS,
+                model.vertices.as_mut_ptr() as *mut c_void,
+                (4 * 3) as u8,
+            );
+            GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX16 as u8);
+            GX_SetVtxDesc(GX_VA_CLR0 as u8, GX_DIRECT as u8);
+            GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+            GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_CLR0, GX_CLR_RGB, GX_F32, 0);
+
+            GX_Begin(
+                GX_TRIANGLES as u8,
+                GX_VTXFMT0 as u8,
+                model.indices.len() as u16,
+            );
+            let indices_copy = model.indices.to_vec();
+            for index in indices_copy {
+                GX_Position1x16(index);
+                GX_Color3f32(1.0, 1.0, 1.0);
+            }
+            GX_End();
         }
     }
 }
