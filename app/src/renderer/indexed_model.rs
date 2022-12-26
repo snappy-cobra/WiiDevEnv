@@ -16,27 +16,29 @@ pub struct IndexedModel {
  */
 impl IndexedModel {
     /**
-     * Turn a model into its indexed equivalent
+     * Turn a model into its indexed equivalent.
+     *
+     * This is done by filling a memotable whose keys are known vertices that we have seen before,
+     * and whose values are indexes into an array containing the position of those vertices.
      */
-    pub fn new(object: &Obj) -> IndexedModel {
-        let mut seen: BTreeMap<Index, u16> = BTreeMap::new();
-        let mut vertices = Vec::new();
-        let indices = object
+    pub fn new(obj_data: &Obj) -> IndexedModel {
+        let mut memo: BTreeMap<Index, u16> = BTreeMap::new();
+        let mut positions = Vec::new();
+        let indices = obj_data
             .vertices()
             .map(|vertex| {
-                let pos = vertex.position_index();
-                match seen.get(&pos) {
-                    None => {
-                        let index = seen.len() as u16;
-                        seen.insert(pos, index);
-                        vertices.extend(vertex.position());
-                        index
-                    }
-                    Some(index) => *index,
-                }
+                let vertexId = vertex.position_index();
+                *memo.entry(vertexId).or_insert_with(|| {
+                    let index = (positions.len() / 3) as u16;
+                    positions.extend(vertex.position());
+                    index
+                })
             })
             .collect();
 
-        IndexedModel { vertices, indices }
+        IndexedModel {
+            vertices: positions,
+            indices,
+        }
     }
 }
