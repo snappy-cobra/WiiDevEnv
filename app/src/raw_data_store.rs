@@ -1,51 +1,26 @@
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
-
 /**
- * All models must be defined in this list, which is filled at compile time.
+ * Enumerates all models that exist in the project.
+ * Each of them can be turned into its actual raw data by calling `to_data()` on it.
  */
-const RAW_DATA_LIST: [(&str, &'static [u8]); 4] = [
-    ("Suzanne", include_bytes!("../data/Suz.obj")),
-    ("Suzanne_TEX", include_bytes!("../data/Suz.png")),
-    ("Triangle", include_bytes!("../data/Tri.obj")),
-    ("Triangle_TEX", include_bytes!("../data/Tri.png")),
-];
-
-/**
- * Data structure for the raw data store
- */
-pub struct RawDataStore {
-    raw_data_map: BTreeMap<&'static str, &'static [u8]>,
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+pub enum ModelName {
+    Suzanne,
+    SuzanneTexture,
+    Triangle,
+    SuzanneTexture,
 }
 
-/**
- * Implementation of the raw data store: allows for fast searching.
- */
-impl RawDataStore {
-    /**
-     * Create a new factory.
-     */
-    pub fn new() -> RawDataStore {
-        let mut store = RawDataStore {
-            raw_data_map: BTreeMap::new(),
-        };
-        store.load_references();
-        return store;
-    }
-
-    /**
-     * Load all references
-     */
-    fn load_references(&mut self) {
-        for entry in RAW_DATA_LIST {
-            self.raw_data_map.insert(entry.0, entry.1);
+impl ModelName {
+    /// Returns the raw model data of this particular ModelName
+    ///
+    /// Internally, `include_bytes!` is used
+    /// so each of the files in the ../data directory is included at compile time.
+    pub const fn to_data(&self) -> &'static [u8] {
+        match self {
+            ModelName::Suzanne => include_bytes!("../data/Suz.obj"),
+            ModelName::SuzanneMaterial => include_bytes!("../data/Suz.png"),
+            ModelName::Triangle => include_bytes!("../data/Tri.obj"),
+            ModelName::TriangleMaterial => include_bytes!("../data/Tri.png"),
         }
-    }
-
-    /**
-     * Return the given raw data.
-     */
-    pub fn get(&mut self, key: &'static str) -> Option<&&'static [u8]> {
-        return self.raw_data_map.get(key);
     }
 }

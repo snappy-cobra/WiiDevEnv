@@ -4,7 +4,7 @@ use alloc::vec::Vec;
 use ogc_rs::print;
 use wavefront::Obj;
 
-use crate::raw_data_store::RawDataStore;
+use crate::raw_data_store::ModelName;
 
 use super::indexed_model::IndexedModel;
 use super::texture::Texture;
@@ -13,14 +13,13 @@ use super::textured_model::TexturedModel;
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const MODEL_KEYS: [&str; 1] = ["Suzanne"];
-const KEY_TEXTURE: &str = "TEX";
+const MODEL_KEYS: [ModelName; 1] = [ModelName::Suzanne];
 
 /**
  * Data structure for the model factory.
  */
 pub struct ModelFactory {
-    models: BTreeMap<&'static str, TexturedModel>,
+    models: BTreeMap<ModelName, TexturedModel>,
 }
 
 /**
@@ -40,9 +39,23 @@ impl ModelFactory {
      * Load all models.
      */
     pub fn load_models(&mut self) {
-        let mut store = RawDataStore::new();
-        for key in MODEL_KEYS {
-            // Get the texture
+        for model_key in MODEL_KEYS {
+            let raw_data = model.to_data();
+            let string_data = from_utf8(raw_data).unwrap();
+
+            // Load the model
+            let indexed_model: IndexedModel;
+            match Obj::from_lines(string_data.lines()) {
+                Ok(object) => {
+                    indexed_model = IndexedModel::new(&object);
+                }
+                Err(error) => {
+                    print!("Error loading model: {}", error);
+                    continue;
+                }
+            }
+
+            // Load the texture
             let texture: Texture;
             match store.get(key + '_' + KEY_TEXTURE) {
                 Some(tex_data) => {
@@ -55,20 +68,6 @@ impl ModelFactory {
                 }
             }
 
-            // Get the model
-            let raw_model_data = store.get(key).unwrap();
-            let string_model_data = from_utf8(raw_model_data).unwrap();
-            let indexed_model: TexturedModel;
-            match Obj::from_lines(string_model_data.lines()) {
-                Ok(object) => {
-                    indexed_model = IndexedModel::new(&object);
-                }
-                Err(error) => {
-                    print!("Error loading model for key {} : {}", key, error);
-                    continue;
-                }
-            }
-
             // All went well, insert the textured model.
             self.models.insert(key, TexturedModel::new(indexed_model, texture));
         }
@@ -77,7 +76,7 @@ impl ModelFactory {
     /**
      * Return the given model.
      */
-    pub fn get_model(&mut self, key: &'static str) -> Option<&mut TexturedModel> {
-        return self.models.get_mut(key);
+    pub fn get_model(&mut self, key: ModelName) -> Option<&mut TexturedModel> {
+        return self.models.get_mut(&key);
     }
 }

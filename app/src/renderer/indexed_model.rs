@@ -1,6 +1,7 @@
+use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use ogc_rs::{print, println};
-use wavefront::{Obj, Vertex};
+use wavefront::{Index, Obj, Vertex};
 
 /**
  * Our representation of a model.
@@ -16,42 +17,32 @@ pub struct IndexedModel {
  */
 impl IndexedModel {
     /**
-     * Turn a model into its indexed equivalent
+     * Turn a model into its indexed equivalent.
+     *
+     * This is done by filling a memotable whose keys are known vertices that we have seen before,
+     * and whose values are indexes into an array containing the position of those vertices.
      */
-    pub fn new(object: &Obj) -> IndexedModel {
-        let mut vertex_map: Vec<Vertex> = Vec::new();
-        let mut positions: Vec<f32> = Vec::new();
+    pub fn new(obj_data: &Obj) -> IndexedModel {
+        let mut memo: BTreeMap<Index, u16> = BTreeMap::new();
+        let mut positions = Vec::new();
         let mut tex_coords: Vec<f32> = Vec::new();
-        let mut indices: Vec<u16> = Vec::new();
+        let indices = obj_data
+            .vertices()
+            .map(|vertex| {
+                let vertexId = vertex.position_index();
+                *memo.entry(vertexId).or_insert_with(|| {
+                    let index = (positions.len() / 3) as u16;
+                    positions.extend(vertex.position());
+                    tex_coords.extend(vertex.uv()[0..1]);
+                    index
+                })
+            })
+            .collect();
 
-        for vertex in object.vertices() {
-            match vertex_map
-                .iter()
-                .position(|check_vertex| check_vertex.position_index() == vertex.position_index())
-            {
-                Some(index) => indices.push(index as u16),
-                None => {
-                    // Remember this vertex and store the index
-                    indices.push(vertex_map.len() as u16);
-                    vertex_map.push(vertex);
-                    
-                    // Add the position coords
-                    positions.push(vertex.position()[0]);
-                    positions.push(vertex.position()[1]);
-                    positions.push(vertex.position()[2]);
-                    
-                    // Add the texture coords (we only use the UV/ST coords, no 3D textures).
-                    let uv = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
-                    tex_coords.push(uv[0]);
-                    tex_coords.push(uv[1]);
-                }
-            }
-        }
-
-        return IndexedModel {
+        IndexedModel {
             vertices: positions,
             indices,
-            tex_coords,
-        };
+            tex_coords
+        }
     }
 }
