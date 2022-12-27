@@ -1,4 +1,5 @@
 use crate::renderer::{GRRLIB_texImg, GRRLIB_LoadTexture, GRRLIB_SetTexture};
+use alloc::vec::Vec;
 
 /**
  * Our representation of a texture.

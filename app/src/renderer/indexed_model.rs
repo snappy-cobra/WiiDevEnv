@@ -33,7 +33,10 @@ impl IndexedModel {
                 *memo.entry(vertexId).or_insert_with(|| {
                     let index = (positions.len() / 3) as u16;
                     positions.extend(vertex.position());
-                    tex_coords.extend(vertex.uv()[0..1]);
+                    let uv: [f32; 2] = vertex.uv().unwrap_or([0.0, 0.0, 0.0])[0..2]
+                    .try_into()
+                    .expect("UV slice with incorrect length");
+                    tex_coords.extend(uv);
                     index
                 })
             })

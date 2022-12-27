@@ -39,8 +39,8 @@ impl ModelFactory {
      * Load all models.
      */
     pub fn load_models(&mut self) {
-        for model_key in MODEL_KEYS {
-            let raw_data = model.to_data();
+        for model_name in MODEL_KEYS {
+            let raw_data = model_name.to_data();
             let string_data = from_utf8(raw_data).unwrap();
 
             // Load the model
@@ -69,7 +69,7 @@ impl ModelFactory {
             }
 
             // All went well, insert the textured model.
-            self.models.insert(key, TexturedModel::new(indexed_model, texture));
+            self.models.insert(model_name, TexturedModel::new(indexed_model, texture));
         }
     }
 

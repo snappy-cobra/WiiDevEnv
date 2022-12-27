@@ -7,7 +7,7 @@ pub enum ModelName {
     Suzanne,
     SuzanneTexture,
     Triangle,
-    SuzanneTexture,
+    TriangleTexture,
 }
 
 impl ModelName {
@@ -18,9 +18,9 @@ impl ModelName {
     pub const fn to_data(&self) -> &'static [u8] {
         match self {
             ModelName::Suzanne => include_bytes!("../data/Suz.obj"),
-            ModelName::SuzanneMaterial => include_bytes!("../data/Suz.png"),
+            ModelName::SuzanneTexture => include_bytes!("../data/Suz.png"),
             ModelName::Triangle => include_bytes!("../data/Tri.obj"),
-            ModelName::TriangleMaterial => include_bytes!("../data/Tri.png"),
+            ModelName::TriangleTexture => include_bytes!("../data/Tri.png"),
         }
     }
 }

@@ -1,3 +1,6 @@
+use super::texture::Texture;
+use super::indexed_model::IndexedModel;
+
 /**
  * Represents an indexed model that is textured.
  */
@@ -10,7 +13,7 @@ pub struct TexturedModel {
  * Implementation of the textured model.
  */
 impl TexturedModel {
-    pub fn new(model: TexturedModel, texture: Texture) -> TexturedModel {
+    pub fn new(model: IndexedModel, texture: Texture) -> TexturedModel {
         return TexturedModel { model, texture };
     }
 }

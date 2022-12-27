@@ -12,9 +12,7 @@ mod model_factory;
 
 use crate::raw_data_store::ModelName;
 use model_factory::ModelFactory;
-
 use textured_model::TexturedModel;
-use model_factory::ModelFactory;
 use crate::{Position, Velocity};
 use hecs::*;
 use ogc_rs::{print, println};
@@ -78,7 +76,7 @@ impl Renderer {
                 GRRLIB_ObjectView(
                     position.x, position.y, position.z, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0,
                 );
-                Self::render_mesh(&mut model);
+                Self::render_textured_model(&mut model);
             }
         }
         unsafe {
@@ -89,17 +87,17 @@ impl Renderer {
     /**
      * Allows for rendering the given object.
      */
-    fn render_mesh(model: &mut TexturedModel) {
+    fn render_textured_model(textured_model: &mut TexturedModel) {
         unsafe {
             // Pass the data to the GPU
             GX_SetArray(
                 GX_VA_POS,
-                model.vertices.as_mut_ptr() as *mut c_void,
+                textured_model.model.vertices.as_mut_ptr() as *mut c_void,
                 BYTE_SIZE_F32 * 3u8 as u8,
             );
             GX_SetArray(
                 GX_VA_TEX0,
-                model.tex_coords.as_mut_ptr() as *mut c_void,
+                textured_model.model.tex_coords.as_mut_ptr() as *mut c_void,
                 BYTE_SIZE_F32 * 2u8 as u8,
             );
 
@@ -110,15 +108,15 @@ impl Renderer {
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
             // Set the repeating texture.
-            model.texture.set_active(true);
+            textured_model.texture.set_active(true);
 
             // Provide all the indices (wii really wants this in direct mode it seems)
             GX_Begin(
                 GX_TRIANGLES as u8,
                 GX_VTXFMT0 as u8,
-                model.indices.len() as u16,
+                textured_model.model.indices.len() as u16,
             );
-            let indices_copy = model.indices.to_vec();
+            let indices_copy = textured_model.model.indices.to_vec();
             for index in indices_copy {
                 GX_Position1x16(index);
             }
