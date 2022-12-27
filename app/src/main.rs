@@ -53,20 +53,23 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 
     let mut renderer = Renderer::new();
     renderer.init_render();
-    unsafe {
-        while running {
-            Input::update(ControllerType::Wii);
-            if wii_mote.is_button_down(Button::Home) {
-                break
-            }
-            if wii_mote.is_button_down(Button::One) {
-                system_shake_wii(&mut world, &mut velocity_query);
-            }
-            system_bounce_bounds(&mut world, &mut all_query);
-            system_integrate_motion(&mut world, &mut all_query);
-
-            renderer.render_world(&world);
+    loop {
+        // Check the loop should keep on running
+        unsafe {
+            if !running { break; }
         }
+        Input::update(ControllerType::Wii);
+        if wii_mote.is_button_down(Button::Home) {
+            // break;
+            unsafe { STM_ShutdownToStandby(); }
+        }
+        if wii_mote.is_button_down(Button::One) {
+            system_shake_wii(&mut world, &mut velocity_query);
+        }
+        system_bounce_bounds(&mut world, &mut all_query);
+        system_integrate_motion(&mut world, &mut all_query);
+
+        renderer.render_world(&world);
     }
     renderer.close_render();
     return 0;
@@ -77,9 +80,5 @@ pub unsafe extern "C" fn power_callback() {
     unsafe {
         running = false
     }
-
-    // libc::exit(0)
-    // STM_ShutdownToIdle();
-    // STM_ShutdownToStandby();
-    // STM_RebootSystem();
+    // Here STM_ShutdownToStandby() does not work
 }
