@@ -6,6 +6,7 @@ use wavefront::{Index, Obj, Vertex};
 /**
  * Our representation of a model.
  */
+#[derive(Debug)]
 pub struct IndexedModel {
     pub vertices: Vec<f32>,
     pub indices: Vec<u16>,
