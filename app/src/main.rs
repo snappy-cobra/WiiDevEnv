@@ -10,6 +10,7 @@
 
 // Make sure the allocator is set.
 extern crate alloc;
+use core::sync::atomic::{AtomicBool, Ordering};
 use ogc_rs::input::*;
 use ogc_rs::prelude::*;
 
@@ -27,7 +28,7 @@ mod target_tests;
 
 // Needed to signal to the main loop that it has to stop
 // TODO: if someone knows a cleaner way, please let me know
-static mut running: bool = false;
+static keepRunning: AtomicBool = AtomicBool::new(true);
 /**
  * Main entrypoint of the application.
  */
@@ -46,10 +47,9 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 fn main_game() -> isize {
     println!("Hello Rust!");
     // Set up shutdown catching
-    unsafe { running = true }
-    let power_callback_function_pointer: unsafe extern "C" fn() = power_callback;
-    let s = Some(power_callback_function_pointer);
-    unsafe { SYS_SetPowerCallback(s) };
+    // let power_callback_function_pointer: unsafe extern "C" fn() = power_callback;
+    // let s = Some(power_callback_function_pointer);
+    unsafe { SYS_SetPowerCallback(Some(power_callback)) };
 
     // Setup the wiimote
     Input::init(ControllerType::Wii);
@@ -70,16 +70,12 @@ fn main_game() -> isize {
     renderer.init_render();
     loop {
         // Check the loop should keep on running
-        unsafe {
-            if !running {
-                STM_ShutdownToStandby();
-            }
+        if !keepRunning.load(Ordering::Relaxed) {
+            break;
         }
         Input::update(ControllerType::Wii);
         if wii_mote.is_button_down(Button::Home) {
-            unsafe {
-                STM_ShutdownToStandby();
-            }
+            break;
         }
         if wii_mote.is_button_down(Button::One) {
             system_shake_wii(&mut world, &mut velocity_query);
@@ -89,11 +85,17 @@ fn main_game() -> isize {
 
         renderer.render_world(&world);
     }
-    renderer.close_render();
+    shutdown();
     0
 }
 
-pub unsafe extern "C" fn power_callback() {
+pub extern "C" fn power_callback() {
     println!("Received a shutdown call");
-    unsafe { running = false }
+    keepRunning.store(false, Ordering::Relaxed);
+}
+
+pub fn shutdown() {
+    unsafe {
+        STM_ShutdownToStandby();
+    }
 }
