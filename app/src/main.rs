@@ -42,34 +42,53 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 }
 
 fn main_game() -> isize {
-    // Setup the wiimote
-    Input::init(ControllerType::Wii);
-    let wii_mote = Input::new(ControllerType::Wii, ControllerPort::One);
-    wii_mote
-        .as_wpad()
-        .set_data_format(WPadDataFormat::ButtonsAccelIR);
-
     let mut game_state = GameState::new();
-
-    // Kickstart main loop.
+    let mut input_manager = InputManager::new();
     let renderer = Renderer::new();
+
     loop {
-        Input::update(ControllerType::Wii);
-        if wii_mote.is_button_down(Button::Home) {
-            break;
-        }
-        let controls = Controls {
-            home_button_down: wii_mote.is_button_down(Button::Home),
-            one_button_down: wii_mote.is_button_down(Button::One),
-        };
+        let controls = input_manager.update();
 
         let changes = Changes {
             controls,
             delta_time_ms: 100,
         };
-        game_state.update(&changes);
+        let should_continue = game_state.update(&changes);
+        if !should_continue {
+            break;
+        }
 
         renderer.render_world(&game_state.world);
     }
     0
+}
+
+struct InputManager {
+    wii_mote: Input,
+}
+
+impl InputManager {
+    pub fn new() -> Self {
+        // Setup the wiimote
+        Input::init(ControllerType::Wii);
+        let wii_mote = Input::new(ControllerType::Wii, ControllerPort::One);
+        wii_mote
+            .as_wpad()
+            .set_data_format(WPadDataFormat::ButtonsAccelIR);
+        Self { wii_mote }
+    }
+
+    pub fn update(&mut self) -> Controls {
+        Input::update(ControllerType::Wii);
+        Controls {
+            home_button_down: self.wii_mote.is_button_down(Button::Home),
+            one_button_down: self.wii_mote.is_button_down(Button::One),
+        }
+    }
+}
+
+impl Default for InputManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
