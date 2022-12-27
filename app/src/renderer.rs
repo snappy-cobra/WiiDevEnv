@@ -127,6 +127,7 @@ impl Renderer {
 impl Drop for Renderer {
     /// Cleanup the renderer
     fn drop(&mut self) {
+        println!("Dropping Renderer");
         unsafe {
             GRRLIB_Exit();
         }

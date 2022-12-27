@@ -11,6 +11,7 @@
 
 // Make sure the allocator is set.
 extern crate alloc;
+use core::sync::atomic::{AtomicBool, Ordering};
 use ogc_rs::input::*;
 use ogc_rs::prelude::*;
 
@@ -27,10 +28,18 @@ mod raw_data_store;
 
 mod target_tests;
 
-#[start]
+/// Global flag to signal to the main game loop when the game should quit.
+///
+/// Starts of 'true', and is toggled whenever someone physically tries to power down the Wii/shut off the game.
+///
+/// C.f. `register_power_callback`
+static KEEP_RUNNING: AtomicBool = AtomicBool::new(true);
+
 /**
  * Main entrypoint of the application.
  */
+
+#[start]
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
     if cfg!(feature = "run_target_tests") {
         println!("Running the target test suite...");
@@ -42,11 +51,12 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 }
 
 fn main_game() -> isize {
+    register_power_callback();
     let mut game_state = GameState::new();
     let mut input_manager = InputManager::new();
     let renderer = Renderer::new();
 
-    loop {
+    while KEEP_RUNNING.load(Ordering::SeqCst) {
         let controls = input_manager.update();
 
         let changes = Changes {
@@ -60,7 +70,33 @@ fn main_game() -> isize {
 
         renderer.render_world(&game_state.world);
     }
-    0
+    shutdown();
+}
+
+/// Registers the power callback,
+/// ensuring that when someone tries to shutdown the Wii by pressing the power button,
+/// we first can do cleanup and shut down cleanly afterwards
+///
+/// Without this, the Wii would hang when the user would try to exit the game.
+///
+pub fn register_power_callback() {
+    unsafe { SYS_SetPowerCallback(Some(power_callback)) };
+}
+
+/// Callback to be registered as power callback
+///
+/// Toggles a global flag which is checked inside the game loop, to break from it.
+extern "C" fn power_callback() {
+    println!("Received a shutdown call");
+    KEEP_RUNNING.store(false, Ordering::SeqCst);
+}
+
+/// Instructs the system to shut down cleanly.
+pub fn shutdown() -> ! {
+    unsafe {
+        STM_ShutdownToStandby();
+    }
+    core::unreachable!()
 }
 
 struct InputManager {
