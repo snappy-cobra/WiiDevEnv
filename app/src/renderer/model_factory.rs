@@ -16,6 +16,7 @@ const MODEL_KEYS: [&str; 1] = ["Suzanne"];
 /**
  * Data structure for the model factory.
  */
+#[derive(Debug)]
 pub struct ModelFactory {
     models: BTreeMap<&'static str, IndexedModel>,
 }
@@ -28,9 +29,11 @@ impl ModelFactory {
      * Create a new factory.
      */
     pub fn new() -> ModelFactory {
-        ModelFactory {
-            models: BTreeMap::new(),
-        }
+        let mut res: Self = ModelFactory {
+            models: Default::default(),
+        };
+        res.load_models();
+        res
     }
 
     /**
@@ -55,7 +58,7 @@ impl ModelFactory {
     /**
      * Return the given model.
      */
-    pub fn get_model(&mut self, key: &'static str) -> Option<&mut IndexedModel> {
-        return self.models.get_mut(key);
+    pub fn get_model(&self, key: &'static str) -> Option<&IndexedModel> {
+        return self.models.get(key);
     }
 }

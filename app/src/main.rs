@@ -7,6 +7,7 @@
 #![no_std]
 #![feature(start)]
 #![feature(slice_flatten)]
+#![feature(slice_ptr_get)]
 
 // Make sure the allocator is set.
 extern crate alloc;
@@ -54,8 +55,7 @@ fn main_game() -> isize {
     let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
 
     // Kickstart main loop.
-    let mut renderer = Renderer::new();
-    renderer.init_render();
+    let renderer = Renderer::new();
     loop {
         Input::update(ControllerType::Wii);
         if wii_mote.is_button_down(Button::Home) {
@@ -69,6 +69,5 @@ fn main_game() -> isize {
 
         renderer.render_world(&world);
     }
-    renderer.close_render();
     0
 }
