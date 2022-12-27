@@ -62,13 +62,19 @@ impl GameState {
     ///
     /// If the returned bool is `true`, the game loop should continue.
     /// When `false` is returned, the game should quit.
-    pub fn update(&mut self, changes: &Changes) {
+    pub fn update(&mut self, changes: &Changes) -> bool {
+        if changes.controls.home_button_down {
+            return false;
+        }
+
         if changes.controls.one_button_down {
             system_shake_wii(&mut self.world)
         }
 
         system_bounce_bounds(&mut self.world);
         system_integrate_motion(&mut self.world);
+
+        true
     }
 }
 
