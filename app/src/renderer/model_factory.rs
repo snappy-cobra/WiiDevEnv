@@ -4,7 +4,7 @@ use alloc::vec::Vec;
 use ogc_rs::print;
 use wavefront::Obj;
 
-use crate::raw_data_store::ModelName;
+use crate::raw_data_store::AssetName;
 
 use super::indexed_model::IndexedModel;
 use super::texture::Texture;
@@ -13,13 +13,15 @@ use super::textured_model::TexturedModel;
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const MODEL_KEYS: [ModelName; 1] = [ModelName::Suzanne];
+const TEXTURED_MODEL_DATA: [(AssetName, AssetName); 1] = [
+    (AssetName::Suzanne, AssetName::SuzanneTexture)
+];
 
 /**
  * Data structure for the model factory.
  */
 pub struct ModelFactory {
-    models: BTreeMap<ModelName, TexturedModel>,
+    models: BTreeMap<AssetName, TexturedModel>,
 }
 
 /**
@@ -39,7 +41,7 @@ impl ModelFactory {
      * Load all models.
      */
     pub fn load_models(&mut self) {
-        for model_name in MODEL_KEYS {
+        for (model_name, texture_name) in TEXTURED_MODEL_DATA {
             let raw_data = model_name.to_data();
             let string_data = from_utf8(raw_data).unwrap();
 
@@ -56,17 +58,8 @@ impl ModelFactory {
             }
 
             // Load the texture
-            let texture: Texture;
-            match store.get(key + '_' + KEY_TEXTURE) {
-                Some(tex_data) => {
-                    let mut tex_vec: Vec<u8> = Vec::from(tex_data);
-                    texture = Texture::new(tex_vec);
-                }
-                None => {
-                    print!("Error loading texture for key: {}", key);
-                    continue;
-                }
-            }
+            let mut tex_vec: Vec<u8> = Vec::from(texture_name.to_data());
+            let texture = Texture::new(tex_vec);
 
             // All went well, insert the textured model.
             self.models.insert(model_name, TexturedModel::new(indexed_model, texture));
@@ -76,7 +69,7 @@ impl ModelFactory {
     /**
      * Return the given model.
      */
-    pub fn get_model(&mut self, key: ModelName) -> Option<&mut TexturedModel> {
+    pub fn get_model(&mut self, key: AssetName) -> Option<&mut TexturedModel> {
         return self.models.get_mut(&key);
     }
 }
