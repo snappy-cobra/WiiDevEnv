@@ -52,11 +52,11 @@ pub fn system_integrate_motion(
     const drag: f32 = 1.001;
     for (_id, (position, velocity)) in query.query_mut(world) {
         position.x += velocity.x;
-        velocity.x = velocity.x / drag;
+        velocity.x /= drag;
         position.y += velocity.y;
-        velocity.y = velocity.y / drag;
+        velocity.y /= drag;
         position.z += velocity.z;
-        velocity.z = velocity.z / drag;
+        velocity.z /= drag;
     }
 }
 
@@ -70,24 +70,24 @@ pub fn system_bounce_bounds(
     for (_id, (position, velocity)) in query.query_mut(world) {
         const box_size: f32 = 5.0;
         if position.x > box_size {
-            velocity.x = -1.0 * velocity.x;
+            velocity.x *= -1.0;
             position.x = box_size;
         } else if position.x < -1.0 * box_size {
-            velocity.x = -1.0 * velocity.x;
+            velocity.x *= -1.0;
             position.x = -box_size;
         }
         if position.y > box_size {
-            velocity.y = -1.0 * velocity.y;
+            velocity.y *= -1.0;
             position.y = box_size;
         } else if position.y < -1.0 * box_size {
-            velocity.y = -1.0 * velocity.y;
+            velocity.y *= -1.0;
             position.y = -box_size;
         }
         if position.z > box_size {
-            velocity.z = -1.0 * velocity.z;
+            velocity.z *= -1.0;
             position.z = box_size;
         } else if position.z < -1.0 * box_size {
-            velocity.z = -1.0 * velocity.z;
+            velocity.z *= -1.0;
             position.z = -box_size;
         }
         velocity.x = clamp(velocity.x, -0.5, 0.5);
