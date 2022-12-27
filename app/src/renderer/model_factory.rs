@@ -1,33 +1,35 @@
-use ogc_rs::print;
-use wavefront::{Obj};
 use alloc::collections::BTreeMap;
 use alloc::str::from_utf8;
+use alloc::vec::Vec;
+use ogc_rs::print;
+use wavefront::Obj;
+
+use crate::raw_data_store::ModelName;
+
+use super::indexed_model::IndexedModel;
 
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const raw_model_data: [(&str, &'static[u8]); 2] = [
-    ("Teapot", include_bytes!("../../data/Teapot.obj")),
-    ("Suzanne", include_bytes!("../../data/Suzanne.obj"))
-];
+const MODEL_KEYS: [ModelName; 1] = [ModelName::Suzanne];
 
 /**
  * Data structure for the model factory.
  */
-pub struct ModelFactory<'a> {
-    models : BTreeMap<&'a str, Obj>
+pub struct ModelFactory {
+    models: BTreeMap<ModelName, IndexedModel>,
 }
 
 /**
  * Implementation of the model factory: allows for preloading and fetching model data.
  */
-impl<'a> ModelFactory<'a> {
+impl ModelFactory {
     /**
      * Create a new factory.
      */
-    pub fn new() -> ModelFactory<'a> {
+    pub fn new() -> ModelFactory {
         ModelFactory {
-            models: BTreeMap::new()
+            models: BTreeMap::new(),
         }
     }
 
@@ -35,15 +37,14 @@ impl<'a> ModelFactory<'a> {
      * Load all models.
      */
     pub fn load_models(&mut self) {
-        for entry in raw_model_data {
-            let key = entry.0;
-            let raw_data = entry.1;
+        for model in MODEL_KEYS {
+            let raw_data = model.to_data();
             let string_data = from_utf8(raw_data).unwrap();
             match Obj::from_lines(string_data.lines()) {
-                Ok(value) => {
-                    self.models.insert(key, value);
-                },
-                Err(error) =>{
+                Ok(object) => {
+                    self.models.insert(model, IndexedModel::new(&object));
+                }
+                Err(error) => {
                     print!("Error loading model: {}", error);
                 }
             }
@@ -53,7 +54,7 @@ impl<'a> ModelFactory<'a> {
     /**
      * Return the given model.
      */
-    pub fn get_model(&mut self, key: &str) -> Option<&wavefront::Obj> {
-        return self.models.get(key);
+    pub fn get_model(&mut self, key: ModelName) -> Option<&mut IndexedModel> {
+        return self.models.get_mut(&key);
     }
 }

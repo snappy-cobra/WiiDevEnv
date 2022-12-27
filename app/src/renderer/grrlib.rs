@@ -11529,18 +11529,13 @@ extern "C" {
     pub fn GRRLIB_Render();
 }
 extern "C" {
-    pub fn GRRLIB_Screen2Texture(
-        posx: ::libc::c_int,
-        posy: ::libc::c_int,
-        tex: *mut GRRLIB_texImg,
-        clear: bool,
-    );
+    pub fn GRRLIB_Screen2Texture(posx: u16_, posy: u16_, tex: *mut GRRLIB_texImg, clear: bool);
 }
 extern "C" {
     pub fn GRRLIB_CompoStart();
 }
 extern "C" {
-    pub fn GRRLIB_CompoEnd(posx: ::libc::c_int, posy: ::libc::c_int, tex: *mut GRRLIB_texImg);
+    pub fn GRRLIB_CompoEnd(posx: u16_, posy: u16_, tex: *mut GRRLIB_texImg);
 }
 extern "C" {
     pub fn GRRLIB_CreateEmptyTexture(width: u32_, height: u32_) -> *mut GRRLIB_texImg;
@@ -11555,10 +11550,7 @@ extern "C" {
     pub fn GRRLIB_LoadTextureJPG(my_jpg: *const u8_) -> *mut GRRLIB_texImg;
 }
 extern "C" {
-    pub fn GRRLIB_LoadTextureJPGEx(
-        my_jpg: *const u8_,
-        my_size: ::libc::c_int,
-    ) -> *mut GRRLIB_texImg;
+    pub fn GRRLIB_LoadTextureJPGEx(my_jpg: *const u8_, my_size: u32_) -> *mut GRRLIB_texImg;
 }
 extern "C" {
     pub fn GRRLIB_LoadTextureBMP(my_bmp: *const u8_) -> *mut GRRLIB_texImg;
@@ -11664,10 +11656,10 @@ extern "C" {
     pub fn GRRLIB_DrawCube(size: f32_, filled: bool, col: u32_);
 }
 extern "C" {
-    pub fn GRRLIB_DrawCylinder(r: f32_, h: f32_, d: ::libc::c_int, filled: bool, col: u32_);
+    pub fn GRRLIB_DrawCylinder(r: f32_, h: f32_, d: u16_, filled: bool, col: u32_);
 }
 extern "C" {
-    pub fn GRRLIB_DrawCone(r: f32_, h: f32_, d: ::libc::c_int, filled: bool, col: u32_);
+    pub fn GRRLIB_DrawCone(r: f32_, h: f32_, d: u16_, filled: bool, col: u32_);
 }
 extern "C" {
     pub fn GRRLIB_DrawTessPanel(
@@ -11803,7 +11795,7 @@ extern "C" {
     pub fn _calloc_r(arg1: *mut _reent, arg2: usize, arg3: usize) -> *mut ::libc::c_void;
 }
 extern "C" {
-    pub fn memalign(arg1: ::libc::c_ulong, arg2: ::libc::c_ulong) -> *mut ::libc::c_void;
+    pub fn memalign(arg1: usize, arg2: usize) -> *mut ::libc::c_void;
 }
 extern "C" {
     pub fn _memalign_r(arg1: *mut _reent, arg2: usize, arg3: usize) -> *mut ::libc::c_void;
@@ -11870,7 +11862,7 @@ extern "C" {
     pub fn bcmp(
         arg1: *const ::libc::c_void,
         arg2: *const ::libc::c_void,
-        arg3: ::libc::c_ulong,
+        arg3: usize,
     ) -> ::libc::c_int;
 }
 extern "C" {
@@ -12078,7 +12070,7 @@ extern "C" {
         arg1: *mut ::libc::c_void,
         arg2: *const ::libc::c_void,
         arg3: ::libc::c_int,
-        arg4: ::libc::c_ulong,
+        arg4: usize,
     ) -> *mut ::libc::c_void;
 }
 extern "C" {

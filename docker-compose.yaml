@@ -1,9 +1,0 @@
-version: "3.9"
-services:
-  builder:
-    build:
-      context: ./docker/builder
-      dockerfile: Dockerfile
-    volumes:
-      - ./app:/app
-      - ./bin:/build/bin
