@@ -7,6 +7,7 @@ pub use inline::*;
 
 mod indexed_model;
 mod model_factory;
+use crate::raw_data_store::ModelName;
 use indexed_model::IndexedModel;
 use model_factory::ModelFactory;
 
@@ -62,7 +63,7 @@ impl Renderer {
      * As part of this, refreshes the graphics buffer and wait for the next frame.
      */
     pub fn render_world(&self, world: &World) {
-        let model = self.model_factory.get_model("Suzanne").unwrap();
+        let model = self.model_factory.get_model(ModelName::Suzanne).unwrap();
         for (entity, (position, _velocity)) in &mut world.query::<(&Position, &Velocity)>() {
             self.render_entity(model, entity, position);
         }
