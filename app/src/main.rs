@@ -21,9 +21,6 @@ use rust_wii_lib::{Changes, Controls, GameState};
 pub mod renderer;
 use renderer::*;
 
-mod game;
-pub use game::*;
-
 mod raw_data_store;
 
 mod target_tests;
