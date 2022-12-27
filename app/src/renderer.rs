@@ -9,12 +9,9 @@ mod indexed_model;
 mod texture;
 mod textured_model;
 mod model_factory;
-<<<<<<< HEAD
-=======
+
 use crate::raw_data_store::ModelName;
-use indexed_model::IndexedModel;
 use model_factory::ModelFactory;
->>>>>>> develop
 
 use textured_model::TexturedModel;
 use model_factory::ModelFactory;
