@@ -15,6 +15,7 @@ use ogc_rs::input::*;
 use ogc_rs::prelude::*;
 
 use hecs::*;
+use rust_wii_lib::{Changes, Controls, GameState};
 
 pub mod renderer;
 use renderer::*;
@@ -49,10 +50,11 @@ fn main_game() -> isize {
         .set_data_format(WPadDataFormat::ButtonsAccelIR);
 
     // Setup the ECS environment.
-    let mut world = World::new();
-    batch_spawn_entities(&mut world, 5);
-    let mut velocity_query = PreparedQuery::<&mut Velocity>::default();
-    let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
+    // let mut world = World::new();
+    // batch_spawn_entities(&mut world, 5);
+    // let mut velocity_query = PreparedQuery::<&mut Velocity>::default();
+    // let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
+    let mut game_state = GameState::new();
 
     // Kickstart main loop.
     let renderer = Renderer::new();
@@ -61,13 +63,24 @@ fn main_game() -> isize {
         if wii_mote.is_button_down(Button::Home) {
             break;
         }
-        if wii_mote.is_button_down(Button::One) {
-            system_shake_wii(&mut world, &mut velocity_query);
-        }
-        system_bounce_bounds(&mut world, &mut all_query);
-        system_integrate_motion(&mut world, &mut all_query);
+        // if wii_mote.is_button_down(Button::One) {
+        //     system_shake_wii(&mut world, &mut velocity_query);
+        // }
+        // system_bounce_bounds(&mut world, &mut all_query);
+        // system_integrate_motion(&mut world, &mut all_query);
+        let controls = Controls {
+            home_button_down: wii_mote.is_button_down(Button::Home),
+            one_button_down: wii_mote.is_button_down(Button::One),
+        };
 
-        renderer.render_world(&world);
+        let changes = Changes {
+            controls,
+            delta_time_ms: 100,
+        };
+        game_state.update(&changes);
+
+        renderer.render_world(&game_state.world);
+        // renderer.render_world(&world);
     }
     0
 }

@@ -24,7 +24,7 @@ fn foo() -> bool {
 ///
 /// This includes all entities, as well as potentially score, 'current mode' and other global data
 pub struct GameState {
-    world: World,
+    pub world: World,
 }
 
 /// Represents any changes made by the outside world during a single frame.
@@ -63,14 +63,12 @@ impl GameState {
     /// If the returned bool is `true`, the game loop should continue.
     /// When `false` is returned, the game should quit.
     pub fn update(&mut self, changes: &Changes) {
-        let mut velocity_query = PreparedQuery::<&mut Velocity>::default();
-        let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
         if changes.controls.one_button_down {
-            system_shake_wii(&mut self.world, &mut velocity_query)
+            system_shake_wii(&mut self.world)
         }
 
-        system_bounce_bounds(&mut self.world, &mut all_query);
-        system_integrate_motion(&mut self.world, &mut all_query);
+        system_bounce_bounds(&mut self.world);
+        system_integrate_motion(&mut self.world);
     }
 }
 
@@ -84,6 +82,7 @@ pub struct Position {
     pub z: f32,
 }
 
+#[derive(Debug)]
 pub struct Velocity {
     pub x: f32,
     pub y: f32,
@@ -96,9 +95,9 @@ pub struct Velocity {
 pub fn batch_spawn_entities(world: &mut World, n: i32) {
     let mut small_rng = SmallRng::seed_from_u64(10u64);
     for index in 0..n {
-        const row_width: i32 = 10;
-        let pos_x: f32 = (index % row_width) as f32;
-        let pos_z: f32 = (index / row_width) as f32;
+        const ROW_WIDTH: i32 = 10;
+        let pos_x: f32 = (index % ROW_WIDTH) as f32;
+        let pos_z: f32 = (index / ROW_WIDTH) as f32;
 
         let position = Position {
             x: pos_x,
@@ -119,16 +118,15 @@ pub fn batch_spawn_entities(world: &mut World, n: i32) {
  */
 pub fn system_integrate_motion(
     world: &mut World,
-    query: &mut PreparedQuery<(&mut Position, &mut Velocity)>,
 ) {
-    const drag: f32 = 1.001;
-    for (_id, (position, velocity)) in query.query_mut(world) {
+    const DRAG: f32 = 1.001;
+    for (id, (position, velocity)) in world.query_mut::<(&mut Position, &mut Velocity)>() {
         position.x += velocity.x;
-        velocity.x /= drag;
+        velocity.x /= DRAG;
         position.y += velocity.y;
-        velocity.y /= drag;
+        velocity.y /= DRAG;
         position.z += velocity.z;
-        velocity.z /= drag;
+        velocity.z /= DRAG;
     }
 }
 
@@ -137,30 +135,29 @@ pub fn system_integrate_motion(
  */
 pub fn system_bounce_bounds(
     world: &mut World,
-    query: &mut PreparedQuery<(&mut Position, &mut Velocity)>,
 ) {
-    for (_id, (position, velocity)) in query.query_mut(world) {
-        const box_size: f32 = 5.0;
-        if position.x > box_size {
+    for (_id, (position, velocity)) in world.query_mut::<(&mut Position, &mut Velocity)>() {
+        const BOX_SIZE: f32 = 5.0;
+        if position.x > BOX_SIZE {
             velocity.x *= -1.0;
-            position.x = box_size;
-        } else if position.x < -1.0 * box_size {
+            position.x = BOX_SIZE;
+        } else if position.x < -1.0 * BOX_SIZE {
             velocity.x *= -1.0;
-            position.x = -box_size;
+            position.x = -BOX_SIZE;
         }
-        if position.y > box_size {
+        if position.y > BOX_SIZE {
             velocity.y *= -1.0;
-            position.y = box_size;
-        } else if position.y < -1.0 * box_size {
+            position.y = BOX_SIZE;
+        } else if position.y < -1.0 * BOX_SIZE {
             velocity.y *= -1.0;
-            position.y = -box_size;
+            position.y = -BOX_SIZE;
         }
-        if position.z > box_size {
+        if position.z > BOX_SIZE {
             velocity.z *= -1.0;
-            position.z = box_size;
-        } else if position.z < -1.0 * box_size {
+            position.z = BOX_SIZE;
+        } else if position.z < -1.0 * BOX_SIZE {
             velocity.z *= -1.0;
-            position.z = -box_size;
+            position.z = -BOX_SIZE;
         }
         velocity.x = clamp(velocity.x, -0.5, 0.5);
         velocity.y = clamp(velocity.y, -0.5, 0.5);
@@ -171,9 +168,10 @@ pub fn system_bounce_bounds(
 /**
  * Create velocity in random directions.
  */
-pub fn system_shake_wii(world: &mut World, query: &mut PreparedQuery<&mut Velocity>) {
+pub fn system_shake_wii(world: &mut World,
+) {
     let mut small_rng = SmallRng::seed_from_u64(10u64);
-    for (_id, velocity) in query.query_mut(world) {
+    for (_id, velocity) in world.query_mut::<&mut Velocity>() {
         velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
         velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
     }
