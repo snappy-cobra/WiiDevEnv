@@ -26,9 +26,13 @@ mod raw_data_store;
 
 mod target_tests;
 
-// Needed to signal to the main loop that it has to stop
-// TODO: if someone knows a cleaner way, please let me know
-static keepRunning: AtomicBool = AtomicBool::new(true);
+/// Global flag to signal to the main game loop when the game should quit.
+///
+/// Starts of 'true', and is toggled whenever someone physically tries to power down the Wii/shut off the game.
+///
+/// C.f. `register_power_callback`
+static KEEP_RUNNING: AtomicBool = AtomicBool::new(true);
+
 /**
  * Main entrypoint of the application.
  */
@@ -46,10 +50,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 
 fn main_game() -> isize {
     println!("Hello Rust!");
-    // Set up shutdown catching
-    // let power_callback_function_pointer: unsafe extern "C" fn() = power_callback;
-    // let s = Some(power_callback_function_pointer);
-    unsafe { SYS_SetPowerCallback(Some(power_callback)) };
+    register_power_callback();
 
     // Setup the wiimote
     Input::init(ControllerType::Wii);
@@ -70,7 +71,7 @@ fn main_game() -> isize {
     renderer.init_render();
     loop {
         // Check the loop should keep on running
-        if !keepRunning.load(Ordering::Relaxed) {
+        if !KEEP_RUNNING.load(Ordering::Relaxed) {
             break;
         }
         Input::update(ControllerType::Wii);
@@ -89,11 +90,25 @@ fn main_game() -> isize {
     0
 }
 
-pub extern "C" fn power_callback() {
-    println!("Received a shutdown call");
-    keepRunning.store(false, Ordering::Relaxed);
+/// Registers the power callback,
+/// ensuring that when someone tries to shutdown the Wii by pressing the power button,
+/// we first can do cleanup and shut down cleanly afterwards
+///
+/// Without this, the Wii would hang when the user would try to exit the game.
+///
+pub fn register_power_callback() {
+    unsafe { SYS_SetPowerCallback(Some(power_callback)) };
 }
 
+/// Callback to be registered as power callback
+///
+/// Toggles a global flag which is checked inside the game loop, to break from it.
+extern "C" fn power_callback() {
+    println!("Received a shutdown call");
+    KEEP_RUNNING.store(false, Ordering::Relaxed);
+}
+
+/// Instructs the system to shut down cleanly.
 pub fn shutdown() {
     unsafe {
         STM_ShutdownToStandby();
