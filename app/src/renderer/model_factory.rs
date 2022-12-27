@@ -14,7 +14,7 @@ use super::textured_model::TexturedModel;
  * All models must be defined in this list, which is filled at compile time.
  */
 const TEXTURED_MODEL_DATA: [(AssetName, AssetName); 1] = [
-    (AssetName::Suzanne, AssetName::SuzanneTexture)
+    (AssetName::Cube, AssetName::CubeTexture)
 ];
 
 /**
@@ -58,7 +58,7 @@ impl ModelFactory {
             }
 
             // Load the texture
-            let mut tex_vec: Vec<u8> = Vec::from(texture_name.to_data());
+            let tex_vec: Vec<u8> = Vec::from(texture_name.to_data());
             let texture = Texture::new(tex_vec);
 
             // All went well, insert the textured model.
