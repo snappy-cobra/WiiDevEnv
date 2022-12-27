@@ -55,7 +55,6 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
     renderer.init_render();
     unsafe {
         while running {
-            println!("{}", running);
             Input::update(ControllerType::Wii);
             if wii_mote.is_button_down(Button::Home) {
                 break
@@ -78,6 +77,7 @@ pub unsafe extern "C" fn power_callback() {
     unsafe {
         running = false
     }
+
     // libc::exit(0)
     // STM_ShutdownToIdle();
     // STM_ShutdownToStandby();
