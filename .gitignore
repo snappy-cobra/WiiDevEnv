@@ -19,3 +19,8 @@ bin/*
 app/target
 app/Cargo.lock
 *.DS_Store
+
+# Ignore Clion
+app/.idea
+.idea
+
