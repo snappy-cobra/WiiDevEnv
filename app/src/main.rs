@@ -7,6 +7,7 @@
 #![no_std]
 #![feature(start)]
 #![feature(slice_flatten)]
+#![feature(slice_ptr_get)]
 
 // Make sure the allocator is set.
 extern crate alloc;
@@ -66,9 +67,7 @@ fn main_game() -> isize {
     let mut all_query = PreparedQuery::<(&mut Position, &mut Velocity)>::default();
 
     // Kickstart main loop.
-
-    let mut renderer = Renderer::new();
-    renderer.init_render();
+    let renderer = Renderer::new();
     loop {
         // Check the loop should keep on running
         if !KEEP_RUNNING.load(Ordering::Relaxed) {
