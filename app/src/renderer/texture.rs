@@ -1,3 +1,5 @@
+use core::ptr::null;
+
 use crate::renderer::{GRRLIB_texImg, GRRLIB_LoadTexture, GRRLIB_SetTexture};
 use alloc::vec::Vec;
 
@@ -15,10 +17,13 @@ impl Texture {
     /**
      * Load a new texture based on PNG image data.
      */
-    pub fn new(png_data: Vec<u8>) -> Texture {
+    pub fn from_bytes(png_data: Vec<u8>) -> Result<Texture, &'static str> {
         unsafe {
             let grrlib_texture = GRRLIB_LoadTexture(png_data.as_ptr());
-            return Texture { grrlib_texture };
+            if grrlib_texture.is_null() {
+                return Err("Image could not be loaded");
+            }
+            return Ok(Texture { grrlib_texture });
         }
     }
 

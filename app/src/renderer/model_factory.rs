@@ -59,7 +59,14 @@ impl ModelFactory {
 
             // Load the texture
             let tex_vec: Vec<u8> = Vec::from(texture_name.to_data());
-            let texture = Texture::new(tex_vec);
+            let texture: Texture;
+            match Texture::from_bytes(tex_vec) {
+                Ok(new_texture) => texture = new_texture,
+                Err(error) => {
+                    print!("Error loading model: {}", error);
+                    continue;
+                }
+            }
 
             // All went well, insert the textured model.
             self.models.insert(model_name, TexturedModel::new(indexed_model, texture));
