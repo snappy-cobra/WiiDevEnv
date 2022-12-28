@@ -8,7 +8,7 @@ extern crate alloc;
 #[cfg(not(feature = "wii"))]
 pub use std::{print, println};
 
-use hecs::{World, PreparedQuery};
+use hecs::{PreparedQuery, World};
 use num::clamp;
 use rand::rngs::SmallRng;
 use rand::RngCore;
@@ -50,7 +50,9 @@ pub struct Controls {
 impl GameState {
     /// Creates a GameState in the situation at the start of the game
     pub fn new() -> GameState {
-        let mut res = GameState { world: World::new() };
+        let mut res = GameState {
+            world: World::new(),
+        };
 
         batch_spawn_entities(&mut res.world, 5);
 
@@ -77,9 +79,6 @@ impl GameState {
         true
     }
 }
-
-
-
 
 #[derive(Debug)]
 pub struct Position {
@@ -122,9 +121,7 @@ pub fn batch_spawn_entities(world: &mut World, n: i32) {
 /**
  * Apply the velocity to the positions.
  */
-pub fn system_integrate_motion(
-    world: &mut World,
-) {
+pub fn system_integrate_motion(world: &mut World) {
     const DRAG: f32 = 1.001;
     for (id, (position, velocity)) in world.query_mut::<(&mut Position, &mut Velocity)>() {
         position.x += velocity.x;
@@ -139,9 +136,7 @@ pub fn system_integrate_motion(
 /**
  * Bounce the cubes against the bounds.
  */
-pub fn system_bounce_bounds(
-    world: &mut World,
-) {
+pub fn system_bounce_bounds(world: &mut World) {
     for (_id, (position, velocity)) in world.query_mut::<(&mut Position, &mut Velocity)>() {
         const BOX_SIZE: f32 = 5.0;
         if position.x > BOX_SIZE {
@@ -174,16 +169,13 @@ pub fn system_bounce_bounds(
 /**
  * Create velocity in random directions.
  */
-pub fn system_shake_wii(world: &mut World,
-) {
+pub fn system_shake_wii(world: &mut World) {
     let mut small_rng = SmallRng::seed_from_u64(10u64);
     for (_id, velocity) in world.query_mut::<&mut Velocity>() {
         velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
         velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {

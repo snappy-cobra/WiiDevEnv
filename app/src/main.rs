@@ -12,6 +12,7 @@
 // Make sure the allocator is set.
 extern crate alloc;
 use core::sync::atomic::{AtomicBool, Ordering};
+use libc::exit;
 use ogc_rs::input::*;
 use ogc_rs::prelude::*;
 
@@ -43,12 +44,15 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
         target_tests::run_test_suite()
     } else {
         println!("Starting game!");
-        main_game()
+        register_power_callback();
+        main_game();
+        shutdown();
+        0
     }
 }
 
 fn main_game() -> isize {
-    register_power_callback();
+    // register_power_callback();
     let mut game_state = GameState::new();
     let mut input_manager = InputManager::new();
     let renderer = Renderer::new();
@@ -67,7 +71,9 @@ fn main_game() -> isize {
 
         renderer.render_world(&game_state.world);
     }
-    shutdown();
+    println!("Test me");
+    // shutdown();
+    0
 }
 
 /// Registers the power callback,
@@ -90,10 +96,11 @@ extern "C" fn power_callback() {
 
 /// Instructs the system to shut down cleanly.
 pub fn shutdown() -> ! {
-    unsafe {
-        STM_ShutdownToStandby();
-    }
-    core::unreachable!()
+    // unsafe {
+    //     STM_ShutdownToStandby();
+    // }
+    unsafe { exit(0) };
+    // core::unreachable!()
 }
 
 struct InputManager {
