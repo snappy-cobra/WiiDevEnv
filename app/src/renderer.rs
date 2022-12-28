@@ -94,6 +94,7 @@ impl Renderer {
 
             // Describe the data as indexed
             GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX16 as u8);
+            GX_SetVtxDesc(GX_VA_CLR0 as u8, GX_DIRECT as u8);
             GX_SetVtxDesc(GX_VA_TEX0 as u8, GX_INDEX16 as u8);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);

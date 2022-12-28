@@ -1,6 +1,10 @@
 use core::ptr::null;
 
-use crate::renderer::{GRRLIB_texImg, GRRLIB_LoadTexture, GRRLIB_SetTexture};
+use crate::renderer::{
+    GRRLIB_texImg, 
+    GRRLIB_LoadTexture, 
+    GRRLIB_SetTexture
+};
 use alloc::vec::Vec;
 
 /**
@@ -33,17 +37,6 @@ impl Texture {
     pub fn set_active(&self, is_repeating: bool) {
         unsafe {
             GRRLIB_SetTexture(self.grrlib_texture, is_repeating);
-        }
-    }
-}
-
-/**
- * Custom destruction code to cleanly destroy the texture.
- */
-impl Drop for Texture {
-    fn drop(&mut self) {
-        unsafe {
-            GRRLIB_FreeTexture(self.grrlib_texture);
         }
     }
 }
