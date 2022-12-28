@@ -89,17 +89,8 @@ impl Renderer {
      */
     fn render_textured_model(textured_model: &mut TexturedModel) {
         unsafe {
-            // Pass the data to the GPU
-            GX_SetArray(
-                GX_VA_POS,
-                textured_model.model.vertices.as_mut_ptr() as *mut c_void,
-                BYTE_SIZE_F32 * 3u8 as u8,
-            );
-            GX_SetArray(
-                GX_VA_TEX0,
-                textured_model.model.tex_coords.as_mut_ptr() as *mut c_void,
-                BYTE_SIZE_F32 * 2u8 as u8,
-            );
+            // Set the repeating texture to active.
+            textured_model.texture.set_active(true);
 
             // Describe the data as indexed
             GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX16 as u8);
@@ -107,9 +98,18 @@ impl Renderer {
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-            // Set the repeating texture.
-            textured_model.texture.set_active(true);
-
+            // Pass the data to the GPU
+            GX_SetArray(
+                GX_VA_POS,
+                textured_model.model.vertices.as_mut_ptr() as *mut c_void,
+                BYTE_SIZE_F32 * 3u8,
+            );
+            GX_SetArray(
+                GX_VA_TEX0,
+                textured_model.model.tex_coords.as_mut_ptr() as *mut c_void,
+                BYTE_SIZE_F32 * 2u8,
+            );
+            
             // Provide all the indices (wii really wants this in direct mode it seems)
             GX_Begin(
                 GX_TRIANGLES as u8,
@@ -119,6 +119,8 @@ impl Renderer {
             let indices_copy = textured_model.model.indices.to_vec();
             for index in indices_copy {
                 GX_Position1x16(index);
+                GX_Color1u32(0xFFFFFFFF);
+                GX_TexCoord1x16(index);
             }
             GX_End();
         }

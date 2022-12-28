@@ -36,3 +36,14 @@ impl Texture {
         }
     }
 }
+
+/**
+ * Custom destruction code to cleanly destroy the texture.
+ */
+impl Drop for Texture {
+    fn drop(&mut self) {
+        unsafe {
+            GRRLIB_FreeTexture(self.grrlib_texture);
+        }
+    }
+}
