@@ -5,10 +5,10 @@ mod inline;
 
 pub use inline::*;
 
-mod indexed_model;
-mod texture;
-mod textured_model;
-mod model_factory;
+pub mod indexed_model;
+pub mod texture;
+pub mod textured_model;
+pub mod model_factory;
 
 use crate::raw_data_store::AssetName;
 use model_factory::ModelFactory;
