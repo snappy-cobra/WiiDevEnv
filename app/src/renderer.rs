@@ -20,7 +20,7 @@ use wavefront::{Obj, Vertex};
 use libc::c_void;
 use ogc_rs::prelude::Vec;
 
-const BYTE_SIZE_F32: u8 = 4;
+use self::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 
 /**
  * Data structure for the renderer.
@@ -103,12 +103,12 @@ impl Renderer {
             GX_SetArray(
                 GX_VA_POS,
                 textured_model.model.positions.as_mut_ptr() as *mut c_void,
-                BYTE_SIZE_F32 * 3u8,
+                BYTE_SIZE_POSITION,
             );
             GX_SetArray(
                 GX_VA_TEX0,
                 textured_model.model.tex_coords.as_mut_ptr() as *mut c_void,
-                BYTE_SIZE_F32 * 2u8,
+                BYTE_SIZE_TEX_COORD,
             );
             
             // Provide all the indices (wii really wants this in direct mode it seems)
