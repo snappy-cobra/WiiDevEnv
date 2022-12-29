@@ -7,8 +7,8 @@ use wavefront::{Index, Obj, Vertex};
  * Our representation of a model.
  */
 pub struct IndexedModel {
-    pub vertices: Vec<f32>,
-    pub indices: Vec<u16>,
+    pub positions: Vec<f32>,
+    pub position_indices: Vec<u16>,
     pub tex_coords: Vec<f32>,
 }
 
@@ -26,7 +26,7 @@ impl IndexedModel {
         let mut memo: BTreeMap<Index, u16> = BTreeMap::new();
         let mut positions = Vec::new();
         let mut tex_coords: Vec<f32> = Vec::new();
-        let indices = obj_data
+        let position_indices = obj_data
             .vertices()
             .map(|vertex| {
                 let vertexId = vertex.position_index();
@@ -54,8 +54,8 @@ impl IndexedModel {
         println!("Verts: {:?}, UVs: {:?}", positions, tex_coords);
 
         IndexedModel {
-            vertices: positions,
-            indices,
+            positions,
+            position_indices,
             tex_coords
         }
     }

@@ -102,7 +102,7 @@ impl Renderer {
             // Pass the data to the GPU
             GX_SetArray(
                 GX_VA_POS,
-                textured_model.model.vertices.as_mut_ptr() as *mut c_void,
+                textured_model.model.positions.as_mut_ptr() as *mut c_void,
                 BYTE_SIZE_F32 * 3u8,
             );
             GX_SetArray(
@@ -115,9 +115,9 @@ impl Renderer {
             GX_Begin(
                 GX_TRIANGLES as u8,
                 GX_VTXFMT0 as u8,
-                textured_model.model.indices.len() as u16,
+                textured_model.model.position_indices.len() as u16,
             );
-            let indices_copy = textured_model.model.indices.to_vec();
+            let indices_copy = textured_model.model.position_indices.to_vec();
             for index in indices_copy {
                 GX_Position1x16(index);
                 GX_Color1u32(0xFFFFFFFF);
