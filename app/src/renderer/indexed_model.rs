@@ -24,7 +24,8 @@ impl IndexedModel {
      * and whose values are indexes into an array containing the position of those vertices.
      */
     pub fn new(obj_data: &Obj) -> IndexedModel {
-        let mut memo: BTreeMap<Index, u16> = BTreeMap::new();
+        let mut vertex_memo: BTreeMap<Index, u16> = BTreeMap::new();
+        let mut tex_coord_memo: BTreeMap<Index, u16> = BTreeMap::new();
         let mut positions = Vec::new();
         let mut tex_coords: Vec<f32> = Vec::new();
         
@@ -32,8 +33,8 @@ impl IndexedModel {
         let position_indices = obj_data
             .vertices()
             .map(|vertex| {
-                let vertexId = vertex.position_index();
-                *memo.entry(vertexId).or_insert_with(|| {
+                let vertex_id = vertex.position_index();
+                *vertex_memo.entry(vertex_id).or_insert_with(|| {
                     let index = (positions.len() / 3) as u16;
                     positions.extend(vertex.position());
                     index
@@ -45,16 +46,18 @@ impl IndexedModel {
         let tex_coord_indices = obj_data
             .vertices()
             .map(|vertex| {
-                 let uvw = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
-                 let mut uv: [f32; 2] = uvw[0..2]
-                     .try_into()
-                     .expect("UV slice with incorrect length");
-                 // Flip the V coord, as it seems to be flipped on the Wii GPU.
-                 uv[1] = 1.0 - uv[1];
-                 tex_coords.extend(uv);
-
-                 let vertexId = vertex.position_index();
-                 *memo.entry(vertexId).key() as u16
+                let tex_coord_id = vertex.uv_index().unwrap();
+                *tex_coord_memo.entry(tex_coord_id).or_insert_with(|| {
+                    let index = (tex_coords.len() / 2) as u16;
+                    let uvw = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
+                    let mut uv: [f32; 2] = uvw[0..2]
+                        .try_into()
+                        .expect("UV slice with incorrect length");
+                    // Flip the V coord, as it seems to be flipped on the Wii GPU.
+                    uv[1] = 1.0 - uv[1];
+                    tex_coords.extend(uv);
+                    index
+                })
             })
             .collect();
 
