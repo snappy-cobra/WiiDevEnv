@@ -43,7 +43,7 @@ impl IndexedModel {
                         .expect("UV slice with incorrect length");
                     tex_coords.extend(uv);
 
-                    // Retur the current index
+                    // Return the current index
                     index
                 })
             })
