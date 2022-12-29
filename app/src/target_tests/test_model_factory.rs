@@ -24,8 +24,8 @@ fn test_textured_cube() {
     // Check if the indexes are non-empty
     assert!(textured_model.model.position_indices.len() > 0);
 
-    // Check if the texture coords are present and are length of 2 (U, V) times vertex count.
+    // Check if the texture coords are present and are length of 2 (U, V) times index count.
     assert!(textured_model.model.tex_coords.len() > 0);
-    let num_vertices = textured_model.model.positions.len() / 3;
+    let num_vertices = textured_model.model.position_indices.len();
     assert!(textured_model.model.tex_coords.len() == num_vertices * 2);
 }

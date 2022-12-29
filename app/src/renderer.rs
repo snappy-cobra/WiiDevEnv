@@ -117,11 +117,13 @@ impl Renderer {
                 GX_VTXFMT0 as u8,
                 textured_model.model.position_indices.len() as u16,
             );
-            let indices_copy = textured_model.model.position_indices.to_vec();
-            for index in indices_copy {
-                GX_Position1x16(index);
+            let num_verts = textured_model.model.position_indices.len();
+            let position_indices = textured_model.model.position_indices.to_vec();
+            let tex_coord_indices = textured_model.model.tex_coord_indices.to_vec();
+            for index in 0..num_verts {
+                GX_Position1x16(position_indices[index]);
                 GX_Color1u32(0xFFFFFFFF);
-                GX_TexCoord1x16(index);
+                GX_TexCoord1x16(tex_coord_indices[index]);
             }
             GX_End();
         }

@@ -10,6 +10,7 @@ pub struct IndexedModel {
     pub positions: Vec<f32>,
     pub position_indices: Vec<u16>,
     pub tex_coords: Vec<f32>,
+    pub tex_coord_indices: Vec<u16>
 }
 
 /**
@@ -26,37 +27,44 @@ impl IndexedModel {
         let mut memo: BTreeMap<Index, u16> = BTreeMap::new();
         let mut positions = Vec::new();
         let mut tex_coords: Vec<f32> = Vec::new();
+        
+        // Add vertex positions
         let position_indices = obj_data
             .vertices()
             .map(|vertex| {
                 let vertexId = vertex.position_index();
                 *memo.entry(vertexId).or_insert_with(|| {
                     let index = (positions.len() / 3) as u16;
-
-                    // Add vertex positions
                     positions.extend(vertex.position());
-                    
-                    // Add tex coords
-                    let uvw = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
-                    let mut uv: [f32; 2] = uvw[0..2]
-                        .try_into()
-                        .expect("UV slice with incorrect length");
-                    // Flip the V coord, as it seems to be flipped on the Wii GPU.
-                    uv[1] = 1.0 - uv[1];
-                    tex_coords.extend(uv);
-
-                    // Return the current index
                     index
                 })
             })
             .collect();
 
-        println!("Verts: {:?}, UVs: {:?}", positions, tex_coords);
+        // Add tex coords
+        let tex_coord_indices = obj_data
+            .vertices()
+            .map(|vertex| {
+                 let uvw = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
+                 let mut uv: [f32; 2] = uvw[0..2]
+                     .try_into()
+                     .expect("UV slice with incorrect length");
+                 // Flip the V coord, as it seems to be flipped on the Wii GPU.
+                 uv[1] = 1.0 - uv[1];
+                 tex_coords.extend(uv);
+
+                 let vertexId = vertex.position_index();
+                 *memo.entry(vertexId).key() as u16
+            })
+            .collect();
+
+        println!("Verts: {:?}, UVs: {:?}, UVidx: {:?}", positions, tex_coords, tex_coord_indices);
 
         IndexedModel {
             positions,
             position_indices,
-            tex_coords
+            tex_coords,
+            tex_coord_indices,
         }
     }
 }
