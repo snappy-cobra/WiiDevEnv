@@ -8,11 +8,11 @@ extern crate alloc;
 #[cfg(not(feature = "wii"))]
 pub use std::{print, println};
 
-use hecs::{PreparedQuery, World};
+use hecs::World;
 use num::clamp;
 use rand::rngs::SmallRng;
 use rand::RngCore;
-use rand::{Rng, SeedableRng};
+use rand::SeedableRng;
 
 #[allow(dead_code)]
 fn foo() -> bool {
@@ -123,7 +123,7 @@ pub fn batch_spawn_entities(world: &mut World, n: i32) {
  */
 pub fn system_integrate_motion(world: &mut World) {
     const DRAG: f32 = 1.001;
-    for (id, (position, velocity)) in world.query_mut::<(&mut Position, &mut Velocity)>() {
+    for (_id, (position, velocity)) in world.query_mut::<(&mut Position, &mut Velocity)>() {
         position.x += velocity.x;
         velocity.x /= DRAG;
         position.y += velocity.y;
