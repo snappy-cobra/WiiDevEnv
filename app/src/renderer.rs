@@ -11,7 +11,6 @@ use crate::raw_data_store::ModelName;
 use indexed_model::IndexedModel;
 use model_factory::ModelFactory;
 
-// use crate::{Position, Velocity};
 use hecs::*;
 use ogc_rs::{print, println};
 use rust_wii_lib::{Position, Velocity};
