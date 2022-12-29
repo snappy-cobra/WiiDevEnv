@@ -13,8 +13,9 @@ use super::textured_model::TexturedModel;
 /**
  * All models must be defined in this list, which is filled at compile time.
  */
-const TEXTURED_MODEL_DATA: [(AssetName, AssetName); 1] = [
-    (AssetName::Cube, AssetName::CubeTexture)
+const TEXTURED_MODEL_DATA: [(AssetName, AssetName); 2] = [
+    (AssetName::Cube, AssetName::CubeTexture),
+    (AssetName::Triangle, AssetName::TriangleTexture)
 ];
 
 /**

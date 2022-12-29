@@ -8,6 +8,7 @@ pub enum AssetName {
     Suzanne,
     Triangle,
     CubeTexture,
+    TriangleTexture,
 }
 
 impl AssetName {
@@ -21,6 +22,7 @@ impl AssetName {
             AssetName::Suzanne => include_bytes!("../data/Suz.obj"),
             AssetName::Triangle => include_bytes!("../data/Tri.obj"),
             AssetName::CubeTexture => include_bytes!("../data/Cube.png"),
+            AssetName::TriangleTexture => include_bytes!("../data/Tri.png"),
         }
     }
 }

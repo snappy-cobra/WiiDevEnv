@@ -38,9 +38,11 @@ impl IndexedModel {
                     
                     // Add tex coords
                     let uvw = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
-                    let uv: [f32; 2] = uvw[0..2]
+                    let mut uv: [f32; 2] = uvw[0..2]
                         .try_into()
                         .expect("UV slice with incorrect length");
+                    // Flip the V coord, as it seems to be flipped on the Wii GPU.
+                    uv[1] = 1.0 - uv[1];
                     tex_coords.extend(uv);
 
                     // Return the current index
@@ -48,6 +50,8 @@ impl IndexedModel {
                 })
             })
             .collect();
+
+        println!("Verts: {:?}, UVs: {:?}", positions, tex_coords);
 
         IndexedModel {
             vertices: positions,
