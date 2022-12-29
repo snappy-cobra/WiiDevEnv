@@ -17,15 +17,14 @@ fn test_textured_cube() {
     factory.load_models();
     let textured_model = factory.get_model(AssetName::Cube).unwrap();
 
-    // Check if the vertices are non-empty and a multiple of 3 (X, Y, Z).
+    // Check if the attributes are non-empty and of the right size
     assert!(textured_model.model.positions.len() > 0);
     assert!(textured_model.model.positions.len() % 3 == 0);
-
-    // Check if the indexes are non-empty
-    assert!(textured_model.model.position_indices.len() > 0);
-
-    // Check if the texture coords are present and are length of 2 (U, V) times index count.
     assert!(textured_model.model.tex_coords.len() > 0);
-    let num_vertices = textured_model.model.position_indices.len();
-    assert!(textured_model.model.tex_coords.len() == num_vertices * 2);
+    assert!(textured_model.model.tex_coords.len() % 2 == 0);
+
+    // Check if the indexes are non-empty and of the same size
+    assert!(textured_model.model.position_indices.len() > 0);
+    assert!(textured_model.model.tex_coord_indices.len() > 0);
+    assert!(textured_model.model.position_indices.len() == textured_model.model.tex_coord_indices.len());
 }
