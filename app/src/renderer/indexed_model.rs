@@ -32,11 +32,18 @@ impl IndexedModel {
                 let vertexId = vertex.position_index();
                 *memo.entry(vertexId).or_insert_with(|| {
                     let index = (positions.len() / 3) as u16;
+
+                    // Add vertex positions
                     positions.extend(vertex.position());
-                    let uv: [f32; 2] = vertex.uv().unwrap_or([0.0, 0.0, 0.0])[0..2]
-                    .try_into()
-                    .expect("UV slice with incorrect length");
+                    
+                    // Add tex coords
+                    let uvw = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
+                    let uv: [f32; 2] = uvw[0..2]
+                        .try_into()
+                        .expect("UV slice with incorrect length");
                     tex_coords.extend(uv);
+
+                    // Retur the current index
                     index
                 })
             })
