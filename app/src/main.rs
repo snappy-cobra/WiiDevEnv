@@ -21,10 +21,12 @@ pub mod renderer;
 use renderer::*;
 
 mod game;
+use crate::plot::Plot;
 pub use game::*;
 
 mod raw_data_store;
 
+mod plot;
 mod target_tests;
 
 /// Global flag to signal to the main game loop when the game should quit.
@@ -56,6 +58,7 @@ fn main_game() -> isize {
     // Setup the wiimote
     Input::init(ControllerType::Wii);
     let wii_mote = Input::new(ControllerType::Wii, ControllerPort::One);
+
     wii_mote
         .as_wpad()
         .set_data_format(WPadDataFormat::ButtonsAccelIR);
@@ -68,6 +71,8 @@ fn main_game() -> isize {
 
     // Kickstart main loop.
     let renderer = Renderer::new();
+    // let mut gforce_plot_vec: Vec<Vec<f32>> = Vec::new();
+    let mut plotHolder = Plot::new("gforce", vec!["x", "y", "z"]);
     while KEEP_RUNNING.load(Ordering::SeqCst) {
         Input::update(ControllerType::Wii);
         if wii_mote.is_button_down(Button::Home) {
@@ -75,6 +80,25 @@ fn main_game() -> isize {
         }
         if wii_mote.is_button_down(Button::One) {
             system_shake_wii(&mut world, &mut velocity_query);
+        }
+
+        if wii_mote.is_button_down(Button::B) {
+            // gforce_plot_vec = Vec::new();
+        }
+        if wii_mote.is_button_held(Button::B) {
+            let gforce = wii_mote.as_wpad().raw().gforce;
+            plotHolder.addMeasurement(vec![gforce.x, gforce.y, gforce.z])
+            // gforce_plot_vec.push(vec![gforce.x, gforce.y, gforce.z]);
+            // let gforce = wii_mote.as_wpad().raw().gforce;
+            // println! ("P_gforce_x={:?},y={:?},z={:?}", gforce.x, gforce.y, gforce.z);
+            // let accel = wii_mote.as_wpad().raw().accel;
+            // println! ("P_accel_x={:?},y={:?},z={:?}", accel.x, accel.y, accel.z);
+            // let orient = wii_mote.as_wpad().raw().orient;
+            // println! ("P_orient_roll={:?},pitch={:?},yaw={:?}", orient.roll, orient.pitch, orient.yaw);
+        }
+        if wii_mote.is_button_up(Button::B) {
+            // plot::create_plot("gforce", &gforce_plot_vec);
+            plotHolder.plotToLogs()
         }
         system_bounce_bounds(&mut world, &mut all_query);
         system_integrate_motion(&mut world, &mut all_query);
