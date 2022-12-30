@@ -22,9 +22,5 @@ hashbrown = { version = "0.13.1" } # no_std hashmaps
 rust-wii-lib = { path = "./lib", features = ["wii"]}
 grrustlib = { path = "./grrustlib" }
 
-[build-dependencies]
-bindgen = "0.61"
-regex = "1.5"
-
 [features]
 run_target_tests = []
