@@ -93,6 +93,17 @@ build-prepare:
   COPY ./app/lib/ .
   SAVE IMAGE --cache-hint
 
+  # Build only app/grrustlib/ dependencies, cacheable:
+  WORKDIR /app/grrustlib/
+  COPY +app-lib-deps/recipe.json ./
+  COPY ./app/powerpc-unknown-eabi.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  # Only copy the rest of /app/lib afterwards:
+  COPY ./app/grrustlib/ .
+  SAVE IMAGE --cache-hint
+
   WORKDIR /app/
 
 # Build the main game Wii ROM

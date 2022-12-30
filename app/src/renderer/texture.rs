@@ -1,6 +1,6 @@
 use core::ptr::null;
 
-use super::grrustlib::{
+use grrustlib::{
     GRRLIB_texImg, 
     GRRLIB_LoadTexture, 
     GRRLIB_SetTexture

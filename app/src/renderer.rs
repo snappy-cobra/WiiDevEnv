@@ -2,7 +2,6 @@ pub mod indexed_model;
 pub mod texture;
 pub mod textured_model;
 pub mod model_factory;
-pub mod grrustlib;
 
 use crate::raw_data_store::AssetName;
 use model_factory::ModelFactory;
