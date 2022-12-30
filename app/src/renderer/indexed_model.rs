@@ -57,6 +57,7 @@ impl IndexedModel {
                     let index = (tex_coords.len() / SIZE_TEX_COORD as usize) as u16;
                     let uvw = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
                     tex_coords.push(uvw[0]);
+                    // Flip the V coordinate, as the Wii expects it exactly the other way around.
                     tex_coords.push(1.0 - uvw[1]);
                     index
                 })
