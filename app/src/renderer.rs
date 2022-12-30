@@ -1,14 +1,8 @@
-#![allow(clippy::all)]
-include!("renderer/grrlib.rs");
-
-mod inline;
-
-pub use inline::*;
-
 pub mod indexed_model;
 pub mod texture;
 pub mod textured_model;
 pub mod model_factory;
+pub mod grrustlib;
 
 use crate::raw_data_store::AssetName;
 use model_factory::ModelFactory;
@@ -19,6 +13,7 @@ use ogc_rs::{print, println};
 use wavefront::{Obj, Vertex};
 use libc::c_void;
 use ogc_rs::prelude::Vec;
+use grrustlib::*;
 
 use self::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 

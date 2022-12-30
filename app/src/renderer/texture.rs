@@ -1,6 +1,6 @@
 use core::ptr::null;
 
-use crate::renderer::{
+use super::grrustlib::{
     GRRLIB_texImg, 
     GRRLIB_LoadTexture, 
     GRRLIB_SetTexture
