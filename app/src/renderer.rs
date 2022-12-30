@@ -83,7 +83,6 @@ impl Renderer {
      */
     fn render_textured_model(textured_model: &mut TexturedModel) {
         unsafe {
-            // Set the repeating texture to active.
             textured_model.texture.set_active(true);
 
             // Describe the data as indexed
