@@ -60,7 +60,7 @@ impl Renderer {
      * As part of this, refreshes the graphics buffer and wait for the next frame.
      */
     pub fn render_world(&self, world: &World) {
-        let model = self.model_factory.get_model(AssetName::Suzanne).unwrap();
+        let model = self.model_factory.get_model(&AssetName::Suzanne).unwrap();
         Self::pass_textured_model_data(model);
         for (entity, (position, _velocity)) in &mut world.query::<(&Position, &Velocity)>() {
             self.render_entity(model, entity, position);

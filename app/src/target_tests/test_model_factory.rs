@@ -15,7 +15,7 @@ pub fn test_model_factory(tests: &mut HashMap<&'static str, fn()>) {
 fn test_textured_cube() {
     let mut factory = ModelFactory::new();
     factory.load_models();
-    let textured_model = factory.get_model(AssetName::Cube).unwrap();
+    let textured_model = factory.get_model(&AssetName::Cube).unwrap();
 
     // Check if the attributes are non-empty and of the right size
     assert!(textured_model.model.positions.len() > 0);
