@@ -18,6 +18,7 @@ use ogc_rs::prelude::*;
 
 use hecs::*;
 use rust_wii_lib::{Changes, Controls, GameState};
+use grrustlib::{SYS_SetPowerCallback, STM_ShutdownToStandby};
 
 pub mod renderer;
 use renderer::*;
