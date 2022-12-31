@@ -4,6 +4,7 @@ use super::indexed_model::IndexedModel;
 /**
  * Represents an indexed model that is textured.
  */
+#[derive(Debug)]
 pub struct TexturedModel {
     pub model: IndexedModel,
     pub texture: Texture

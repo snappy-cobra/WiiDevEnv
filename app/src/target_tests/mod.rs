@@ -13,10 +13,6 @@ pub fn tests() -> HashMap<&'static str, fn()> {
     tests.insert("Trivial test", || assert!(true));
     test_model_factory(&mut tests);
 
-    // tests.insert("Problematic test", || {
-    //     assert!(1 == 0)
-    // });
-
     tests
 }
 

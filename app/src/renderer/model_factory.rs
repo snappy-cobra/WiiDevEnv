@@ -22,6 +22,7 @@ const TEXTURED_MODEL_DATA: [(AssetName, AssetName); 3] = [
 /**
  * Data structure for the model factory.
  */
+#[derive(Debug)]
 pub struct ModelFactory {
     models: BTreeMap<AssetName, TexturedModel>,
 }
@@ -34,9 +35,11 @@ impl ModelFactory {
      * Create a new factory.
      */
     pub fn new() -> ModelFactory {
-        ModelFactory {
-            models: BTreeMap::new(),
-        }
+        let mut res: Self = ModelFactory {
+            models: Default::default(),
+        };
+        res.load_models();
+        res
     }
 
     /**
@@ -78,7 +81,7 @@ impl ModelFactory {
     /**
      * Return the given model.
      */
-    pub fn get_model(&mut self, key: AssetName) -> Option<&mut TexturedModel> {
-        return self.models.get_mut(&key);
+    pub fn get_model(&self, key: AssetName) -> Option<& TexturedModel> {
+        return self.models.get(&key);
     }
 }

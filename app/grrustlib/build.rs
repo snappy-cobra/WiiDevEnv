@@ -51,19 +51,10 @@ fn get_clang_version() -> String {
 fn main() {
     let dkp_path = env::var("DEVKITPRO").expect("devkitPro is needed to use this crate");
 
-    println!(
-        "cargo:rustc-link-search=native={}/devkitPPC/powerpc-eabi/lib",
-        dkp_path
-    );
-    println!("cargo:rustc-link-search=native={}/libogc/lib/wii", dkp_path);
-    println!(
-        "cargo:rustc-link-search=native={}/portlibs/wii/lib",
-        dkp_path
-    );
-    println!(
-        "cargo:rustc-link-search=native={}/portlibs/ppc/lib",
-        dkp_path
-    );
+    println!("cargo:rustc-link-search=native={dkp_path}/devkitPPC/powerpc-eabi/lib");
+    println!("cargo:rustc-link-search=native={dkp_path}/libogc/lib/wii");
+    println!("cargo:rustc-link-search=native={dkp_path}/portlibs/wii/lib");
+    println!("cargo:rustc-link-search=native={dkp_path}/portlibs/ppc/lib");
 
     println!("cargo:rustc-link-lib=static=c");
     println!("cargo:rustc-link-lib=static=sysbase");
@@ -97,18 +88,17 @@ fn main() {
         .blocklist_type("i(8|16|32|64|128)")
         .blocklist_type("f(32|64)")
         .clang_arg("--target=powerpc-none-eabi")
-        .clang_arg(format!("--sysroot={}/devkitPPC/powerpc-eabi", dkp_path))
+        .clang_arg(format!("--sysroot={dkp_path}/devkitPPC/powerpc-eabi"))
         .clang_arg(format!(
-            "-isystem/{}/devkitPPC/powerpc-eabi/include",
-            dkp_path
+            "-isystem/{dkp_path}/devkitPPC/powerpc-eabi/include"
         ))
         .clang_arg(format!(
             "-isystem/usr/lib/clang/{}/include",
             get_clang_version()
         ))
-        .clang_arg(format!("-I{}/libogc/include", dkp_path))
-        .clang_arg(format!("-I{}/portlibs/wii/include", dkp_path))
-        .clang_arg(format!("-I{}/portlibs/ppc/include", dkp_path))
+        .clang_arg(format!("-I{dkp_path}/libogc/include"))
+        .clang_arg(format!("-I{dkp_path}/portlibs/wii/include"))
+        .clang_arg(format!("-I{dkp_path}/portlibs/ppc/include"))
         .clang_arg("-g")
         .clang_arg("-mfloat-abi=hard")
         .clang_arg("-nostdinc")

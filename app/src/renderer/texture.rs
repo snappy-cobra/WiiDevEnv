@@ -10,6 +10,7 @@ use alloc::vec::Vec;
 /**
  * Our representation of a texture.
  */
+#[derive(Debug)]
 pub struct Texture {
     grrlib_texture: *mut GRRLIB_texImg
 }
