@@ -51,17 +51,14 @@ fn get_clang_version() -> String {
 fn main() {
     let dkp_path = env::var("DEVKITPRO").expect("devkitPro is needed to use this crate");
 
-    println!(
-        "cargo:rustc-link-search=native={}/devkitPPC/powerpc-eabi/lib",
-        dkp_path
-    );
-    println!("cargo:rustc-link-search=native={}/libogc/lib/wii", dkp_path);
-    println!("cargo:rustc-link-search=native={}/portlibs/wii/lib", dkp_path);
-    println!("cargo:rustc-link-search=native={}/portlibs/ppc/lib", dkp_path);
+    println!("cargo:rustc-link-search=native={dkp_path}/devkitPPC/powerpc-eabi/lib");
+    println!("cargo:rustc-link-search=native={dkp_path}/libogc/lib/wii");
+    println!("cargo:rustc-link-search=native={dkp_path}/portlibs/wii/lib");
+    println!("cargo:rustc-link-search=native={dkp_path}/portlibs/ppc/lib");
 
     println!("cargo:rustc-link-lib=static=c");
     println!("cargo:rustc-link-lib=static=sysbase");
-    println!("cargo:rustc-link-lib=static=db");    
+    println!("cargo:rustc-link-lib=static=db");
     println!("cargo:rustc-link-lib=static=grrlib");
     println!("cargo:rustc-link-lib=static=freetype");
     println!("cargo:rustc-link-lib=static=bz2");
@@ -75,7 +72,7 @@ fn main() {
     println!("cargo:rustc-link-lib=static=ogc");
     println!("cargo:rustc-link-lib=static=m");
     println!("cargo:rustc-link-lib=static=asnd");
-    println!("cargo:rustc-link-lib=static=aesnd");    
+    println!("cargo:rustc-link-lib=static=aesnd");
 
     println!("cargo:rerun-if-changed=wrapper.h");
     let bindings = bindgen::Builder::default()
@@ -91,15 +88,17 @@ fn main() {
         .blocklist_type("i(8|16|32|64|128)")
         .blocklist_type("f(32|64)")
         .clang_arg("--target=powerpc-none-eabi")
-        .clang_arg(format!("--sysroot={}/devkitPPC/powerpc-eabi", dkp_path))
-        .clang_arg(format!("-isystem/{}/devkitPPC/powerpc-eabi/include", dkp_path))
+        .clang_arg(format!("--sysroot={dkp_path}/devkitPPC/powerpc-eabi"))
+        .clang_arg(format!(
+            "-isystem/{dkp_path}/devkitPPC/powerpc-eabi/include"
+        ))
         .clang_arg(format!(
             "-isystem/usr/lib/clang/{}/include",
             get_clang_version()
         ))
-        .clang_arg(format!("-I{}/libogc/include", dkp_path))
-        .clang_arg(format!("-I{}/portlibs/wii/include", dkp_path))
-        .clang_arg(format!("-I{}/portlibs/ppc/include", dkp_path))
+        .clang_arg(format!("-I{dkp_path}/libogc/include"))
+        .clang_arg(format!("-I{dkp_path}/portlibs/wii/include"))
+        .clang_arg(format!("-I{dkp_path}/portlibs/ppc/include"))
         .clang_arg("-g")
         .clang_arg("-mfloat-abi=hard")
         .clang_arg("-nostdinc")
@@ -111,6 +110,6 @@ fn main() {
         .expect("Unable to generate bindings");
 
     bindings
-        .write_to_file("./src/renderer/grrlib.rs")
+        .write_to_file("./src/grrlib.rs")
         .expect("Unable to write bindings to file");
 }

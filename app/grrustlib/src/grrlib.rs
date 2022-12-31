@@ -1466,6 +1466,29 @@ pub const M_TRIM_THRESHOLD: i32 = -1;
 pub const M_TOP_PAD: i32 = -2;
 pub const M_MMAP_THRESHOLD: i32 = -3;
 pub const M_MMAP_MAX: i32 = -4;
+pub const TB_BUS_CLOCK: u32 = 243000000;
+pub const TB_CORE_CLOCK: u32 = 729000000;
+pub const TB_TIMER_CLOCK: u32 = 60750;
+pub const TB_SECSPERMIN: u32 = 60;
+pub const TB_MINSPERHR: u32 = 60;
+pub const TB_MONSPERYR: u32 = 12;
+pub const TB_DAYSPERYR: u32 = 365;
+pub const TB_HRSPERDAY: u32 = 24;
+pub const TB_SECSPERDAY: u32 = 86400;
+pub const TB_SECSPERNYR: u32 = 31536000;
+pub const TB_MSPERSEC: u32 = 1000;
+pub const TB_USPERSEC: u32 = 1000000;
+pub const TB_NSPERSEC: u32 = 1000000000;
+pub const TB_NSPERMS: u32 = 1000000;
+pub const TB_NSPERUS: u32 = 1000;
+pub const TB_USPERTICK: u32 = 10000;
+pub const LWP_WD_INACTIVE: u32 = 0;
+pub const LWP_WD_INSERTED: u32 = 1;
+pub const LWP_WD_ACTIVE: u32 = 2;
+pub const LWP_WD_REMOVE: u32 = 3;
+pub const LWP_WD_FORWARD: u32 = 0;
+pub const LWP_WD_BACKWARD: u32 = 1;
+pub const LWP_WD_NOTIMEOUT: u32 = 0;
 pub type __int8_t = ::libc::c_schar;
 pub type __uint8_t = ::libc::c_uchar;
 pub type __int16_t = ::libc::c_short;
@@ -11529,18 +11552,13 @@ extern "C" {
     pub fn GRRLIB_Render();
 }
 extern "C" {
-    pub fn GRRLIB_Screen2Texture(
-        posx: ::libc::c_int,
-        posy: ::libc::c_int,
-        tex: *mut GRRLIB_texImg,
-        clear: bool,
-    );
+    pub fn GRRLIB_Screen2Texture(posx: u16_, posy: u16_, tex: *mut GRRLIB_texImg, clear: bool);
 }
 extern "C" {
     pub fn GRRLIB_CompoStart();
 }
 extern "C" {
-    pub fn GRRLIB_CompoEnd(posx: ::libc::c_int, posy: ::libc::c_int, tex: *mut GRRLIB_texImg);
+    pub fn GRRLIB_CompoEnd(posx: u16_, posy: u16_, tex: *mut GRRLIB_texImg);
 }
 extern "C" {
     pub fn GRRLIB_CreateEmptyTexture(width: u32_, height: u32_) -> *mut GRRLIB_texImg;
@@ -11555,10 +11573,7 @@ extern "C" {
     pub fn GRRLIB_LoadTextureJPG(my_jpg: *const u8_) -> *mut GRRLIB_texImg;
 }
 extern "C" {
-    pub fn GRRLIB_LoadTextureJPGEx(
-        my_jpg: *const u8_,
-        my_size: ::libc::c_int,
-    ) -> *mut GRRLIB_texImg;
+    pub fn GRRLIB_LoadTextureJPGEx(my_jpg: *const u8_, my_size: u32_) -> *mut GRRLIB_texImg;
 }
 extern "C" {
     pub fn GRRLIB_LoadTextureBMP(my_bmp: *const u8_) -> *mut GRRLIB_texImg;
@@ -11664,10 +11679,10 @@ extern "C" {
     pub fn GRRLIB_DrawCube(size: f32_, filled: bool, col: u32_);
 }
 extern "C" {
-    pub fn GRRLIB_DrawCylinder(r: f32_, h: f32_, d: ::libc::c_int, filled: bool, col: u32_);
+    pub fn GRRLIB_DrawCylinder(r: f32_, h: f32_, d: u16_, filled: bool, col: u32_);
 }
 extern "C" {
-    pub fn GRRLIB_DrawCone(r: f32_, h: f32_, d: ::libc::c_int, filled: bool, col: u32_);
+    pub fn GRRLIB_DrawCone(r: f32_, h: f32_, d: u16_, filled: bool, col: u32_);
 }
 extern "C" {
     pub fn GRRLIB_DrawTessPanel(
@@ -11803,7 +11818,7 @@ extern "C" {
     pub fn _calloc_r(arg1: *mut _reent, arg2: usize, arg3: usize) -> *mut ::libc::c_void;
 }
 extern "C" {
-    pub fn memalign(arg1: ::libc::c_ulong, arg2: ::libc::c_ulong) -> *mut ::libc::c_void;
+    pub fn memalign(arg1: usize, arg2: usize) -> *mut ::libc::c_void;
 }
 extern "C" {
     pub fn _memalign_r(arg1: *mut _reent, arg2: usize, arg3: usize) -> *mut ::libc::c_void;
@@ -11870,7 +11885,7 @@ extern "C" {
     pub fn bcmp(
         arg1: *const ::libc::c_void,
         arg2: *const ::libc::c_void,
-        arg3: ::libc::c_ulong,
+        arg3: usize,
     ) -> ::libc::c_int;
 }
 extern "C" {
@@ -12078,7 +12093,7 @@ extern "C" {
         arg1: *mut ::libc::c_void,
         arg2: *const ::libc::c_void,
         arg3: ::libc::c_int,
-        arg4: ::libc::c_ulong,
+        arg4: usize,
     ) -> *mut ::libc::c_void;
 }
 extern "C" {
@@ -12149,5 +12164,70 @@ extern "C" {
 }
 extern "C" {
     pub fn strsignal(__signo: ::libc::c_int) -> *mut ::libc::c_char;
+}
+extern "C" {
+    pub static mut _wd_sync_level: vu32;
+}
+extern "C" {
+    pub static mut _wd_sync_count: vu32;
+}
+extern "C" {
+    pub static mut _wd_ticks_since_boot: u32_;
+}
+extern "C" {
+    pub static mut _wd_ticks_queue: lwp_queue;
+}
+extern "C" {
+    pub fn gettick() -> u32_;
+}
+extern "C" {
+    pub fn gettime() -> u64_;
+}
+extern "C" {
+    pub fn settime(arg1: u64_);
+}
+extern "C" {
+    pub fn diff_sec(start: u64_, end: u64_) -> u32_;
+}
+extern "C" {
+    pub fn diff_msec(start: u64_, end: u64_) -> u32_;
+}
+extern "C" {
+    pub fn diff_usec(start: u64_, end: u64_) -> u32_;
+}
+extern "C" {
+    pub fn diff_nsec(start: u64_, end: u64_) -> u32_;
+}
+pub type wd_service_routine =
+    ::core::option::Option<unsafe extern "C" fn(arg1: *mut ::libc::c_void)>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _wdcntrl {
+    pub node: lwp_node,
+    pub start: u64_,
+    pub id: u32_,
+    pub state: u32_,
+    pub fire: u64_,
+    pub routine: wd_service_routine,
+    pub usr_data: *mut ::libc::c_void,
+}
+pub type wd_cntrl = _wdcntrl;
+extern "C" {
+    pub fn __lwp_watchdog_init();
+}
+extern "C" {
+    pub fn __lwp_watchdog_settimer(wd: *mut wd_cntrl);
+}
+extern "C" {
+    pub fn __lwp_wd_insert(header: *mut lwp_queue, wd: *mut wd_cntrl);
+}
+extern "C" {
+    pub fn __lwp_wd_remove(header: *mut lwp_queue, wd: *mut wd_cntrl) -> u32_;
+}
+extern "C" {
+    pub fn __lwp_wd_tickle(queue: *mut lwp_queue);
+}
+extern "C" {
+    pub fn __lwp_wd_adjust(queue: *mut lwp_queue, dir: u32_, interval: s64);
 }
 pub type __builtin_va_list = [[u32; 3usize]; 1usize];
