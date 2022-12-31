@@ -22,9 +22,9 @@ impl Texture {
     /**
      * Load a new texture based on PNG image data.
      */
-    pub fn from_bytes(png_data: Vec<u8>) -> Result<Texture, &'static str> {
+    pub fn from_bytes(png_data: impl AsRef<[u8]>) -> Result<Texture, &'static str> {
         unsafe {
-            let grrlib_texture = GRRLIB_LoadTexture(png_data.as_ptr());
+            let grrlib_texture = GRRLIB_LoadTexture(png_data.as_ref().as_ptr());
             if grrlib_texture.is_null() {
                 return Err("Image could not be loaded");
             }

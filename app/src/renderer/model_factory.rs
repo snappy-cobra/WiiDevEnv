@@ -46,28 +46,10 @@ impl ModelFactory {
      * Load all models.
      */
     pub fn load_models(&mut self) {
-        // for (model_name, texture_name) in TEXTURED_MODEL_DATA {
-        //     let indexed_model: IndexedModel = Self::load_indexed_model(model_name);
-
-        //     // Load the texture
-        //     let tex_vec: Vec<u8> = Vec::from(texture_name.to_data());
-        //     let texture: Texture;
-        //     match Texture::from_bytes(tex_vec) {
-        //         Ok(new_texture) => texture = new_texture,
-        //         Err(error) => {
-        //             print!("Error loading model: {}", error);
-        //             continue;
-        //         }
-        //     }
-
-        //     // All went well, insert the textured model.
-        //     self.models.insert(model_name, TexturedModel::new(indexed_model, texture));
-        // }
-
         let loaded_models: Vec<(AssetName, TexturedModel)> = TEXTURED_MODEL_DATA
             .into_iter()
             .filter_map(|(model_name, texture_name)| {
-                match (Self::load_indexed_model(&model_name).ok(), Self::load_texture(&texture_name).ok()) {
+                match (Self::load_indexed_model(&model_name).ok(), Texture::from_bytes(texture_name.to_data()).ok()) {
                     (Some(indexed_model), Some(texture)) =>
                         Some((model_name, TexturedModel::new(indexed_model, texture))),
                     _ => {
@@ -94,14 +76,6 @@ impl ModelFactory {
                 return Err("Error loading indexed model from OBJ data.");
             }
         }
-    }
-
-    /**
-     * Load an indexed model from a given asset name.
-     */
-    fn load_texture(name: &AssetName) -> Result<Texture, &'static str> {
-        let tex_vec: Vec<u8> = Vec::from(name.to_data());
-        return Texture::from_bytes(tex_vec);
     }
 
     /**
