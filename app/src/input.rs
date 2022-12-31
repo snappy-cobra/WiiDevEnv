@@ -1,5 +1,5 @@
-use ogc_rs::prelude::{Button, ControllerPort, ControllerType, Input, WPadDataFormat};
 use gamelib::Controls;
+use ogc_rs::prelude::{Button, ControllerPort, ControllerType, Input, WPadDataFormat};
 
 pub struct InputManager {
     wii_mote: Input,

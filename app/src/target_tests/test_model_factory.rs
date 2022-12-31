@@ -1,6 +1,6 @@
-use hashbrown::HashMap;
-use crate::renderer::model_factory::ModelFactory;
 use crate::raw_data_store::AssetName;
+use crate::renderer::model_factory::ModelFactory;
+use hashbrown::HashMap;
 
 /**
  * Test if the model factory behaves as expected.
@@ -26,5 +26,7 @@ fn test_textured_cube() {
     // Check if the indexes are non-empty and of the same size
     assert!(textured_model.model.position_indices.len() > 0);
     assert!(textured_model.model.tex_coord_indices.len() > 0);
-    assert!(textured_model.model.position_indices.len() == textured_model.model.tex_coord_indices.len());
+    assert!(
+        textured_model.model.position_indices.len() == textured_model.model.tex_coord_indices.len()
+    );
 }

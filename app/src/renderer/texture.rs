@@ -1,18 +1,14 @@
 use core::ptr::null;
 
-use grrustlib::{
-    GRRLIB_texImg, 
-    GRRLIB_LoadTexture, 
-    GRRLIB_SetTexture
-};
 use alloc::vec::Vec;
+use grrustlib::{GRRLIB_LoadTexture, GRRLIB_SetTexture, GRRLIB_texImg};
 
 /**
  * Our representation of a texture.
  */
 #[derive(Debug)]
 pub struct Texture {
-    grrlib_texture: *mut GRRLIB_texImg
+    grrlib_texture: *mut GRRLIB_texImg,
 }
 
 /**

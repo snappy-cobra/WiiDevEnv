@@ -1,18 +1,18 @@
 pub mod indexed_model;
+pub mod model_factory;
 pub mod texture;
 pub mod textured_model;
-pub mod model_factory;
 
 use crate::raw_data_store::AssetName;
-use model_factory::ModelFactory;
-use textured_model::TexturedModel;
-use hecs::*;
-use ogc_rs::{print, println};
 use gamelib::{Position, Velocity};
-use wavefront::{Obj, Vertex};
-use libc::c_void;
-use ogc_rs::prelude::Vec;
 use grrustlib::*;
+use hecs::*;
+use libc::c_void;
+use model_factory::ModelFactory;
+use ogc_rs::prelude::Vec;
+use ogc_rs::{print, println};
+use textured_model::TexturedModel;
+use wavefront::{Obj, Vertex};
 
 use self::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 
@@ -91,7 +91,7 @@ impl Renderer {
     /**
      * Renders the given model at whatever position was set previously using other calls into GRRLIB / GX.
      */
-    fn render_textured_model(textured_model: & TexturedModel) {
+    fn render_textured_model(textured_model: &TexturedModel) {
         textured_model.texture.set_active(true);
         Self::pass_textured_model_description();
         Self::pass_textured_model_data_indices(textured_model);
@@ -119,7 +119,7 @@ impl Renderer {
      * In other words: The argument is treated as if it were a 'const *void' (C syntax) AKA '*const c_void' (Rust syntax).
      * As such, it is OK to turn the immutable reference into a mutable pointer.
      */
-    fn pass_textured_model_data(textured_model: & TexturedModel) {
+    fn pass_textured_model_data(textured_model: &TexturedModel) {
         let positions_ptr = textured_model.model.positions.as_ptr().cast_mut() as *mut c_void;
         let tex_coord_ptr = textured_model.model.tex_coords.as_ptr().cast_mut() as *mut c_void;
         unsafe {
@@ -132,7 +132,7 @@ impl Renderer {
      * Iterate over the index arrays and set them in direct mode for the GPU to use.
      * Expects data to be described and passed before being called.
      */
-    fn pass_textured_model_data_indices(textured_model: & TexturedModel) {
+    fn pass_textured_model_data_indices(textured_model: &TexturedModel) {
         unsafe {
             // Provide all the indices (wii really wants this in direct mode it seems)
             GX_Begin(

@@ -16,7 +16,7 @@ use super::textured_model::TexturedModel;
 const TEXTURED_MODEL_DATA: [(AssetName, AssetName); 3] = [
     (AssetName::Cube, AssetName::CubeTexture),
     (AssetName::Triangle, AssetName::TriangleTexture),
-    (AssetName::Suzanne, AssetName::SuzanneTexture)
+    (AssetName::Suzanne, AssetName::SuzanneTexture),
 ];
 
 /**
@@ -49,13 +49,17 @@ impl ModelFactory {
         let loaded_models: Vec<(AssetName, TexturedModel)> = TEXTURED_MODEL_DATA
             .into_iter()
             .filter_map(|(model_name, texture_name)| {
-                match (Self::load_indexed_model(&model_name).ok(), Texture::from_bytes(texture_name.to_data()).ok()) {
-                    (Some(indexed_model), Some(texture)) =>
-                        Some((model_name, TexturedModel::new(indexed_model, texture))),
+                match (
+                    Self::load_indexed_model(&model_name).ok(),
+                    Texture::from_bytes(texture_name.to_data()).ok(),
+                ) {
+                    (Some(indexed_model), Some(texture)) => {
+                        Some((model_name, TexturedModel::new(indexed_model, texture)))
+                    }
                     _ => {
                         print!("Skipped model because of loading errors.");
                         None
-                    },
+                    }
                 }
             })
             .collect();
@@ -81,7 +85,7 @@ impl ModelFactory {
     /**
      * Return the given model.
      */
-    pub fn get_model(&self, key: &AssetName) -> Option<& TexturedModel> {
+    pub fn get_model(&self, key: &AssetName) -> Option<&TexturedModel> {
         return self.models.get(key);
     }
 }

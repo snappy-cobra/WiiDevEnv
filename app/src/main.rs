@@ -16,9 +16,9 @@ use libc::exit;
 use ogc_rs::input::*;
 use ogc_rs::prelude::*;
 
-use hecs::*;
 use gamelib::{Changes, Controls, GameState};
-use grrustlib::{SYS_SetPowerCallback, STM_ShutdownToStandby};
+use grrustlib::{STM_ShutdownToStandby, SYS_SetPowerCallback};
+use hecs::*;
 
 pub mod renderer;
 use renderer::*;

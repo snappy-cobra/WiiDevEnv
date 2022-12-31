@@ -11,7 +11,7 @@ pub struct IndexedModel {
     pub positions: Vec<f32>,
     pub position_indices: Vec<u16>,
     pub tex_coords: Vec<f32>,
-    pub tex_coord_indices: Vec<u16>
+    pub tex_coord_indices: Vec<u16>,
 }
 
 pub const SIZE_POSITION: usize = 3;
@@ -46,16 +46,16 @@ impl IndexedModel {
         let mut vertex_memo: BTreeMap<Index, u16> = BTreeMap::new();
         let mut positions = Vec::new();
         let position_indices = obj_data
-        .vertices()
-        .map(|vertex| {
-            let vertex_id = vertex.position_index();
-            *vertex_memo.entry(vertex_id).or_insert_with(|| {
-                let index = u16::try_from(positions.len() / SIZE_POSITION).unwrap();
-                positions.extend(vertex.position());
-                index
+            .vertices()
+            .map(|vertex| {
+                let vertex_id = vertex.position_index();
+                *vertex_memo.entry(vertex_id).or_insert_with(|| {
+                    let index = u16::try_from(positions.len() / SIZE_POSITION).unwrap();
+                    positions.extend(vertex.position());
+                    index
+                })
             })
-        })
-        .collect();
+            .collect();
         return (positions, position_indices);
     }
 

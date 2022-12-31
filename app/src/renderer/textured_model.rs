@@ -1,5 +1,5 @@
-use super::texture::Texture;
 use super::indexed_model::IndexedModel;
+use super::texture::Texture;
 
 /**
  * Represents an indexed model that is textured.
@@ -7,7 +7,7 @@ use super::indexed_model::IndexedModel;
 #[derive(Debug)]
 pub struct TexturedModel {
     pub model: IndexedModel,
-    pub texture: Texture
+    pub texture: Texture,
 }
 
 /**
