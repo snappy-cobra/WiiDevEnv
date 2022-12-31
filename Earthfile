@@ -82,15 +82,15 @@ build-deps:
 build-prepare:
   FROM +rust-cargo-chef
 
-  # Build only app/lib/ dependencies, cacheable:
-  WORKDIR /app/lib/
+  # Build only app/gamelib/ dependencies, cacheable:
+  WORKDIR /app/gamelib/
   COPY +app-lib-deps/recipe.json ./
   COPY ./app/powerpc-unknown-eabi.json ./
   RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE IMAGE --cache-hint
 
-  # Only copy the rest of /app/lib afterwards:
-  COPY ./app/lib/ .
+  # Only copy the rest of /app/gamelib afterwards:
+  COPY ./app/gamelib/ .
   SAVE IMAGE --cache-hint
 
   # Build only app/grrustlib/ dependencies, cacheable:
@@ -100,7 +100,7 @@ build-prepare:
   RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE IMAGE --cache-hint
 
-  # Only copy the rest of /app/lib afterwards:
+  # Only copy the rest of /app/grrustlib afterwards:
   COPY ./app/grrustlib/ .
   SAVE IMAGE --cache-hint
 
@@ -142,28 +142,28 @@ build-integration-test:
   SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/Cargo.lock
   SAVE IMAGE --cache-hint
 
-# Extract dependencies from the app/lib subproject using 'cargo chef'
+# Extract dependencies from the app/gamelib subproject using 'cargo chef'
 app-lib-deps:
   FROM +rust-cargo-chef
-  WORKDIR /app/lib/
-  COPY ./app/lib/Cargo.* ./
+  WORKDIR /app/gamelib/
+  COPY ./app/gamelib/Cargo.* ./
   RUN cargo +nightly chef prepare  --recipe-path recipe.json
   SAVE IMAGE --cache-hint
   SAVE ARTIFACT recipe.json
 
-# Run unit tests of the `app/lib` subcrate using the normal Rust test flow.
+# Run unit tests of the `app/gamelib` subcrate using the normal Rust test flow.
 unit-test:
   FROM +rust-cargo-chef
   # Build only dependencies, cacheable:
-  WORKDIR /app/lib/
+  WORKDIR /app/gamelib/
   COPY +app-lib-deps/recipe.json ./
   RUN cargo +nightly chef cook --recipe-path recipe.json
   SAVE IMAGE --cache-hint
 
-  # Build the app/lib project itself and execute the test runner:
-  COPY ./app/lib/ ./
+  # Build the app/gamelib project itself and execute the test runner:
+  COPY ./app/gamelib/ ./
   RUN cargo +nightly test --color=always
-  SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/lib/Cargo.lock
+  SAVE ARTIFACT ./Cargo.lock AS LOCAL ./app/gamelib/Cargo.lock
 
 # BASE IMAGE CONTAINING DOLPHIN
 # -----------------------------
