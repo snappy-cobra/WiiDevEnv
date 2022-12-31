@@ -33,7 +33,7 @@ Exit by signalling an interrupt (Ctrl+C).
 #### Unit tests:
 `earthly +unit-test`
 
-This will run all (unit) tests in the `./app/lib` subcrate.
+This will run all (unit) tests in the `./app/gamelib` subcrate.
 In this subcrate, all testing features of Rust are available.
 The limitation is that not all functionality of `ogc_rs`/`grrrlib` is.
 (Specifically: Only those features for which `ogc_rs` has a drop-in replacement for `std` are.)
@@ -76,7 +76,7 @@ Side note: The final step of the publishing can easily take 15+ minutes in which
 Rust's build tool `cargo` by itself does not support building dependencies separately from the main project code.
 In Docker we really want this separation because it can significantly speed up repeated builds.
 The plugin [cargo chef](https://github.com/LukeMathWalker/cargo-chef) is used to allow this.
-However, the current process is not perfect for nested crates (which we have, such as usage of `app/lib` inside `app/`).
+However, the current process is not perfect for nested crates (which we have, such as usage of `app/gamelib` inside `app/`).
 
 ## How to contribute
 
