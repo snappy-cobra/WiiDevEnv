@@ -123,8 +123,8 @@ impl Renderer {
         let positions_ptr = textured_model.model.positions.as_ptr().cast_mut() as *mut c_void;
         let tex_coord_ptr = textured_model.model.tex_coords.as_ptr().cast_mut() as *mut c_void;
         unsafe {
-            GX_SetArray(GX_VA_POS, positions_ptr, BYTE_SIZE_POSITION);
-            GX_SetArray(GX_VA_TEX0, tex_coord_ptr, BYTE_SIZE_TEX_COORD);
+            GX_SetArray(GX_VA_POS, positions_ptr, BYTE_SIZE_POSITION as u8);
+            GX_SetArray(GX_VA_TEX0, tex_coord_ptr, BYTE_SIZE_TEX_COORD as u8);
         }
     }
 

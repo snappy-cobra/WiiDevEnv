@@ -14,11 +14,10 @@ pub struct IndexedModel {
     pub tex_coord_indices: Vec<u16>
 }
 
-pub const BYTE_SIZE_F32: u8 = 4;
-pub const SIZE_POSITION: u8 = 3;
-pub const BYTE_SIZE_POSITION: u8 = BYTE_SIZE_F32 * SIZE_POSITION;
-pub const SIZE_TEX_COORD: u8 = 2;
-pub const BYTE_SIZE_TEX_COORD: u8 = BYTE_SIZE_F32 * SIZE_TEX_COORD;
+pub const SIZE_POSITION: usize = 3;
+pub const BYTE_SIZE_POSITION: usize = core::mem::size_of::<f32>() * SIZE_POSITION;
+pub const SIZE_TEX_COORD: usize = 2;
+pub const BYTE_SIZE_TEX_COORD: usize = core::mem::size_of::<f32>() * SIZE_TEX_COORD;
 
 /**
  * Implementation of the indexed model.
@@ -42,7 +41,7 @@ impl IndexedModel {
             .map(|vertex| {
                 let vertex_id = vertex.position_index();
                 *vertex_memo.entry(vertex_id).or_insert_with(|| {
-                    let index = (positions.len() / SIZE_POSITION as usize) as u16;
+                    let index = u16::try_from(positions.len() / SIZE_POSITION).unwrap();
                     positions.extend(vertex.position());
                     index
                 })
@@ -55,7 +54,7 @@ impl IndexedModel {
             .map(|vertex| {
                 let tex_coord_id = vertex.uv_index().unwrap_or(0usize);
                 *tex_coord_memo.entry(tex_coord_id).or_insert_with(|| {
-                    let index = (tex_coords.len() / SIZE_TEX_COORD as usize) as u16;
+                    let index = u16::try_from(tex_coords.len() / SIZE_TEX_COORD).unwrap();
                     let uvw = vertex.uv().unwrap_or([0.0, 0.0, 0.0]);
                     tex_coords.push(uvw[0]);
                     // Flip the V coordinate, as the Wii expects it exactly the other way around.
