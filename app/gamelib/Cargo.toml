@@ -1,10 +1,10 @@
 [package]
-name = "rust-wii-lib"
+name = "gamelib"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name="rust_wii_lib"
+name="gamelib"
 
 [dependencies]
 ogc-rs = {git = "https://github.com/rust-wii/ogc-rs.git", optional = true}

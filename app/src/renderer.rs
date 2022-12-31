@@ -8,7 +8,7 @@ use model_factory::ModelFactory;
 use textured_model::TexturedModel;
 use hecs::*;
 use ogc_rs::{print, println};
-use rust_wii_lib::{Position, Velocity};
+use gamelib::{Position, Velocity};
 use wavefront::{Obj, Vertex};
 use libc::c_void;
 use ogc_rs::prelude::Vec;
