@@ -1,21 +1,27 @@
 use alloc::format;
 use alloc::vec::Vec;
 // use ogc_rs::input::*;
+use hashbrown::HashMap;
 use ogc_rs::prelude::*;
 
-pub fn createPlot(title: &str, labels: &Vec<&str>, measurements: &Vec<Vec<f32>>) {
-    startPlot();
+/// Allow for easy creation of plots to the logs.
+/// these logs can than be parsed using the plot_logs.py which will create the actual plots.
+/// plot_logs.py can be found in the python_support folder.
+pub fn create_plot(title: &str, labels: &Vec<&str>, measurements: &Vec<Vec<f32>>) {
     for measurement in measurements {
-        printPlotMeasurement(title, labels, measurement);
+        print_plot_measurement(title, labels, measurement);
     }
-    stopPlot();
 }
 
-fn startPlot() {
-    println!("START_PLOT");
+fn start_plot_group() {
+    println!("START_PLOTS");
 }
 
-fn printPlotMeasurement(title: &str, labels: &Vec<&str>, measurement: &Vec<f32>) {
+fn stop_plot_group() {
+    println!("STOP_PLOTS");
+}
+
+fn print_plot_measurement(title: &str, labels: &[&str], measurement: &[f32]) {
     let mut formatted_measurement: Vec<String> = Vec::new();
     for (i, label) in labels.iter().enumerate() {
         let m = format!("{}={:.5}", label, measurement[i]);
@@ -24,10 +30,8 @@ fn printPlotMeasurement(title: &str, labels: &Vec<&str>, measurement: &Vec<f32>)
     println!("P_{}_{}", title, formatted_measurement.join(","));
 }
 
-fn stopPlot() {
-    println!("STOP_PLOT");
-}
-
+/// Stores all the information needed for a single plot
+/// These measurements increase over time, and are reset when a plot is "logged"
 pub struct Plot {
     title: String,
     labels: Vec<String>,
@@ -45,22 +49,53 @@ impl Plot {
         }
     }
 
-    pub fn addMeasurement(&mut self, measurement: Vec<f32>) {
+    pub fn add_measurement(&mut self, measurement: Vec<f32>) {
         self.measurements.push(measurement)
     }
 
-    fn resetMeasurements(&mut self) {
+    fn reset_measurements(&mut self) {
         self.measurements = vec![];
     }
 
-    pub fn plotToLogs(&mut self) {
+    pub fn to_logs(&mut self) {
+        if self.measurements.is_empty() {
+            return;
+        }
         let title = self.title.as_str();
         let labels = self.labels.iter().map(|s| s.as_str()).collect();
-        createPlot(title, &labels, &self.measurements);
-        self.resetMeasurements();
+        create_plot(title, &labels, &self.measurements);
+        self.reset_measurements();
     }
 }
 
-// pub struct PlotsHolder {
-//     plots
-// }
+/// Holds all the plots which are being build up.
+/// Allows for clean tracking of the logs being created.
+pub struct PlotsHolder {
+    plots: HashMap<String, Plot>,
+}
+
+impl PlotsHolder {
+    pub fn new() -> PlotsHolder {
+        PlotsHolder {
+            plots: HashMap::new(),
+        }
+    }
+
+    pub fn add_measurement(&mut self, title: &str, labels: Vec<&str>, measurement: Vec<f32>) {
+        match self.plots.get_mut(title) {
+            Some(plot) => plot.add_measurement(measurement),
+            None => {
+                let newPlot = Plot::new(title, labels);
+                self.plots.insert(title.to_string(), newPlot);
+            }
+        };
+    }
+
+    pub fn plots_to_logs(&mut self) {
+        start_plot_group();
+        for plot in self.plots.values_mut() {
+            plot.to_logs();
+        }
+        stop_plot_group();
+    }
+}
