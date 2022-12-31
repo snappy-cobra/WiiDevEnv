@@ -61,6 +61,7 @@ impl Renderer {
      */
     pub fn render_world(&self, world: &World) {
         let model = self.model_factory.get_model(AssetName::Suzanne).unwrap();
+        Self::pass_textured_model_data(model);
         for (entity, (position, _velocity)) in &mut world.query::<(&Position, &Velocity)>() {
             self.render_entity(model, entity, position);
         }
@@ -89,30 +90,50 @@ impl Renderer {
 
     /**
      * Renders the given model at whatever position was set previously using other calls into GRRLIB / GX.
-     *
-     * ## Safety
-     * We call GX_SetArray which takes a pointer into the vertices of the model as '*void *' (C syntax) AKA '*mut c_void' (Rust syntax).
-     * By cheking the implementation of GX_SetArray it is clear that this signature is wrong; the argument is only used for reading and not mutated.
-     * In other words: The argument is treated as if it were a 'const *void' (C syntax) AKA '*const c_void' (Rust syntax).
-     * As such, it is OK to turn the immutable reference into a mutable pointer.
      */
     fn render_textured_model(textured_model: & TexturedModel) {
-        let positions_ptr = textured_model.model.positions.as_ptr().cast_mut() as *mut c_void;
-        let tex_coord_ptr = textured_model.model.tex_coords.as_ptr().cast_mut() as *mut c_void;
-        unsafe {
-            textured_model.texture.set_active(true);
+        textured_model.texture.set_active(true);
+        Self::pass_textured_model_description();
+        Self::pass_textured_model_data_indices(textured_model);
+    }
 
-            // Describe the data as indexed
+    /**
+     * Describe the data format we push to the GPU as indexed data.
+     */
+    fn pass_textured_model_description() {
+        unsafe {
             GX_SetVtxDesc(GX_VA_POS as u8, GX_INDEX16 as u8);
             GX_SetVtxDesc(GX_VA_CLR0 as u8, GX_DIRECT as u8);
             GX_SetVtxDesc(GX_VA_TEX0 as u8, GX_INDEX16 as u8);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
             GX_SetVtxAttrFmt(GX_VTXFMT0 as u8, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+        }
+    }
 
-            // Pass the data to the GPU
+    /**
+     * Sets pointers to the textured model data for the GPU to access.
+     *
+     * ## Safety
+     * We call GX_SetArray which takes a pointer into the vertices of the model as '*void *' (C syntax) AKA '*mut c_void' (Rust syntax).
+     * By checking the implementation of GX_SetArray it is clear that this signature is wrong; the argument is only used for reading and not mutated.
+     * In other words: The argument is treated as if it were a 'const *void' (C syntax) AKA '*const c_void' (Rust syntax).
+     * As such, it is OK to turn the immutable reference into a mutable pointer.
+     */
+    fn pass_textured_model_data(textured_model: & TexturedModel) {
+        let positions_ptr = textured_model.model.positions.as_ptr().cast_mut() as *mut c_void;
+        let tex_coord_ptr = textured_model.model.tex_coords.as_ptr().cast_mut() as *mut c_void;
+        unsafe {
             GX_SetArray(GX_VA_POS, positions_ptr, BYTE_SIZE_POSITION);
             GX_SetArray(GX_VA_TEX0, tex_coord_ptr, BYTE_SIZE_TEX_COORD);
-            
+        }
+    }
+
+    /**
+     * Iterate over the index arrays and set them in direct mode for the GPU to use.
+     * Expects data to be described and passed before being called.
+     */
+    fn pass_textured_model_data_indices(textured_model: & TexturedModel) {
+        unsafe {
             // Provide all the indices (wii really wants this in direct mode it seems)
             GX_Begin(
                 GX_TRIANGLES as u8,
