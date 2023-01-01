@@ -15,6 +15,8 @@ use rand::RngCore;
 use rand::SeedableRng;
 use core::time::Duration;
 
+mod game_state;
+
 #[allow(dead_code)]
 fn foo() -> bool {
     println!("Hello, world!");
