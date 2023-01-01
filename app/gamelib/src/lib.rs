@@ -13,6 +13,7 @@ use num::clamp;
 use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
+use core::time::Duration;
 
 #[allow(dead_code)]
 fn foo() -> bool {
@@ -34,7 +35,7 @@ pub struct GameState {
 #[derive(Debug, Default)]
 pub struct Changes {
     pub controls: Controls,
-    pub delta_time_ms: u64,
+    pub delta_time: Duration,
 }
 
 /// Represents the state of one or multiple Wii controllers w.r.t. the game

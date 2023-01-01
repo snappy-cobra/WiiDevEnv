@@ -1466,6 +1466,29 @@ pub const M_TRIM_THRESHOLD: i32 = -1;
 pub const M_TOP_PAD: i32 = -2;
 pub const M_MMAP_THRESHOLD: i32 = -3;
 pub const M_MMAP_MAX: i32 = -4;
+pub const TB_BUS_CLOCK: u32 = 243000000;
+pub const TB_CORE_CLOCK: u32 = 729000000;
+pub const TB_TIMER_CLOCK: u32 = 60750;
+pub const TB_SECSPERMIN: u32 = 60;
+pub const TB_MINSPERHR: u32 = 60;
+pub const TB_MONSPERYR: u32 = 12;
+pub const TB_DAYSPERYR: u32 = 365;
+pub const TB_HRSPERDAY: u32 = 24;
+pub const TB_SECSPERDAY: u32 = 86400;
+pub const TB_SECSPERNYR: u32 = 31536000;
+pub const TB_MSPERSEC: u32 = 1000;
+pub const TB_USPERSEC: u32 = 1000000;
+pub const TB_NSPERSEC: u32 = 1000000000;
+pub const TB_NSPERMS: u32 = 1000000;
+pub const TB_NSPERUS: u32 = 1000;
+pub const TB_USPERTICK: u32 = 10000;
+pub const LWP_WD_INACTIVE: u32 = 0;
+pub const LWP_WD_INSERTED: u32 = 1;
+pub const LWP_WD_ACTIVE: u32 = 2;
+pub const LWP_WD_REMOVE: u32 = 3;
+pub const LWP_WD_FORWARD: u32 = 0;
+pub const LWP_WD_BACKWARD: u32 = 1;
+pub const LWP_WD_NOTIMEOUT: u32 = 0;
 pub type __int8_t = ::libc::c_schar;
 pub type __uint8_t = ::libc::c_uchar;
 pub type __int16_t = ::libc::c_short;
@@ -12141,5 +12164,70 @@ extern "C" {
 }
 extern "C" {
     pub fn strsignal(__signo: ::libc::c_int) -> *mut ::libc::c_char;
+}
+extern "C" {
+    pub static mut _wd_sync_level: vu32;
+}
+extern "C" {
+    pub static mut _wd_sync_count: vu32;
+}
+extern "C" {
+    pub static mut _wd_ticks_since_boot: u32_;
+}
+extern "C" {
+    pub static mut _wd_ticks_queue: lwp_queue;
+}
+extern "C" {
+    pub fn gettick() -> u32_;
+}
+extern "C" {
+    pub fn gettime() -> u64_;
+}
+extern "C" {
+    pub fn settime(arg1: u64_);
+}
+extern "C" {
+    pub fn diff_sec(start: u64_, end: u64_) -> u32_;
+}
+extern "C" {
+    pub fn diff_msec(start: u64_, end: u64_) -> u32_;
+}
+extern "C" {
+    pub fn diff_usec(start: u64_, end: u64_) -> u32_;
+}
+extern "C" {
+    pub fn diff_nsec(start: u64_, end: u64_) -> u32_;
+}
+pub type wd_service_routine =
+    ::core::option::Option<unsafe extern "C" fn(arg1: *mut ::libc::c_void)>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _wdcntrl {
+    pub node: lwp_node,
+    pub start: u64_,
+    pub id: u32_,
+    pub state: u32_,
+    pub fire: u64_,
+    pub routine: wd_service_routine,
+    pub usr_data: *mut ::libc::c_void,
+}
+pub type wd_cntrl = _wdcntrl;
+extern "C" {
+    pub fn __lwp_watchdog_init();
+}
+extern "C" {
+    pub fn __lwp_watchdog_settimer(wd: *mut wd_cntrl);
+}
+extern "C" {
+    pub fn __lwp_wd_insert(header: *mut lwp_queue, wd: *mut wd_cntrl);
+}
+extern "C" {
+    pub fn __lwp_wd_remove(header: *mut lwp_queue, wd: *mut wd_cntrl) -> u32_;
+}
+extern "C" {
+    pub fn __lwp_wd_tickle(queue: *mut lwp_queue);
+}
+extern "C" {
+    pub fn __lwp_wd_adjust(queue: *mut lwp_queue, dir: u32_, interval: s64);
 }
 pub type __builtin_va_list = [[u32; 3usize]; 1usize];
