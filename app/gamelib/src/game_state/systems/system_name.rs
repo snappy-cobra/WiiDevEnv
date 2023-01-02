@@ -12,7 +12,6 @@ pub enum SystemName {
     ShakeAction,
     IntegrateMotion,
     BounceBounds,
-    RenderWorld,
 }
 
 impl SystemName {
@@ -23,7 +22,6 @@ impl SystemName {
             SystemName::ShakeAction => system_shake_action,
             SystemName::IntegrateMotion => system_integrate_motion,
             SystemName::BounceBounds => system_bounce_bounds,
-            SystemName::RenderWorld => system_render_world,
         }
     }
 }

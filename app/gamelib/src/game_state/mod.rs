@@ -1,11 +1,13 @@
 mod systems;
-mod changes;
+pub mod changes;
 mod components;
+pub mod game_state_name;
 
 use hecs::World;
 use ogc_rs::prelude::Vec;
 use changes::Changes;
 use systems::system_name::SystemName;
+use game_state_name::GameStateName;
 
 /// Represents the state of the game
 ///
@@ -13,8 +15,9 @@ use systems::system_name::SystemName;
 pub struct GameState {
     pub world: World,
     pub changes: Changes,
+    pub next_state: Option<GameStateName>,
+    pub is_running: bool,
     systems: Vec<SystemName>,
-    is_running: bool
 }
 
 /**
@@ -26,7 +29,8 @@ impl GameState {
             world: World::new(),
             changes: Changes::nothing(),
             systems: Vec::new(),
-            is_running: true
+            is_running: true,
+            next_state: None,
         }
     }
 

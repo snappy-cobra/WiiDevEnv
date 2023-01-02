@@ -22,3 +22,22 @@ pub fn system_shake_action(state: &mut GameState) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::game_state::GameState;
+
+    #[test]
+    fn test_exit() {
+        // Doing nothing should not exit the game.
+        let mut state = GameState::new();
+        super::system_exit_action(&mut state);
+        assert_eq!(state.is_running, true);
+
+        // Pressing the home button should exit the game.
+        state.changes.controls.home_button_down = true;
+        assert_eq!(state.is_running, true);
+        super::system_exit_action(&mut state);
+        assert_eq!(state.is_running, false);
+    }
+}
