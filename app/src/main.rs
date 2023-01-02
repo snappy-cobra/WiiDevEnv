@@ -21,7 +21,7 @@ use ogc_rs::prelude::*;
 use core::sync::atomic::{AtomicBool, Ordering};
 use libc::exit;
 use grrustlib::{STM_ShutdownToStandby, SYS_SetPowerCallback};
-use gamelib::{game::Game, game_state::game_state_name::GameStateName};
+use gamelib::{game::Game, game_states::GameStateName};
 use renderer::WiiRenderer;
 use input::InputManager;
 

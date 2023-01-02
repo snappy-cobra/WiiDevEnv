@@ -1,4 +1,5 @@
-use crate::game_state::{changes::ChangeProvider, GameState, game_state_name::GameStateName};
+use crate::game_state::{changes::ChangeProvider, GameState};
+use crate::game_states::GameStateName;
 
 /**
  * Main game loop struct that should handle the game flow, with help from

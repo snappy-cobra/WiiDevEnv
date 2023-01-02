@@ -1,7 +1,6 @@
 mod systems;
 pub mod changes;
 mod components;
-pub mod game_state_name;
 
 use hecs::World;
 use ogc_rs::prelude::Vec;
