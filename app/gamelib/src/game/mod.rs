@@ -35,7 +35,7 @@ impl Game {
         // Get the changes and update the current state.
         let changes = self.change_provider.get_changes();
         let mut current_state = &mut self.state;
-        let is_running = current_state.update(changes);
+        let is_running = current_state.update(&changes);
         if ! is_running {
             return false;
         }
@@ -57,5 +57,5 @@ impl Game {
  * Simple trait for implementing the wii specific renderer.
  */
 pub trait Renderer {
-    pub fn render_state(state: &GameState);
+    pub fn render_state(&self, state: &GameState);
 }

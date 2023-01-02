@@ -26,5 +26,5 @@ impl Changes {
  * Useful trait for providing changes, not implemented because the code would be wii specific.
  */
 pub trait ChangeProvider {
-    pub fn get_changes() -> Changes;
+    pub fn get_changes(&mut self) -> Changes;
 }
