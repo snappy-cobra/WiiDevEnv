@@ -1,10 +1,11 @@
+mod systems;
+mod changes;
+mod components;
 
 use hecs::World;
 use ogc_rs::prelude::Vec;
-use core::time::Duration;
-
-mod systems;
-mod system_name;
+use changes::Changes;
+use systems::system_name::SystemName;
 
 /// Represents the state of the game
 ///
@@ -12,7 +13,7 @@ mod system_name;
 pub struct GameState {
     pub world: World,
     pub changes: Changes,
-    systems: Vec<fn(&mut GameState)>,
+    systems: Vec<SystemName>,
     is_running: bool
 }
 
@@ -20,23 +21,19 @@ pub struct GameState {
  * Implementation of the game state.
  */
 impl GameState {
-    pub fn from_json_string(json_string: &str) -> Result<GameState, &'static str> {
-        let mut res = GameState {
+    pub fn new() -> GameState {
+        GameState {
             world: World::new(),
             changes: Changes::nothing(),
             systems: Vec::new(),
             is_running: true
-        };
-
-        // TODO: parse json description.
-
-        res
+        }
     }
 
     /**
      * Add a new system to the game state.
      */
-    pub fn add_system(&mut self, system: fn(&mut GameState)) {
+    pub fn add_system(&mut self, system: SystemName) {
         self.systems.push(system);
     }
 
@@ -48,46 +45,8 @@ impl GameState {
     pub fn update(&mut self, changes: &Changes) -> bool {
         self.changes = changes;
         for system in self.systems {
-            system(&self);
+            system.to_function()(&mut self);
         }
         return self.is_running
-    }
-}
-
-/// Represents any changes made by the outside world during a single frame.
-///
-/// Its fields are public so they can be filled in from outside the library
-/// (before `GameState::update` is called)
-#[derive(Debug, Default)]
-pub struct Changes {
-    pub controls: Controls,
-    pub delta_time: Duration,
-}
-
-impl Changes {
-    pub fn nothing() -> Changes {
-        return Changes {
-            controls: Controls::nothing(),
-            delta_time: Duration::new(0, 0)
-        };
-    }
-}
-
-/// Represents the state of one or multiple Wii controllers w.r.t. the game
-///
-/// Its fields are public so they can be filled in from outside the library
-/// (before `GameState::update` is called)
-#[derive(Debug, Default)]
-pub struct Controls {
-    pub home_button_down: bool,
-    pub one_button_down: bool,
-}
-
-impl Controls {
-    pub fn nothing() -> Controls {
-        return Controls {
-            home_button_down: false,
-            one_button_down: false,
-        }
     }
 }
