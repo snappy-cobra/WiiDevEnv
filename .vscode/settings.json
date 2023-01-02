@@ -1,5 +1,10 @@
 {
     "cSpell.words": [
-        "GRRLIB"
+        "gamelib",
+        "GRRLIB",
+        "grrustlib",
+        "hecs",
+        "libc",
+        "VTXFMT"
     ]
 }

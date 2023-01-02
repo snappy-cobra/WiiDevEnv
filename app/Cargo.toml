@@ -19,11 +19,8 @@ rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
 num = { version = "0.4.0", default-features = false}
 wavefront = { version = "0.2.3", default-features = false}
 hashbrown = { version = "0.13.1" } # no_std hashmaps
-rust-wii-lib = { path = "./lib", features = ["wii"]}
-
-[build-dependencies]
-bindgen = "0.61"
-regex = "1.5"
+gamelib = { path = "./gamelib", features = ["wii"]}
+grrustlib = { path = "./grrustlib" }
 
 [features]
 run_target_tests = []
