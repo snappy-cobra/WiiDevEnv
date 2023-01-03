@@ -30,3 +30,7 @@ app/.idea
 # Cargo build caching, so changes in Docker build do not require re-indexing crates
 docker/build_watch/.cargo_build_cache/*
 !docker/build_watch/.cargo_build_cache/.keep
+
+# Ignore python_support ugly files
+python_support/venv
+python_support/.idea
