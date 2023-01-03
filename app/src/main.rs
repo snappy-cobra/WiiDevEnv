@@ -28,11 +28,14 @@ use modulator::*;
 pub mod renderer;
 use renderer::*;
 
+use crate::plot::{Plot, PlotsHolder};
 pub mod input;
 use input::InputManager;
 
 mod raw_data_store;
 
+mod controller;
+mod plot;
 mod target_tests;
 
 /// Global flag to signal to the main game loop when the game should quit.
