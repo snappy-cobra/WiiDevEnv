@@ -39,7 +39,7 @@ class GraphHolder:
 
     def create_graph(self):
         for i, line_points in enumerate(self._points):
-            plt.plot(line_points)
+            plt.plot(line_points, marker='o')
         plt.title(self._name)
         plt.legend(self._line_names)
         plt.show()

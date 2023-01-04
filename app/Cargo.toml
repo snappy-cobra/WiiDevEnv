@@ -21,6 +21,7 @@ wavefront = { version = "0.2.3", default-features = false}
 hashbrown = { version = "0.13.1" } # no_std hashmaps
 gamelib = { path = "./gamelib", features = ["wii"]}
 grrustlib = { path = "./grrustlib" }
+micromath = { version = "2.0.0"} # mathematical functions for f32
 
 [features]
 run_target_tests = []
