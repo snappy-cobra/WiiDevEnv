@@ -34,6 +34,7 @@ use input::InputManager;
 mod raw_data_store;
 
 mod target_tests;
+mod audio;
 
 /// Global flag to signal to the main game loop when the game should quit.
 ///
