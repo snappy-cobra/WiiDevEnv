@@ -7,7 +7,7 @@ use alloc::vec::Vec;
  * All audio files must be defined in this list.
  */
 const AUDIO_DATA: [(AssetName, AudioFormat); 1] = [
-    (AssetName::DemoMusic, AudioFormat::MP3),
+    (AssetName::DemoMusic, AudioFormat::OGG),
 ];
 
 /**
