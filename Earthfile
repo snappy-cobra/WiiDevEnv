@@ -33,12 +33,24 @@ build-env:
   ENV DEVKITPPC="${DEVKITPRO}/devkitPPC"
   ENV PATH="${PATH}:${DEVKITPPC}/bin/"
 
+  SAVE IMAGE --cache-hint
+
   # Install Wii 3D Dev lib: GRRLIB
   RUN curl -L https://github.com/GRRLIB/GRRLIB/archive/master.zip > GRRLIB.zip && unzip GRRLIB.zip && rm GRRLIB.zip
   WORKDIR /GRRLIB-master/GRRLIB/
   RUN sudo dkp-pacman --sync --needed --noconfirm libfat-ogc ppc-libpng ppc-freetype ppc-libjpeg-turbo
   RUN make clean all install
   WORKDIR /
+  SAVE IMAGE --cache-hint
+
+  # Install OGGPlayer lib
+  COPY docker/oggplayer oggplayer
+  WORKDIR oggplayer
+  RUN sudo dkp-pacman --sync --needed --noconfirm ppc-libvorbisidec
+  RUN make clean all install
+  RUN echo $(ls /opt/devkitpro/portlibs/wii/include/) 
+  WORKDIR /
+  SAVE IMAGE --cache-hint
 
   # Setup build folder structure
   RUN mkdir /app
@@ -115,6 +127,16 @@ build-prepare:
   COPY ./app/gamelib/ .
   SAVE IMAGE --cache-hint
 
+  # Build only app/ogglib/ dependencies, cacheable:
+  WORKDIR /app/ogglib/
+  COPY +app-lib-deps/recipe.json ./
+  COPY ./app/powerpc-unknown-eabi.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  # Only copy the rest of /app/gamelib afterwards:
+  COPY ./app/ogglib/ .
+  SAVE IMAGE --cache-hint
 
   WORKDIR /app/
 
