@@ -64,6 +64,8 @@ fn main() {
     println!("cargo:rustc-link-lib=static=ogc");
     println!("cargo:rustc-link-lib=static=asnd");
     println!("cargo:rustc-link-lib=static=aesnd");
+    println!("cargo:rustc-link-lib=static=ogg");
+    println!("cargo:rustc-link-lib=static=vorbisidec");
 
     println!("cargo:rerun-if-changed=wrapper.h");
     let bindings = bindgen::Builder::default()

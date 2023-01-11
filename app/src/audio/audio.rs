@@ -40,6 +40,10 @@ impl Audio {
     pub fn is_looping(&self) -> bool {
         return self.looping;
     }
+
+    pub fn set_looping(&mut self, is_looping: bool) {
+        self.looping = is_looping;
+    }
 }
 
 /**

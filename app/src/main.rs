@@ -66,13 +66,16 @@ fn main_game() -> isize {
     let mut game_state = GameState::new();
     let mut input_manager = InputManager::new();
     let renderer = Renderer::new();
-    let mut audio_player = AudioPlayer::new();
-    let audio_store = AudioStore::new();
+    let audio_player = AudioPlayer::new();
+    let mut audio_store = AudioStore::new();
 
     let mut modenv: ModulatorEnv<f32> = Default::default();
     modenv.take("myfancywave", Box::new(Wave::new(2.0, 0.5))); // start with 2.0 amplitude and 0.5Hz frequency)
     let mut now = Instant::now();
-    let audio = audio_store.get_audio(&AssetName::DemoMusic).unwrap();
+    
+    let audio = audio_store.get_audio_mut(&AssetName::DemoMusic).unwrap();
+    audio.set_looping(true);
+    audio_player.set_volume(100);
     audio_player.play(audio);
 
     while KEEP_RUNNING.load(Ordering::SeqCst) {
@@ -99,6 +102,7 @@ fn main_game() -> isize {
 
         renderer.render_world(&game_state.world);
     }
+    audio_player.stop();
     shutdown()
 }
 
