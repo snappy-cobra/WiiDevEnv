@@ -98,7 +98,6 @@ fn main_game() -> isize {
                 .try_into()
                 .expect("Overflow in duration"),
         );
-        println!("dt: {:?}", delta_time);
 
         renderer.render_world(&game_state.world);
     }
