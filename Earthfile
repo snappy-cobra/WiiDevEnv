@@ -33,24 +33,12 @@ build-env:
   ENV DEVKITPPC="${DEVKITPRO}/devkitPPC"
   ENV PATH="${PATH}:${DEVKITPPC}/bin/"
 
-  SAVE IMAGE --cache-hint
-
   # Install Wii 3D Dev lib: GRRLIB
   RUN curl -L https://github.com/GRRLIB/GRRLIB/archive/master.zip > GRRLIB.zip && unzip GRRLIB.zip && rm GRRLIB.zip
   WORKDIR /GRRLIB-master/GRRLIB/
   RUN sudo dkp-pacman --sync --needed --noconfirm libfat-ogc ppc-libpng ppc-freetype ppc-libjpeg-turbo
   RUN make clean all install
   WORKDIR /
-  SAVE IMAGE --cache-hint
-
-  # Install OGGPlayer lib
-  COPY docker/oggplayer oggplayer
-  WORKDIR oggplayer
-  RUN sudo dkp-pacman --sync --needed --noconfirm ppc-libvorbisidec
-  RUN make clean all install
-  RUN echo $(ls /opt/devkitpro/portlibs/wii/include/) 
-  WORKDIR /
-  SAVE IMAGE --cache-hint
 
   # Setup build folder structure
   RUN mkdir /app
@@ -77,6 +65,13 @@ rust-cargo-chef:
   CACHE --sharing=shared /usr/local/cargo/registry/
   CACHE --sharing=shared /usr/local/cargo/git/
   CACHE --sharing=shared /build/target
+
+  # Install OGGPlayer lib
+  COPY docker/oggplayer oggplayer
+  WORKDIR oggplayer
+  RUN sudo dkp-pacman --sync --needed --noconfirm ppc-libvorbisidec
+  RUN make clean all install
+  WORKDIR /
 
   SAVE IMAGE --cache-hint
 

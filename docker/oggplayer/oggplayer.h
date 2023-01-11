@@ -54,7 +54,7 @@ extern "C"
  * mode - playback mode (OGG_ONE_TIME or OGG_INFINITE_TIME)
  * returns: -1 on error, 0 on success
  ***************************************************************************/
-int PlayOgg(const void *buffer, s32 len, int time_pos, int mode);
+int PlayOgg(const void *buffer, int len, int time_pos, int mode);
 
 /****************************************************************************
  * StopOgg
@@ -95,7 +95,7 @@ void SetVolumeOgg(int volume);
  * Gets current Ogg position
  * returns -1 on error, or the time in milliseconds from the start
  ***************************************************************************/
-s32 GetTimeOgg();
+int GetTimeOgg();
 
 /****************************************************************************
  * SetTimeOgg
@@ -103,7 +103,7 @@ s32 GetTimeOgg();
  * Sets the time position
  * time_pos: time position (in milliseconds) to advance
  ***************************************************************************/
-void SetTimeOgg(s32 time_pos);
+void SetTimeOgg(int time_pos);
 
 #ifdef __cplusplus
 }

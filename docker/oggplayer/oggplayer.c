@@ -443,7 +443,7 @@ void StopOgg()
 	}
 }
 
-int PlayOgg(const void *buffer, s32 len, int time_pos, int mode)
+int PlayOgg(const void *buffer, int len, int time_pos, int mode)
 {
 	StopOgg();
 
@@ -521,17 +521,17 @@ void SetVolumeOgg(int volume)
 	ASND_ChangeVolumeVoice(0, volume, volume);
 }
 
-s32 GetTimeOgg()
+int GetTimeOgg()
 {
 	int ret;
 	if (ogg_thread_running == 0 || private_ogg.fd < 0)
 		return -1;
-	ret = ((s32) ov_time_tell(&private_ogg.vf));
+	ret = ((int) ov_time_tell(&private_ogg.vf));
 
 	return ret;
 }
 
-void SetTimeOgg(s32 time_pos)
+void SetTimeOgg(int time_pos)
 {
 	if (time_pos >= 0)
 		private_ogg.seek_time = time_pos;
