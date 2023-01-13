@@ -38,10 +38,14 @@ class GraphHolder:
         # self.points.append(points)
 
     def create_graph(self):
+        f = plt.figure()
         for i, line_points in enumerate(self._points):
             plt.plot(line_points, marker='o')
+        f.set_figwidth(10)
+        f.set_figheight(5)
         plt.title(self._name)
         plt.legend(self._line_names)
+        # plt.figure(figsize=(6, 6), dpi=80)
         plt.show()
 
 

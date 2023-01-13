@@ -22,12 +22,12 @@ pub fn plot_wiimote_movement(plotHolder: &mut PlotsHolder, wii_mote: &Input) {
         //     vec!["x", "y", "z"],
         //     vec![accel.x as f32, accel.y as f32, accel.z as f32],
         // );
-        // let orient = wii_mote.as_wpad().raw().orient;
-        // plotHolder.add_measurement(
-        //     "orient",
-        //     vec!["roll", "pitch", "yaw"],
-        //     vec![orient.roll, orient.pitch, orient.yaw],
-        // );
+        let orient = wii_mote.as_wpad().raw().orient;
+        plotHolder.add_measurement(
+            "orient",
+            vec!["roll", "pitch", "yaw"],
+            vec![orient.roll, orient.pitch, orient.yaw],
+        );
     }
     if wii_mote.is_button_up(Button::B) {
         // plot::create_plot("gforce", &gforce_plot_vec);
