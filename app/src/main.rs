@@ -62,6 +62,7 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 
 fn main_game() -> isize {
     register_power_callback();
+    let ogg_player = OGGPlayer::new(Asnd::init());
     let mut game_state = GameState::new();
     let mut input_manager = InputManager::new();
     let renderer = Renderer::new();
@@ -70,7 +71,6 @@ fn main_game() -> isize {
     modenv.take("myfancywave", Box::new(Wave::new(2.0, 0.5))); // start with 2.0 amplitude and 0.5Hz frequency)
     let mut now = Instant::now();
 
-    let ogg_player = OGGPlayer::new(Asnd::init());
     ogg_player.set_volume(100);
     ogg_player.play(&AssetName::DemoMusic, true);
 
@@ -97,7 +97,7 @@ fn main_game() -> isize {
 
         renderer.render_world(&game_state.world);
     }
-    ogg_player.stop();
+    //ogg_player.stop();
     shutdown()
 }
 
