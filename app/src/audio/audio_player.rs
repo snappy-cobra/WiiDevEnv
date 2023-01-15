@@ -1,7 +1,7 @@
+use super::audio::{Audio, AudioFormat};
+use super::ogg_player::OGGPlayer;
 use alloc::sync::Arc;
 use ogc_rs::asnd::Asnd;
-use super::ogg_player::OGGPlayer;
-use super::audio::{Audio, AudioFormat};
 
 /**
  * General audio player interface, hiding the specific audio format players.
@@ -26,7 +26,7 @@ impl AudioPlayer {
     pub fn play(&self, audio: &Audio) {
         match audio.get_format() {
             AudioFormat::OGG => self.ogg_player.play(audio),
-            AudioFormat::MP3 => () // TODO : Not supported yet due to asnd sharing issue.
+            AudioFormat::MP3 => (), // TODO : Not supported yet due to asnd sharing issue.
         }
     }
 

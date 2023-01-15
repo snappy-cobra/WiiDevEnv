@@ -33,10 +33,10 @@ use input::InputManager;
 
 mod raw_data_store;
 
-mod target_tests;
 mod audio;
-use audio::audio_player::AudioPlayer;
+mod target_tests;
 use audio::audio::AudioStore;
+use audio::audio_player::AudioPlayer;
 use raw_data_store::AssetName;
 
 /// Global flag to signal to the main game loop when the game should quit.
@@ -72,7 +72,7 @@ fn main_game() -> isize {
     let mut modenv: ModulatorEnv<f32> = Default::default();
     modenv.take("myfancywave", Box::new(Wave::new(2.0, 0.5))); // start with 2.0 amplitude and 0.5Hz frequency)
     let mut now = Instant::now();
-    
+
     let audio = audio_store.get_audio_mut(&AssetName::DemoMusic).unwrap();
     audio.set_looping(true);
     audio_player.set_volume(100);

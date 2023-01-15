@@ -1,8 +1,8 @@
-use alloc::sync::Arc;
-use ogc_rs::prelude::Asnd;
 use super::audio::Audio;
-use ogglib::*;
+use alloc::sync::Arc;
 use libc::c_void;
+use ogc_rs::prelude::Asnd;
+use ogglib::*;
 
 /**
  * OGG audio file player. Interfaces with the ogglib doing the actual work.
@@ -16,9 +16,7 @@ impl OGGPlayer {
      * Accept the asnd, as our library will use it and only once can own it at a time.
      */
     pub fn new(asnd: Arc<Asnd>) -> Self {
-        Self {
-            _asnd: asnd
-        }
+        Self { _asnd: asnd }
     }
 
     /**
@@ -38,7 +36,7 @@ impl OGGPlayer {
     fn get_audio_mode(audio: &Audio) -> i32 {
         if audio.is_looping() {
             return OGG_INFINITE_TIME as i32;
-        } else { 
+        } else {
             return OGG_ONE_TIME as i32;
         };
     }

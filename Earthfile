@@ -283,6 +283,14 @@ build-watch-builder:
   FROM qqwy/wii-rust-build-env
   COPY docker/build_watch/build_watch.sh /
   RUN chmod +x /build_watch.sh
+
+  # Install OGGPlayer lib
+  COPY docker/oggplayer oggplayer
+  WORKDIR oggplayer
+  RUN sudo dkp-pacman --sync --needed --noconfirm ppc-libvorbisidec
+  RUN make clean all install
+  WORKDIR /
+
   WORKDIR /app/
   CMD ["/build_watch.sh"]
 

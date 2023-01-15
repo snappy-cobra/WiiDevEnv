@@ -1,22 +1,20 @@
-use alloc::collections::BTreeMap;
-use ogc_rs::audio;
 use crate::raw_data_store::AssetName;
+use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
+use ogc_rs::audio;
 
 /**
  * All audio files must be defined in this list.
  */
-const AUDIO_DATA: [(AssetName, AudioFormat); 1] = [
-    (AssetName::DemoMusic, AudioFormat::OGG),
-];
+const AUDIO_DATA: [(AssetName, AudioFormat); 1] = [(AssetName::DemoMusic, AudioFormat::OGG)];
 
 /**
  * Generic interface for dealing with audio.
  */
 pub struct Audio {
     format: AudioFormat,
-    buffer:  &'static [u8],
-    looping: bool
+    buffer: &'static [u8],
+    looping: bool,
 }
 
 /**
@@ -25,7 +23,7 @@ pub struct Audio {
 #[derive(Clone, Copy)]
 pub enum AudioFormat {
     MP3,
-    OGG
+    OGG,
 }
 
 impl Audio {
@@ -72,7 +70,7 @@ impl AudioStore {
                 let audio = Audio {
                     format: audio_format,
                     buffer: audio_name.to_data(),
-                    looping: false
+                    looping: false,
                 };
                 (audio_name, audio)
             })
