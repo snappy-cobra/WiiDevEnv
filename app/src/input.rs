@@ -65,11 +65,32 @@ impl WiiMote {
 
     pub fn update_motion(&mut self, plot_holder: &mut PlotsHolder) {
         let cur_gforce = self.input_wii_mote.as_wpad().gforce();
-        let average_gforce = find_average(&self.prev_gforce);
+        self.prev_gforce.push(cur_gforce);
+        if self.prev_gforce.len() > 12 {
+            self.prev_gforce.drain(..1);
+        }
+        const measurement_lenght: usize = 3;
+
+        if self.prev_gforce.len() < measurement_lenght + 1 {
+            // Not enough measurements yet to do anything usefull
+            return;
+        }
+        let (neutral_gforce_measurements, movement_gforce_measurements) = self
+            .prev_gforce
+            .split_at(self.prev_gforce.len() - measurement_lenght);
+
+        // println!(
+        //     "{:?}     {:?}",
+        //     neutral_gforce_measurements.len(),
+        //     movement_gforce_measurements.len()
+        // );
+
+        let neutral_gforce = find_average(neutral_gforce_measurements);
+        let movement_gforce = find_average(movement_gforce_measurements);
         let corrected_gforce = (
-            cur_gforce.0 - average_gforce.0,
-            cur_gforce.1 - average_gforce.1,
-            cur_gforce.2 - average_gforce.2,
+            movement_gforce.0 - neutral_gforce.0,
+            movement_gforce.1 - neutral_gforce.1,
+            movement_gforce.2 - neutral_gforce.2,
         );
 
         let total_gforce =
@@ -83,7 +104,7 @@ impl WiiMote {
         // // }
         if self.input_wii_mote.is_button_held(Button::A) {
             plot_holder.add_measurement(
-                "gforce_corrected",
+                "gforcecorrected",
                 vec!["x", "y", "z", "total"],
                 vec![
                     corrected_gforce.0,
@@ -97,32 +118,29 @@ impl WiiMote {
             plot_holder.plots_to_logs()
         }
         match self.motion {
-            None => self.motion = Motion::create_if_needed(total_gforce, cur_gforce),
+            None => self.motion = Motion::create_if_needed(total_gforce, corrected_gforce),
             Some(ref mut motion) => {
                 if motion.ended {
                     self.motion = None;
                     self.prev_gforce = Vec::new();
                 } else {
-                    motion.update(&self.input_wii_mote);
+                    motion.update(total_gforce);
                 }
             }
         }
-        match self.motion {
-            None => {
-                self.prev_gforce.push(cur_gforce);
-                if self.prev_gforce.len() > 9 {
-                    self.prev_gforce.drain(..1);
-                }
-            }
-            Some(ref mut motion) => 
-        }
-        if self.motion == None {
-
-        }
+        // match self.motion {
+        //     None => {
+        //         self.prev_gforce.push(cur_gforce);
+        //         if self.prev_gforce.len() > 9 {
+        //             self.prev_gforce.drain(..1);
+        //         }
+        //     }
+        //     Some(ref mut motion) => (),
+        // }
     }
 }
 
-fn find_average(gforce_vec: &Vec<(f32, f32, f32)>) -> (f32, f32, f32) {
+fn find_average(gforce_vec: &[(f32, f32, f32)]) -> (f32, f32, f32) {
     let mut x_sum: f32 = 0.0;
     let mut y_sum: f32 = 0.0;
     let mut z_sum: f32 = 0.0;
@@ -156,7 +174,7 @@ impl Motion {
         total_gforce: f32,
         corrected_gforce: (f32, f32, f32),
     ) -> Option<Motion> {
-        return if total_gforce >= 3.0 {
+        return if total_gforce >= 2.0 {
             let dir = find_direction(corrected_gforce);
             println!(
                 "Motion started: {:?} {:?} {}",
@@ -169,20 +187,16 @@ impl Motion {
         };
     }
 
-    pub fn update(&mut self, input_wii_mote: &Input) {
+    pub fn update(&mut self, total_gforce: f32) {
         self.started = false;
-        // let gforce = ;
-        let gforce = input_wii_mote.as_wpad().gforce();
-        let total_gforce = (gforce.0.powi(2) + gforce.1.powi(2) + gforce.2.powi(2)).sqrt();
-
-        if input_wii_mote.is_button_down(Button::Minus) {
-            self.ended = true;
-            println!("Motion ended");
-        }
-        // if total_gforce < 3.0 {
+        // if input_wii_mote.is_button_down(Button::Minus) {
         //     self.ended = true;
-        //     println!("Motion ended: {:?} {}", self.direction, total_gforce);
+        //     println!("Motion ended");
         // }
+        if total_gforce < 1.0 {
+            self.ended = true;
+            println!("Motion ended: {:?} {}", self.direction, total_gforce);
+        }
     }
 }
 
