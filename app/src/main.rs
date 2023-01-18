@@ -35,7 +35,7 @@ mod raw_data_store;
 
 mod audio;
 mod target_tests;
-use audio::ogg_player::OGGPlayer;
+use audio::ogg_player::{OGGPlayer, PlayMode};
 use raw_data_store::AssetName;
 
 /// Global flag to signal to the main game loop when the game should quit.
@@ -72,7 +72,7 @@ fn main_game() -> isize {
     let mut now = Instant::now();
 
     ogg_player.set_volume(100);
-    ogg_player.play(&AssetName::DemoMusic, true);
+    ogg_player.play(&AssetName::DemoMusic, PlayMode::Infinite);
 
     while KEEP_RUNNING.load(Ordering::SeqCst) {
         let (delta_time, new_now) = calculate_delta_time(&now);
