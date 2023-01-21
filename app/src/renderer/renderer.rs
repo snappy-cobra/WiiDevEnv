@@ -1,8 +1,3 @@
-pub mod indexed_model;
-pub mod model_factory;
-pub mod texture;
-pub mod textured_model;
-
 use crate::raw_data_store::AssetName;
 use gamelib::{Position, Velocity};
 use grrustlib::*;
@@ -79,15 +74,6 @@ impl Renderer {
         }
     }
 
-    /// Refreshes the visible graphics;
-    /// Usually called as part of `render_world`
-    /// but separately exposed for easier testing.
-    pub fn redraw_world(&self) {
-        unsafe {
-            GRRLIB_Render();
-        }
-    }
-
     /**
      * Renders the given model at whatever position was set previously using other calls into GRRLIB / GX.
      */
@@ -149,6 +135,15 @@ impl Renderer {
                 GX_TexCoord1x16(tex_coord_indices[index]);
             }
             GX_End();
+        }
+    }
+
+    /// Refreshes the visible graphics;
+    /// Usually called as part of `render_world`
+    /// but separately exposed for easier testing.
+    pub fn redraw_world(&self) {
+        unsafe {
+            GRRLIB_Render();
         }
     }
 }
