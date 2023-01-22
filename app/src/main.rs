@@ -12,13 +12,18 @@
 // Make sure the allocator is set.
 extern crate alloc;
 use core::sync::atomic::{AtomicBool, Ordering};
+use core::time::Duration;
 use libc::exit;
+use ogc_rs::clock::Instant;
 use ogc_rs::input::*;
 use ogc_rs::prelude::*;
 
 use gamelib::{Changes, Controls, GameState};
 use grrustlib::{STM_ShutdownToStandby, SYS_SetPowerCallback};
 use hecs::*;
+
+use modulator::sources::*;
+use modulator::*;
 
 pub mod renderer;
 use renderer::*;
@@ -29,9 +34,12 @@ use input::InputManager;
 
 mod raw_data_store;
 
+mod audio;
 mod controller;
 mod plot;
 mod target_tests;
+use audio::ogg_player::{OGGPlayer, PlayMode};
+use raw_data_store::AssetName;
 
 /// Global flag to signal to the main game loop when the game should quit.
 ///
@@ -57,25 +65,57 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 
 fn main_game() -> isize {
     register_power_callback();
+    let ogg_player = OGGPlayer::new(Asnd::init());
     let mut game_state = GameState::new();
     let mut input_manager = InputManager::new();
     let renderer = Renderer::new();
 
+    let mut modenv: ModulatorEnv<f32> = Default::default();
+    modenv.take("myfancywave", Box::new(Wave::new(2.0, 0.5))); // start with 2.0 amplitude and 0.5Hz frequency)
+    let mut now = Instant::now();
+
+    ogg_player.set_volume(100);
+    ogg_player.play(&AssetName::DemoMusic, PlayMode::Infinite);
+
     while KEEP_RUNNING.load(Ordering::SeqCst) {
+        let (delta_time, new_now) = calculate_delta_time(&now);
+        now = new_now;
+
         let controls = input_manager.update();
 
         let changes = Changes {
             controls,
-            delta_time_ms: 100,
+            delta_time,
         };
         let should_continue = game_state.update(&changes);
         if !should_continue {
             break;
         }
+        modenv.advance(
+            delta_time
+                .as_nanos()
+                .try_into()
+                .expect("Overflow in duration"),
+        );
 
         renderer.render_world(&game_state.world);
     }
+    //ogg_player.stop();
     shutdown()
+}
+
+/// Given the Instant returned the last time this function was called,
+/// will calculate the duration elapsed since then, and returns a new Instant
+/// to be passed back to this function next iteration.
+pub fn calculate_delta_time(earlier: &Instant) -> (Duration, Instant) {
+    let now = Instant::now();
+    let delta_time = elapsed_between(earlier, &now);
+    (delta_time, now)
+}
+
+/// Calculate the `Duration` between two different `Instant`s
+pub fn elapsed_between(start: &Instant, end: &Instant) -> Duration {
+    Duration::from_nanos(Instant::from_ticks(end.ticks - start.ticks).nanosecs())
 }
 
 /// Registers the power callback,

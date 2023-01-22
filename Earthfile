@@ -66,6 +66,13 @@ rust-cargo-chef:
   CACHE --sharing=shared /usr/local/cargo/git/
   CACHE --sharing=shared /build/target
 
+  # Install OGGPlayer lib
+  COPY docker/oggplayer oggplayer
+  WORKDIR oggplayer
+  RUN sudo dkp-pacman --sync --needed --noconfirm ppc-libvorbisidec
+  RUN make clean all install
+  WORKDIR /
+
   SAVE IMAGE --cache-hint
 
 
@@ -82,6 +89,28 @@ build-deps:
 build-prepare:
   FROM +rust-cargo-chef
 
+  # Build only app/grrustlib/ dependencies, cacheable:
+  WORKDIR /app/grrustlib/
+  COPY +app-lib-deps/recipe.json ./
+  COPY ./app/powerpc-unknown-eabi.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  # Only copy the rest of /app/grrustlib afterwards:
+  COPY ./app/grrustlib/ .
+  SAVE IMAGE --cache-hint
+
+  # Build only app/modulator/ dependencies, cacheable:
+  WORKDIR /app/modulator/
+  COPY +app-lib-deps/recipe.json ./
+  COPY ./app/powerpc-unknown-eabi.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  # Only copy the rest of /app/modulator afterwards:
+  COPY ./app/modulator/ .
+  SAVE IMAGE --cache-hint
+
   # Build only app/gamelib/ dependencies, cacheable:
   WORKDIR /app/gamelib/
   COPY +app-lib-deps/recipe.json ./
@@ -93,15 +122,15 @@ build-prepare:
   COPY ./app/gamelib/ .
   SAVE IMAGE --cache-hint
 
-  # Build only app/grrustlib/ dependencies, cacheable:
-  WORKDIR /app/grrustlib/
+  # Build only app/ogglib/ dependencies, cacheable:
+  WORKDIR /app/ogglib/
   COPY +app-lib-deps/recipe.json ./
   COPY ./app/powerpc-unknown-eabi.json ./
   RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE IMAGE --cache-hint
 
-  # Only copy the rest of /app/grrustlib afterwards:
-  COPY ./app/grrustlib/ .
+  # Only copy the rest of /app/gamelib afterwards:
+  COPY ./app/ogglib/ .
   SAVE IMAGE --cache-hint
 
   WORKDIR /app/
@@ -254,6 +283,14 @@ build-watch-builder:
   FROM qqwy/wii-rust-build-env
   COPY docker/build_watch/build_watch.sh /
   RUN chmod +x /build_watch.sh
+
+  # Install OGGPlayer lib
+  COPY docker/oggplayer oggplayer
+  WORKDIR oggplayer
+  RUN sudo dkp-pacman --sync --needed --noconfirm ppc-libvorbisidec
+  RUN make clean all install
+  WORKDIR /
+
   WORKDIR /app/
   CMD ["/build_watch.sh"]
 

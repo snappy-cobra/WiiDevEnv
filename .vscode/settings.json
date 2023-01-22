@@ -1,10 +1,12 @@
 {
     "cSpell.words": [
+        "Asnd",
         "gamelib",
         "GRRLIB",
         "grrustlib",
         "hecs",
         "libc",
+        "ogglib",
         "VTXFMT"
     ]
 }
