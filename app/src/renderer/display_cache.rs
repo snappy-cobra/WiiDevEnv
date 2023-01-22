@@ -50,6 +50,15 @@ impl DisplayList {
     }
 
     pub fn open(&mut self) {
+        // If created before, resize to the default size.
+        if self.initialized {
+            self.list_size = ALIGN_SIZE * DEFAULT_LIST_SIZE;
+            unsafe {
+                realloc(self.gx_list, self.list_size);
+            }
+        }
+
+        // Invalidate the cache and initialize
         unsafe {
             DCInvalidateRange(self.gx_list, self.list_size);
             GX_BeginDispList(self.gx_list, self.list_size);
@@ -58,6 +67,7 @@ impl DisplayList {
     }
 
     pub fn close(&mut self) {
+        // Close the list and adjust the size
         unsafe {
             self.list_size = GX_EndDispList();
             realloc(self.gx_list, self.list_size);
