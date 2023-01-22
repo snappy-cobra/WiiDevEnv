@@ -1,5 +1,5 @@
 use crate::controller::plot_wiimote_movement;
-use crate::plot::PlotsHolder;
+use crate::plot::{Plot, PlotsHolder};
 use core::fmt;
 use gamelib::Controls;
 use micromath::F32Ext;
@@ -63,15 +63,19 @@ impl WiiMote {
         }
     }
 
-    pub fn update_motion(&mut self, plot_holder: &mut PlotsHolder) {
+    pub fn update_motion(&mut self, plots_holder: &mut PlotsHolder) {
+        const measurement_lenght: usize = 3;
+        const min_neutral_lenght: usize = 3;
+        const max_neutral_length: usize = 9;
+
         let cur_gforce = self.input_wii_mote.as_wpad().gforce();
+
         self.prev_gforce.push(cur_gforce);
-        if self.prev_gforce.len() > 12 {
+        if self.prev_gforce.len() > max_neutral_length + measurement_lenght {
             self.prev_gforce.drain(..1);
         }
-        const measurement_lenght: usize = 3;
 
-        if self.prev_gforce.len() < measurement_lenght + 1 {
+        if self.prev_gforce.len() < measurement_lenght + min_neutral_lenght {
             // Not enough measurements yet to do anything usefull
             return;
         }
@@ -79,52 +83,35 @@ impl WiiMote {
             .prev_gforce
             .split_at(self.prev_gforce.len() - measurement_lenght);
 
-        // println!(
-        //     "{:?}     {:?}",
-        //     neutral_gforce_measurements.len(),
-        //     movement_gforce_measurements.len()
-        // );
-
         let neutral_gforce = find_average(neutral_gforce_measurements);
         let movement_gforce = find_average(movement_gforce_measurements);
-        let corrected_gforce = (
-            movement_gforce.0 - neutral_gforce.0,
-            movement_gforce.1 - neutral_gforce.1,
-            movement_gforce.2 - neutral_gforce.2,
-        );
 
-        let total_gforce =
-            // (cur_gforce.0.powi(2) + cur_gforce.1.powi(2) + cur_gforce.2.powi(2)).sqrt();
-            (corrected_gforce.0.powi(2) + corrected_gforce.1.powi(2) + corrected_gforce.2.powi(2)).sqrt();
-        // (cur_gforce.0.powi(2) + (cur_gforce.2-1.0).powi(2)).sqrt();
-        // // let total_gforce =
-        // //     (correct_gforce.0.powi(2) + correct_gforce.1.powi(2) + correct_gforce.2.powi(2)).sqrt();
-        // // if total_gforce >= 3.0 {
-        // //     println!("movementsss: {}", total_gforce);
-        // // }
-        if self.input_wii_mote.is_button_held(Button::A) {
-            plot_holder.add_measurement(
-                "gforcecorrected",
-                vec!["x", "y", "z", "total"],
-                vec![
-                    corrected_gforce.0,
-                    corrected_gforce.1,
-                    corrected_gforce.2,
-                    total_gforce,
-                ],
-            );
-        }
+        // if self.input_wii_mote.is_button_held(Button::A) {
+        //     plot_holder.add_measurement(
+        //         "gforcecorrected",
+        //         vec!["x", "y", "z", "total"],
+        //         vec![
+        //             corrected_gforce.0,
+        //             corrected_gforce.1,
+        //             corrected_gforce.2,
+        //             total_gforce,
+        //         ],
+        //     );
+        // }
         if self.input_wii_mote.is_button_up(Button::A) {
-            plot_holder.plots_to_logs()
+            plots_holder.plots_to_logs()
         }
         match self.motion {
-            None => self.motion = Motion::create_if_needed(total_gforce, corrected_gforce),
+            None => {
+                self.motion =
+                    Motion::create_if_needed(neutral_gforce, movement_gforce, plots_holder)
+            }
             Some(ref mut motion) => {
                 if motion.ended {
                     self.motion = None;
                     self.prev_gforce = Vec::new();
                 } else {
-                    motion.update(total_gforce);
+                    motion.update(neutral_gforce, movement_gforce, plots_holder);
                 }
             }
         }
@@ -159,6 +146,7 @@ pub struct Motion {
     direction: Direction,
     started: bool,
     ended: bool,
+    minimal_steps: usize,
 }
 
 impl Motion {
@@ -167,18 +155,31 @@ impl Motion {
             direction,
             started: true, // true only at the first iteration of the motion
             ended: false,  // true only at the last iteration of the motion
+            minimal_steps: 7,
         }
     }
 
     pub fn create_if_needed(
-        total_gforce: f32,
-        corrected_gforce: (f32, f32, f32),
+        neutral_gforce: (f32, f32, f32),
+        movement_gforce: (f32, f32, f32),
+        plots_holder: &mut PlotsHolder,
     ) -> Option<Motion> {
-        return if total_gforce >= 2.0 {
+        let (total_gforce, corrected_gforce) = process_gforce(neutral_gforce, movement_gforce);
+        return if total_gforce >= 1.75 {
             let dir = find_direction(corrected_gforce);
             println!(
                 "Motion started: {:?} {:?} {}",
                 dir, corrected_gforce, total_gforce
+            );
+            plots_holder.add_measurement(
+                "movement",
+                vec!["x", "y", "z", "total"],
+                vec![
+                    corrected_gforce.0,
+                    corrected_gforce.1,
+                    corrected_gforce.2,
+                    total_gforce,
+                ],
             );
             let m = Motion::new(dir);
             Some(m)
@@ -187,15 +188,32 @@ impl Motion {
         };
     }
 
-    pub fn update(&mut self, total_gforce: f32) {
+    pub fn update(
+        &mut self,
+        neutral_gforce: (f32, f32, f32),
+        movement_gforce: (f32, f32, f32),
+        plots_holder: &mut PlotsHolder,
+    ) {
         self.started = false;
-        // if input_wii_mote.is_button_down(Button::Minus) {
-        //     self.ended = true;
-        //     println!("Motion ended");
-        // }
+        let (total_gforce, corrected_gforce) = process_gforce(neutral_gforce, movement_gforce);
+        plots_holder.add_measurement(
+            "movement",
+            vec!["x", "y", "z", "total"],
+            vec![
+                corrected_gforce.0,
+                corrected_gforce.1,
+                corrected_gforce.2,
+                total_gforce,
+            ],
+        );
+        if self.minimal_steps > 0 {
+            self.minimal_steps -= 1;
+            return;
+        }
         if total_gforce < 1.0 {
             self.ended = true;
             println!("Motion ended: {:?} {}", self.direction, total_gforce);
+            plots_holder.plots_to_logs()
         }
     }
 }
@@ -210,7 +228,24 @@ pub enum Direction {
     zn,
 }
 
-pub fn find_direction(gforce: (f32, f32, f32)) -> Direction {
+fn process_gforce(
+    neutral_gforce: (f32, f32, f32),
+    movement_gforce: (f32, f32, f32),
+) -> (f32, (f32, f32, f32)) {
+    let neutral_factor: f32 = 0.8;
+    let corrected_gforce = (
+        movement_gforce.0 - neutral_gforce.0 * neutral_factor,
+        movement_gforce.1 - neutral_gforce.1 * neutral_factor,
+        movement_gforce.2 - neutral_gforce.2 * neutral_factor,
+    );
+
+    let total_gforce =
+        // (corrected_gforce.0.powi(2) + corrected_gforce.1.powi(2) + corrected_gforce.2.powi(2)).sqrt();
+        (corrected_gforce.0.powi(2) + corrected_gforce.2.powi(2)).sqrt();
+    return (total_gforce, corrected_gforce);
+}
+
+fn find_direction(gforce: (f32, f32, f32)) -> Direction {
     // TODO: try to add gravity compensation on gforce measurement
     let x = gforce.0;
     let y = gforce.1;
