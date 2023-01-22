@@ -240,8 +240,9 @@ fn process_gforce(
     );
 
     let total_gforce =
-        // (corrected_gforce.0.powi(2) + corrected_gforce.1.powi(2) + corrected_gforce.2.powi(2)).sqrt();
-        (corrected_gforce.0.powi(2) + corrected_gforce.2.powi(2)).sqrt();
+        (corrected_gforce.0.powi(2) + corrected_gforce.1.powi(2) + corrected_gforce.2.powi(2))
+            .sqrt();
+    // (corrected_gforce.0.powi(2) + corrected_gforce.2.powi(2)).sqrt();
     return (total_gforce, corrected_gforce);
 }
 
@@ -253,19 +254,19 @@ fn find_direction(gforce: (f32, f32, f32)) -> Direction {
     let x_abs = x.abs();
     let y_abs = y.abs();
     let z_abs = z.abs();
-    if x_abs > z_abs {
-        // if x_abs > y_abs && x_abs > z_abs {
+    // if x_abs > z_abs {
+    if x_abs > y_abs && x_abs > z_abs {
         return if x > 0.0 {
             Direction::xp
         } else {
             Direction::xn
         };
-    // } else if y_abs > z_abs {
-    //     return if y > 0.0 {
-    //         Direction::yp
-    //     } else {
-    //         Direction::yn
-    //     };
+    } else if y_abs > z_abs {
+        return if y > 0.0 {
+            Direction::yp
+        } else {
+            Direction::yn
+        };
     } else {
         return if z > 0.0 {
             Direction::zp
