@@ -2,13 +2,14 @@ use alloc::collections::BTreeMap;
 use alloc::str::from_utf8;
 use alloc::vec::Vec;
 use ogc_rs::print;
+use strum::IntoEnumIterator;
 use wavefront::Obj;
 
 use crate::raw_data_store::AssetName;
 
-use super::indexed_model::IndexedModel;
-use super::texture::Texture;
-use super::textured_model::{TexturedModel, TexturedModelName};
+use crate::indexed_model::IndexedModel;
+use crate::texture::Texture;
+use crate::textured_model::{TexturedModel, TexturedModelName};
 
 /**
  * Data structure for the model factory.
@@ -37,7 +38,7 @@ impl ModelFactory {
      * Load all models.
      */
     pub fn load_models(&mut self) {
-        let loaded_models: Vec<(TexturedModelName, TexturedModel)> = TexturedModelName
+        let loaded_models: Vec<(TexturedModelName, TexturedModel)> = TexturedModelName::iter()
             .into_iter()
             .filter_map(|textured_model_name| {
                 let (model_name, texture_model) = textured_model_name.get_assets();

@@ -1,15 +1,14 @@
-use crate::raw_data_store::AssetName;
 use gamelib::{Position, Velocity};
 use grrustlib::*;
 use hecs::*;
 use libc::c_void;
-use model_factory::ModelFactory;
 use ogc_rs::prelude::Vec;
 use ogc_rs::{print, println};
-use textured_model::TexturedModel;
 use wavefront::{Obj, Vertex};
-
-use self::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
+use crate::textured_model::TexturedModel;
+use crate::model_factory::ModelFactory;
+use crate::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
+use crate::raw_data_store::AssetName;
 
 /// Representation of the graphics rendering subsystem of the device
 ///

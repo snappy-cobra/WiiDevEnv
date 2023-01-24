@@ -1,5 +1,8 @@
-use super::indexed_model::IndexedModel;
-use super::texture::Texture;
+use crate::indexed_model::IndexedModel;
+use crate::texture::Texture;
+use crate::raw_data_store::AssetName;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 /**
  * Represents an indexed model that is textured.
@@ -23,7 +26,7 @@ impl TexturedModel {
  * Enumerates all textured models that exist in the project.
  * Each of them can be turned into its associated assets.
  */
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, EnumIter)]
 pub enum TexturedModelName {
     Cube,
     Triangle,
