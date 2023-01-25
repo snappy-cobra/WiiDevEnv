@@ -3,7 +3,10 @@ pub mod changes;
 pub mod components;
 
 use hecs::World;
+#[cfg(feature = "wii")]
 use ogc_rs::prelude::Vec;
+#[cfg(not(feature = "wii"))]
+use std::vec::Vec;
 use changes::Changes;
 use systems::system_name::SystemName;
 use crate::game_states::GameStateName;
