@@ -1,4 +1,4 @@
-use grrustlib::{GX_BeginDispList, GX_EndDispList, DCInvalidateRange};
+use grrustlib::{GX_BeginDispList, GX_EndDispList, DCInvalidateRange, GX_CallDispList};
 use libc::{c_void, memalign, free, realloc};
 use alloc::collections::BTreeMap;
 use super::textured_model::TexturedModelName;
@@ -14,10 +14,15 @@ pub struct DisplayCache {
 }
 
 impl DisplayCache {
+    pub fn new() -> Self {
+        return Self {
+            display_list_map : Default::default()
+        }
+    }
+
     pub fn get_display_list(&mut self, key: &TexturedModelName) -> &mut DisplayList {
         if !self.display_list_map.contains_key(key) {
             self.display_list_map.insert(key.clone(), DisplayList::new());
-
         }
         return self.display_list_map.get_mut(key).unwrap();
     }
@@ -72,6 +77,15 @@ impl DisplayList {
             realloc(self.gx_list, self.list_size as usize);
         }
         self.initialized = true;
+    }
+
+    pub fn set_active(&mut self) {
+        // Tell the wii the display list is to be used, if it is initialized.
+        if self.is_initialized() {
+            unsafe {
+                GX_CallDispList(self.gx_list, self.list_size);
+            }
+        }
     }
 }
 

@@ -5,6 +5,7 @@ use libc::c_void;
 use ogc_rs::prelude::Vec;
 use ogc_rs::{print, println};
 use wavefront::{Obj, Vertex};
+use super::display_cache::DisplayCache;
 use super::textured_model::{TexturedModel, TexturedModelName};
 use super::model_factory::ModelFactory;
 use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
@@ -19,6 +20,7 @@ use crate::raw_data_store::AssetName;
 /// and cleanup happens automatically on drop.
 pub struct Renderer {
     model_factory: ModelFactory,
+    display_cache: DisplayCache
 }
 
 impl Renderer {
@@ -31,6 +33,7 @@ impl Renderer {
     pub fn new() -> Renderer {
         let res = Renderer {
             model_factory: ModelFactory::new(),
+            display_cache: DisplayCache::new()
         };
         res.init_render();
         res
@@ -53,33 +56,40 @@ impl Renderer {
      * Render the entire scene.
      * As part of this, refreshes the graphics buffer and wait for the next frame.
      */
-    pub fn render_world(&self, world: &World) {
-        let model = self.model_factory.get_model(&TexturedModelName::Suzanne).unwrap();
-        Self::pass_textured_model_data(model);
+    pub fn render_world(&mut self, world: &World) {
         for (entity, (position, _velocity)) in &mut world.query::<(&Position, &Velocity)>() {
-            self.render_entity(model, entity, position);
+            self.render_entity(&TexturedModelName::Suzanne, entity, position);
         }
         self.redraw_world();
     }
 
     /// Render a single entity
-    fn render_entity(&self, model: &TexturedModel, _entity: Entity, position: &Position) {
+    fn render_entity(&mut self, model_name: &TexturedModelName, _entity: Entity, position: &Position) {
         unsafe {
             GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
             GRRLIB_ObjectView(
                 position.x, position.y, position.z, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0,
             );
-            Self::render_textured_model(model);
+            self.render_textured_model(model_name);
         }
     }
 
     /**
      * Renders the given model at whatever position was set previously using other calls into GRRLIB / GX.
      */
-    fn render_textured_model(textured_model: &TexturedModel) {
+    fn render_textured_model(&mut self, model_name: &TexturedModelName) {
+        let textured_model = self.model_factory.get_model(model_name).unwrap();
         textured_model.texture.set_active(true);
+        Self::pass_textured_model_data(textured_model);
         Self::pass_textured_model_description();
-        Self::pass_textured_model_data_indices(textured_model);
+
+        let display_list = self.display_cache.get_display_list(model_name);
+        if !display_list.is_initialized() {
+            display_list.open();
+            Self::pass_textured_model_data_indices(textured_model);
+            display_list.close();
+        }
+        display_list.set_active();
     }
 
     /**
