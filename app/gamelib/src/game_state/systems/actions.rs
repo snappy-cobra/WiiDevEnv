@@ -9,7 +9,7 @@ use rand::SeedableRng;
  */
 pub fn system_exit_action(state: &mut GameState) {
     if state.is_running {
-        state.is_running = state.changes.controls.home_button_down;
+        state.is_running = !state.changes.controls.home_button_down;
     }
 }
 
