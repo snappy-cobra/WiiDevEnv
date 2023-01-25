@@ -25,8 +25,8 @@ use hecs::*;
 use modulator::sources::*;
 use modulator::*;
 
-pub mod renderer;
-use renderer::*;
+pub mod rendering;
+use rendering::renderer::*;
 
 pub mod input;
 use input::InputManager;
@@ -65,7 +65,7 @@ fn main_game() -> isize {
     let ogg_player = OGGPlayer::new(Asnd::init());
     let mut game_state = GameState::new();
     let mut input_manager = InputManager::new();
-    let renderer = Renderer::new();
+    let mut renderer = Renderer::new();
 
     let mut modenv: ModulatorEnv<f32> = Default::default();
     modenv.take("myfancywave", Box::new(Wave::new(2.0, 0.5))); // start with 2.0 amplitude and 0.5Hz frequency)

@@ -25,6 +25,8 @@ ogglib = { path = "./ogglib" }
 modulator = { path = "./modulator", features = []}
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
 micromath = { version = "1.0.1" }
+strum = { version = "0.24.1", default-features = false }
+strum_macros = "0.24"
 
 [features]
 run_target_tests = []
