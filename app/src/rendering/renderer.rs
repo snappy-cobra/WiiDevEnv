@@ -1,3 +1,8 @@
+use super::display_cache::DisplayCache;
+use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
+use super::model_factory::ModelFactory;
+use super::textured_model::{TexturedModel, TexturedModelName};
+use crate::raw_data_store::AssetName;
 use gamelib::{Position, Velocity};
 use grrustlib::*;
 use hecs::*;
@@ -5,11 +10,6 @@ use libc::c_void;
 use ogc_rs::prelude::Vec;
 use ogc_rs::{print, println};
 use wavefront::{Obj, Vertex};
-use super::display_cache::DisplayCache;
-use super::textured_model::{TexturedModel, TexturedModelName};
-use super::model_factory::ModelFactory;
-use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
-use crate::raw_data_store::AssetName;
 
 /// Representation of the graphics rendering subsystem of the device
 ///
@@ -20,7 +20,7 @@ use crate::raw_data_store::AssetName;
 /// and cleanup happens automatically on drop.
 pub struct Renderer {
     model_factory: ModelFactory,
-    display_cache: DisplayCache
+    display_cache: DisplayCache,
 }
 
 impl Renderer {
@@ -33,7 +33,7 @@ impl Renderer {
     pub fn new() -> Renderer {
         let res = Renderer {
             model_factory: ModelFactory::new(),
-            display_cache: DisplayCache::new()
+            display_cache: DisplayCache::new(),
         };
         res.init_render();
         res
@@ -64,7 +64,12 @@ impl Renderer {
     }
 
     /// Render a single entity
-    fn render_entity(&mut self, model_name: &TexturedModelName, _entity: Entity, position: &Position) {
+    fn render_entity(
+        &mut self,
+        model_name: &TexturedModelName,
+        _entity: Entity,
+        position: &Position,
+    ) {
         unsafe {
             GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
             GRRLIB_ObjectView(

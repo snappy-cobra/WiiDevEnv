@@ -46,9 +46,10 @@ impl ModelFactory {
                     Self::load_indexed_model(&model_name).ok(),
                     Texture::from_bytes(texture_name.to_data()).ok(),
                 ) {
-                    (Some(indexed_model), Some(texture)) => {
-                        Some((textured_model_name, TexturedModel::new(indexed_model, texture)))
-                    }
+                    (Some(indexed_model), Some(texture)) => Some((
+                        textured_model_name,
+                        TexturedModel::new(indexed_model, texture),
+                    )),
                     _ => {
                         print!("Skipped model because of loading errors.");
                         None

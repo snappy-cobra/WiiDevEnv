@@ -1,7 +1,7 @@
-use grrustlib::{GX_BeginDispList, GX_EndDispList, DCInvalidateRange, GX_CallDispList};
-use libc::{c_void, memalign, free, realloc};
-use alloc::collections::BTreeMap;
 use super::textured_model::TexturedModelName;
+use alloc::collections::BTreeMap;
+use grrustlib::{DCInvalidateRange, GX_BeginDispList, GX_CallDispList, GX_EndDispList};
+use libc::{c_void, free, memalign, realloc};
 
 const ALIGN_SIZE: u32 = 32;
 const DEFAULT_LIST_SIZE: u32 = 1024;
@@ -16,13 +16,14 @@ pub struct DisplayCache {
 impl DisplayCache {
     pub fn new() -> Self {
         return Self {
-            display_list_map : Default::default()
-        }
+            display_list_map: Default::default(),
+        };
     }
 
     pub fn get_display_list(&mut self, key: &TexturedModelName) -> &mut DisplayList {
         if !self.display_list_map.contains_key(key) {
-            self.display_list_map.insert(key.clone(), DisplayList::new());
+            self.display_list_map
+                .insert(key.clone(), DisplayList::new());
         }
         return self.display_list_map.get_mut(key).unwrap();
     }
@@ -34,7 +35,7 @@ impl DisplayCache {
 pub struct DisplayList {
     initialized: bool,
     list_size: u32,
-    gx_list: *mut c_void
+    gx_list: *mut c_void,
 }
 
 impl DisplayList {
@@ -44,7 +45,7 @@ impl DisplayList {
             Self {
                 initialized: false,
                 list_size,
-                gx_list: memalign(ALIGN_SIZE as usize, list_size as usize)
+                gx_list: memalign(ALIGN_SIZE as usize, list_size as usize),
             }
         }
     }

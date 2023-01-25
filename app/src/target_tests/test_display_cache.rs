@@ -6,7 +6,10 @@ use hashbrown::HashMap;
  * Test if the model factory behaves as expected.
  */
 pub fn test_display_cache(tests: &mut HashMap<&'static str, fn()>) {
-    tests.insert("Test creating a display cache list.", test_create_cache_list);
+    tests.insert(
+        "Test creating a display cache list.",
+        test_create_cache_list,
+    );
 }
 
 /**
