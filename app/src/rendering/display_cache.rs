@@ -1,26 +1,25 @@
 use grrustlib::{GX_BeginDispList, GX_EndDispList, DCInvalidateRange};
 use libc::{c_void, memalign, free, realloc};
+use alloc::collections::BTreeMap;
+use super::textured_model::TexturedModelName;
 
-const ALIGN_SIZE: usize = 32;
-const DEFAULT_LIST_SIZE: usize = 1024;
+const ALIGN_SIZE: u32 = 32;
+const DEFAULT_LIST_SIZE: u32 = 1024;
 
 /**
  * Caches display lists based on the textured model name.
  */
 pub struct DisplayCache {
-    display_list_map: BTreeMap<TexturedModelName, c_void>,
+    display_list_map: BTreeMap<TexturedModelName, DisplayList>,
 }
 
 impl DisplayCache {
-    pub fn get_display_list(&self, key: &TexturedModelName) -> DisplayList {
-        match self.display_list_map.get(key) {
-            Some(display_list) => display_list,
-            None => {
-                let display_list =  DisplayList::new();
-                self.display_list_map.insert(key, display_list);
-                display_list
-            } 
+    pub fn get_display_list(&mut self, key: &TexturedModelName) -> &mut DisplayList {
+        if !self.display_list_map.contains_key(key) {
+            self.display_list_map.insert(key.clone(), DisplayList::new());
+
         }
+        return self.display_list_map.get_mut(key).unwrap();
     }
 }
 
@@ -29,7 +28,7 @@ impl DisplayCache {
  */
 pub struct DisplayList {
     initialized: bool,
-    list_size: usize,
+    list_size: u32,
     gx_list: *mut c_void
 }
 
@@ -40,7 +39,7 @@ impl DisplayList {
             Self {
                 initialized: false,
                 list_size,
-                gx_list: memalign(ALIGN_SIZE, list_size)
+                gx_list: memalign(ALIGN_SIZE as usize, list_size as usize)
             }
         }
     }
@@ -54,7 +53,7 @@ impl DisplayList {
         if self.initialized {
             self.list_size = ALIGN_SIZE * DEFAULT_LIST_SIZE;
             unsafe {
-                realloc(self.gx_list, self.list_size);
+                realloc(self.gx_list, self.list_size as usize);
             }
         }
 
@@ -70,7 +69,7 @@ impl DisplayList {
         // Close the list and adjust the size
         unsafe {
             self.list_size = GX_EndDispList();
-            realloc(self.gx_list, self.list_size);
+            realloc(self.gx_list, self.list_size as usize);
         }
         self.initialized = true;
     }

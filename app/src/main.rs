@@ -25,8 +25,8 @@ use hecs::*;
 use modulator::sources::*;
 use modulator::*;
 
-pub mod renderer;
-use renderer::*;
+pub mod rendering;
+use rendering::renderer::*;
 
 pub mod input;
 use input::InputManager;

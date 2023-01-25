@@ -1,5 +1,5 @@
-use crate::indexed_model::IndexedModel;
-use crate::texture::Texture;
+use super::indexed_model::IndexedModel;
+use super::texture::Texture;
 use crate::raw_data_store::AssetName;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
@@ -35,7 +35,7 @@ pub enum TexturedModelName {
 
 impl TexturedModelName {
     /// Returns the assets associations
-    pub const fn get_assets(&self) -> &'static [u8] {
+    pub const fn get_assets(&self) -> (AssetName, AssetName) {
         match self {
             TexturedModelName::Cube => (AssetName::Cube, AssetName::CubeTexture),
             TexturedModelName::Triangle => (AssetName::Triangle, AssetName::TriangleTexture),

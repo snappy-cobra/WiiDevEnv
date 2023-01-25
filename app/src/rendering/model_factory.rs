@@ -7,9 +7,9 @@ use wavefront::Obj;
 
 use crate::raw_data_store::AssetName;
 
-use crate::indexed_model::IndexedModel;
-use crate::texture::Texture;
-use crate::textured_model::{TexturedModel, TexturedModelName};
+use super::indexed_model::IndexedModel;
+use super::texture::Texture;
+use super::textured_model::{TexturedModel, TexturedModelName};
 
 /**
  * Data structure for the model factory.
@@ -41,7 +41,7 @@ impl ModelFactory {
         let loaded_models: Vec<(TexturedModelName, TexturedModel)> = TexturedModelName::iter()
             .into_iter()
             .filter_map(|textured_model_name| {
-                let (model_name, texture_model) = textured_model_name.get_assets();
+                let (model_name, texture_name) = textured_model_name.get_assets();
                 match (
                     Self::load_indexed_model(&model_name).ok(),
                     Texture::from_bytes(texture_name.to_data()).ok(),

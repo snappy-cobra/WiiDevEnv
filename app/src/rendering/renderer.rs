@@ -5,9 +5,9 @@ use libc::c_void;
 use ogc_rs::prelude::Vec;
 use ogc_rs::{print, println};
 use wavefront::{Obj, Vertex};
-use crate::textured_model::TexturedModel;
-use crate::model_factory::ModelFactory;
-use crate::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
+use super::textured_model::{TexturedModel, TexturedModelName};
+use super::model_factory::ModelFactory;
+use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 use crate::raw_data_store::AssetName;
 
 /// Representation of the graphics rendering subsystem of the device
@@ -54,7 +54,7 @@ impl Renderer {
      * As part of this, refreshes the graphics buffer and wait for the next frame.
      */
     pub fn render_world(&self, world: &World) {
-        let model = self.model_factory.get_model(&AssetName::Suzanne).unwrap();
+        let model = self.model_factory.get_model(&TexturedModelName::Suzanne).unwrap();
         Self::pass_textured_model_data(model);
         for (entity, (position, _velocity)) in &mut world.query::<(&Position, &Velocity)>() {
             self.render_entity(model, entity, position);
