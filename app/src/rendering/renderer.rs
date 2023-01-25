@@ -3,7 +3,10 @@ use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 use super::model_factory::ModelFactory;
 use super::textured_model::{TexturedModel, TexturedModelName};
 use crate::raw_data_store::AssetName;
-use gamelib::{Position, Velocity};
+use gamelib::{
+    game::Renderer, game_state::components::motion::Position,
+    game_state::components::motion::Velocity, game_state::GameState,
+};
 use grrustlib::*;
 use hecs::*;
 use libc::c_void;
@@ -18,20 +21,20 @@ use wavefront::{Obj, Vertex};
 ///
 /// Graphics setup happens as part of initialization,
 /// and cleanup happens automatically on drop.
-pub struct Renderer {
+pub struct WiiRenderer {
     model_factory: ModelFactory,
     display_cache: DisplayCache,
 }
 
-impl Renderer {
+impl WiiRenderer {
     ///
     /// Create a new renderer.
     ///
     /// As part of this:
     /// - the graphics chip is initialized in the expected rendering mode.
     /// - The available models are constructed and indexed. (c.f. `ModelFactory`)
-    pub fn new() -> Renderer {
-        let res = Renderer {
+    pub fn new() -> Self {
+        let res = Self {
             model_factory: ModelFactory::new(),
             display_cache: DisplayCache::new(),
         };
@@ -162,12 +165,21 @@ impl Renderer {
     }
 }
 
-impl Drop for Renderer {
+impl Drop for WiiRenderer {
     /// Cleanup the renderer
     fn drop(&mut self) {
         println!("Dropping Renderer");
         unsafe {
             GRRLIB_Exit();
         }
+    }
+}
+
+/**
+ * Implement the render state implementation for the game to use.
+ */
+impl Renderer for WiiRenderer {
+    fn render_state(&mut self, state: &GameState) {
+        self.render_world(&state.world);
     }
 }
