@@ -1,16 +1,21 @@
+use crate::input::InputManager;
+use core::time::Duration;
+use gamelib::game_state::changes::{ChangeProvider, Changes};
+use ogc_rs::clock::Instant;
+
 /**
  * Wii specific implementation of a change provider.
  */
 pub struct WiiChangeProvider {
-    earlier: &Instant,
-    input_manager: InputManager
+    earlier: Instant,
+    input_manager: InputManager,
 }
 
 impl WiiChangeProvider {
     pub fn new(input_manager: InputManager) -> WiiChangeProvider {
         return WiiChangeProvider {
             earlier: Instant::now(),
-            input_manager
+            input_manager,
         };
     }
 
@@ -19,7 +24,7 @@ impl WiiChangeProvider {
     /// to be passed back to this function next iteration.
     fn calculate_delta_time(&self) -> (Duration, Instant) {
         let now = Instant::now();
-        let delta_time = Self::elapsed_between(self.earlier, &now);
+        let delta_time = Self::elapsed_between(&self.earlier, &now);
         (delta_time, now)
     }
 
@@ -35,7 +40,7 @@ impl ChangeProvider for WiiChangeProvider {
         self.earlier = now;
         return Changes {
             controls: self.input_manager.update(),
-            delta_time = delta_time
-        }
+            delta_time,
+        };
     }
-} 
+}

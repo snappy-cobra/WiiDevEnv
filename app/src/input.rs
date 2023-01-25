@@ -1,4 +1,4 @@
-use gamelib::Controls;
+use gamelib::game_state::changes::controls::Controls;
 use ogc_rs::prelude::{Button, ControllerPort, ControllerType, Input, WPadDataFormat};
 
 pub struct InputManager {

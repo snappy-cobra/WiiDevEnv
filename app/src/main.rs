@@ -12,19 +12,20 @@
 // Make sure the allocator is set.
 extern crate alloc;
 
-mod renderer;
+mod change_provider;
 mod input;
 mod raw_data_store;
+mod rendering;
 mod target_tests;
 
-use ogc_rs::prelude::*;
+use change_provider::WiiChangeProvider;
 use core::sync::atomic::{AtomicBool, Ordering};
-use libc::exit;
-use grrustlib::{STM_ShutdownToStandby, SYS_SetPowerCallback};
 use gamelib::{game::Game, game_states::GameStateName};
-use renderer::WiiRenderer;
+use grrustlib::{STM_ShutdownToStandby, SYS_SetPowerCallback};
 use input::InputManager;
-
+use libc::exit;
+use ogc_rs::prelude::*;
+use rendering::renderer::WiiRenderer;
 
 /// Global flag to signal to the main game loop when the game should quit.
 ///
@@ -50,9 +51,9 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 fn main_game() -> isize {
     register_power_callback();
     let mut game = Game::new(
-        GameStateName::BouncingCubes, 
-        WiiChangeProvider::new(InputManager::new()), 
-        WiiRenderer::new()
+        GameStateName::BouncingCubes,
+        WiiChangeProvider::new(InputManager::new()),
+        WiiRenderer::new(),
     );
 
     while KEEP_RUNNING.load(Ordering::SeqCst) {
@@ -60,8 +61,8 @@ fn main_game() -> isize {
         if !should_continue {
             break;
         }
-        shutdown();
     }
+    shutdown()
 }
 
 /// Registers the power callback,

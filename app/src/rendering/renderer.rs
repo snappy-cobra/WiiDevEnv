@@ -3,7 +3,10 @@ use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 use super::model_factory::ModelFactory;
 use super::textured_model::{TexturedModel, TexturedModelName};
 use crate::raw_data_store::AssetName;
-use gamelib::{game::Renderer, game_state::GameState, Position, Velocity};
+use gamelib::{
+    game::Renderer, game_state::components::motion::Position,
+    game_state::components::motion::Velocity, game_state::GameState,
+};
 use grrustlib::*;
 use hecs::*;
 use libc::c_void;
@@ -176,7 +179,7 @@ impl Drop for WiiRenderer {
  * Implement the render state implementation for the game to use.
  */
 impl Renderer for WiiRenderer {
-    fn render_state(&self, state: &GameState) {
+    fn render_state(&mut self, state: &GameState) {
         self.render_world(&state.world);
     }
 }

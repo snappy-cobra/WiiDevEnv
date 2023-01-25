@@ -60,5 +60,5 @@ impl<C: ChangeProvider, R: Renderer> Game<C, R> {
  * Simple trait for implementing the wii specific renderer.
  */
 pub trait Renderer {
-    fn render_state(&self, state: &GameState);
+    fn render_state(&mut self, state: &GameState);
 }
