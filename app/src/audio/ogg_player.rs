@@ -1,4 +1,4 @@
-use gamelib::data_store::AssetName;
+use gamelib::data_store::asset_name::AssetName;
 use alloc::sync::Arc;
 use libc::c_void;
 use ogc_rs::prelude::Asnd;

@@ -10,7 +10,7 @@
 
 It's probably a bit difficult to take all this code and know how to work with it. The main point is that you should only really be concerned with the following files / folders:
 
-- `app/src/raw_data_store.rs` : this is where you add new data files to be accessed elsewhere. Be sure to put them in `app/data`.
+- `app/gamelib/src/data_store/asset_name.rs` : this is where you add new data files to be accessed elsewhere. Be sure to put them in `app/gamelib/src/data_store/data`.
 - `app/src/change_provider.rs` and `app/gamelib/src/game_state/changes/controls.rs` : augment these two files to add different control sources to the game.
 - `app/gamelib/src/game_state/components` : this is is where you add **components**.
 - `app/gamelib/src/game_state/systems` : this is where you add new **systems** that work on different components. Be sure to define a system name in `system_name.rs`

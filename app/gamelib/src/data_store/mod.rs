@@ -1,1 +1,1 @@
-mod asset_name;
+pub mod asset_name;

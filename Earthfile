@@ -43,7 +43,6 @@ build-env:
   # Setup build folder structure
   RUN mkdir /app
   RUN mkdir /app/src
-  RUN mkdir /app/data
   RUN mkdir /build
   RUN mkdir /build/target
   RUN mkdir /build/bin
