@@ -2,7 +2,7 @@ use super::display_cache::DisplayCache;
 use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 use super::model_factory::ModelFactory;
 use super::textured_model::{TexturedModel, TexturedModelName};
-use crate::raw_data_store::AssetName;
+use gamelib::data_store::AssetName;
 use gamelib::{
     game::Renderer, game_state::components::motion::Position,
     game_state::components::motion::Velocity, game_state::GameState,

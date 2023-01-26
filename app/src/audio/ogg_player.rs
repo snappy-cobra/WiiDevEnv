@@ -1,4 +1,4 @@
-use crate::raw_data_store::AssetName;
+use gamelib::data_store::AssetName;
 use alloc::sync::Arc;
 use libc::c_void;
 use ogc_rs::prelude::Asnd;

@@ -5,7 +5,7 @@ use ogc_rs::print;
 use strum::IntoEnumIterator;
 use wavefront::Obj;
 
-use crate::raw_data_store::AssetName;
+use gamelib::data_store::AssetName;
 
 use super::indexed_model::IndexedModel;
 use super::texture::Texture;
