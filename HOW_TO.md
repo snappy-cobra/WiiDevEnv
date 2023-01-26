@@ -18,7 +18,7 @@ It's probably a bit difficult to take all this code and know how to work with it
 
 ### Components and Entities
 
-We use the `hecs` library to implement an Entity Component System (ECS). See [the docs]() for more info.
+We use the `hecs` library to implement an Entity Component System (ECS). See [the docs](https://docs.rs/hecs/latest/hecs/) for more info.
 
 ### Systems
 
@@ -27,4 +27,4 @@ When adding a system be sure to add it to `SystemName` too. You can reference th
 
 ### Game States
 
-The core addition to `hecs`'s ECS is that we can easily define `GameState`s. One state can move to another state
+The core addition to `hecs`'s ECS is that we can easily define `GameState`s. One state can move to another state, and multiple states can reference the same systems and components.
