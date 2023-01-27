@@ -1,5 +1,5 @@
 use core::fmt;
-use gamelib::game_state::changes::controls::Controls;
+use gamelib::game_state::changes::controls::{Controls, WiiMoteControl};
 use gamelib::game_state::changes::motion::Motion;
 use gamelib::plot::PlotsHolder;
 use libc::fprintf;
@@ -41,11 +41,14 @@ impl InputManager {
         self.wii_mote_states
             .iter_mut()
             .for_each(|x| x.update_motion(&mut self.plots_holder));
+        let wii_mote_controls = self
+            .wii_mote_states
+            .iter()
+            .map(|x| x.to_wii_mote_control())
+            .collect::<Vec<WiiMoteControl>>();
+        // let a = wii_mote_controls.try_into<[WiiMoteControl;4]>();
         return Controls {
-            home_button_down: self.wii_mote_states[0]
-                .wii_mote
-                .is_button_down(Button::Home),
-            one_button_down: self.wii_mote_states[0].wii_mote.is_button_down(Button::One),
+            wii_mote_control: wii_mote_controls,
         };
     }
 }
@@ -57,7 +60,7 @@ fn create_wii_mote(controller_port: ControllerPort) -> WiiMoteState {
         // .set_data_format(WPadDataFormat::ButtonsAccel); Maybe usefull if wiimote does not have high enough latency
         .set_data_format(WPadDataFormat::ButtonsAccelIR);
     // wii_mote.as_wpad().set_motion_plus(true);
-    return WiiMoteState::new(wii_mote);
+    WiiMoteState::new(wii_mote)
 }
 
 impl Default for InputManager {
@@ -118,6 +121,13 @@ impl WiiMoteState {
                 }
             }
         }
+    }
+
+    fn to_wii_mote_control(&self) -> WiiMoteControl {
+        return WiiMoteControl {
+            home_button_down: self.wii_mote.is_button_down(Button::Home),
+            one_button_down: self.wii_mote.is_button_down(Button::One),
+        };
     }
 }
 

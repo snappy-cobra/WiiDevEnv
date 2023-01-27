@@ -8,7 +8,6 @@ use controls::Controls;
 ///
 /// Its fields are public so they can be filled in from outside the library
 /// (before `GameState::update` is called)
-#[derive(Debug, Default)]
 pub struct Changes {
     pub controls: Controls,
     pub delta_time: Duration,

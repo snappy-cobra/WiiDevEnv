@@ -9,7 +9,7 @@ use rand::SeedableRng;
  */
 pub fn system_exit_action(state: &mut GameState) {
     if state.is_running {
-        state.is_running = !state.changes.controls.home_button_down;
+        state.is_running = !state.changes.controls.wii_mote_control[0].home_button_down;
     }
 }
 
@@ -17,7 +17,7 @@ pub fn system_exit_action(state: &mut GameState) {
  * Create velocity in random directions if 'one' is pressed.
  */
 pub fn system_shake_action(state: &mut GameState) {
-    if state.changes.controls.one_button_down {
+    if state.changes.controls.wii_mote_control[0].one_button_down {
         let mut small_rng = SmallRng::seed_from_u64(10u64);
         for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
             velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
@@ -38,7 +38,7 @@ mod tests {
         assert_eq!(state.is_running, true);
 
         // Pressing the home button should exit the game.
-        state.changes.controls.home_button_down = true;
+        state.changes.controls.wii_mote_control[0].home_button_down = true;
         assert_eq!(state.is_running, true);
         super::system_exit_action(&mut state);
         assert_eq!(state.is_running, false);
