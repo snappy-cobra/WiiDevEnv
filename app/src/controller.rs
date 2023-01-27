@@ -1,5 +1,5 @@
-use crate::plot::PlotsHolder;
 use alloc::vec;
+use gamelib::plot::PlotsHolder;
 use micromath::F32Ext;
 use ogc_rs::prelude::*;
 

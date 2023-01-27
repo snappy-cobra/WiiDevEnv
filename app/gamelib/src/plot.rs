@@ -1,8 +1,12 @@
 use alloc::format;
 use alloc::vec::Vec;
-// use ogc_rs::input::*;
+use alloc::vec;
+use alloc::string::String;
+use crate::alloc::string::ToString;
 use hashbrown::HashMap;
-use ogc_rs::prelude::*;
+use ogc_rs::println;
+use ogc_rs::print;
+
 
 /// Allow for easy creation of plots to the logs.
 /// these logs can than be parsed using the plot_logs.py which will create the actual plots.
@@ -40,11 +44,11 @@ pub struct Plot {
 
 impl Plot {
     pub fn new(title: &str, labels: Vec<&str>) -> Plot {
-        let titleString = title.to_string();
-        let labelsString: Vec<String> = labels.iter().map(|s| s.to_string()).collect();
+        let title_string = title.to_string();
+        let labels_string: Vec<String> = labels.iter().map(|s| s.to_string()).collect();
         Plot {
-            title: titleString,
-            labels: labelsString,
+            title: title_string,
+            labels: labels_string,
             measurements: vec![],
         }
     }
@@ -85,8 +89,8 @@ impl PlotsHolder {
         match self.plots.get_mut(title) {
             Some(plot) => plot.add_measurement(measurement),
             None => {
-                let newPlot = Plot::new(title, labels);
-                self.plots.insert(title.to_string(), newPlot);
+                let new_plot = Plot::new(title, labels);
+                self.plots.insert(title.to_string(), new_plot);
             }
         };
     }

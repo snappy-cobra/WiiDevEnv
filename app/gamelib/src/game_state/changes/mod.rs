@@ -1,4 +1,5 @@
 pub mod controls;
+pub mod motion;
 
 use core::time::Duration;
 use controls::Controls;

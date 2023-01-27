@@ -16,3 +16,7 @@ impl Controls {
         }
     }
 }
+
+// pub struct WiiMoteControl {
+//     pub motion: Motion
+// }
