@@ -1,7 +1,7 @@
 use crate::controller::plot_wiimote_movement;
-use crate::plot::{Plot, PlotsHolder};
+use crate::plot::PlotsHolder;
 use core::fmt;
-use gamelib::Controls;
+use gamelib::game_state::changes::controls::Controls;
 use micromath::F32Ext;
 use num::ToPrimitive;
 use ogc_rs::input::*;

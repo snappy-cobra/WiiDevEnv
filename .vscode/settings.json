@@ -6,7 +6,9 @@
         "grrustlib",
         "hecs",
         "libc",
+        "memalign",
         "ogglib",
+        "realloc",
         "VTXFMT"
     ]
 }

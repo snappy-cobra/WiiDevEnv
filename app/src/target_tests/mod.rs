@@ -3,6 +3,8 @@ use ogc_rs::*;
 
 mod test_model_factory;
 use test_model_factory::test_model_factory;
+mod test_display_cache;
+use test_display_cache::test_display_cache;
 
 /**
  * Main list of tests to run.
@@ -12,6 +14,7 @@ pub fn tests() -> HashMap<&'static str, fn()> {
 
     tests.insert("Trivial test", || assert!(true));
     test_model_factory(&mut tests);
+    test_display_cache(&mut tests);
 
     tests
 }
