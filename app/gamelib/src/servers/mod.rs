@@ -3,7 +3,11 @@ pub mod renderer;
 
 use crate::servers::audio::AudioServer;
 use crate::servers::renderer::RenderServer;
+
+#[cfg(feature = "wii")]
 use ogc_rs::prelude::Box;
+#[cfg(not(feature = "wii"))]
+use std::boxed::Box;
 
 pub struct ServerProvider {
     pub audio_server: Box<dyn AudioServer>,
