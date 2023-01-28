@@ -9,7 +9,7 @@ use ogc_rs::prelude::Vec;
 use std::vec::Vec;
 use changes::Changes;
 use systems::system_name::SystemName;
-use crate::game_states::GameStateName;
+use crate::{game_states::GameStateName, servers::ServerProvider};
 
 /// Represents the state of the game
 ///
@@ -19,6 +19,7 @@ pub struct GameState {
     pub changes: Changes,
     pub next_state: Option<GameStateName>,
     pub is_running: bool,
+    pub server_provider: Option<ServerProvider>,
     systems: Vec<SystemName>,
 }
 
@@ -32,6 +33,7 @@ impl GameState {
             changes: Changes::nothing(),
             systems: Vec::new(),
             is_running: true,
+            server_provider: None,
             next_state: None,
         }
     }

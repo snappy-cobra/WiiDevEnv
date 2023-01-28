@@ -4,7 +4,7 @@ use super::model_factory::ModelFactory;
 use super::textured_model::{TexturedModel, TexturedModelName};
 use gamelib::data_store::asset_name::AssetName;
 use gamelib::{
-    game::Renderer, game_state::components::motion::Position,
+    servers::renderer::RenderServer, game_state::components::motion::Position,
     game_state::components::motion::Velocity, game_state::GameState,
 };
 use grrustlib::*;
@@ -21,12 +21,12 @@ use wavefront::{Obj, Vertex};
 ///
 /// Graphics setup happens as part of initialization,
 /// and cleanup happens automatically on drop.
-pub struct WiiRenderer {
+pub struct WiiRenderServer {
     model_factory: ModelFactory,
     display_cache: DisplayCache,
 }
 
-impl WiiRenderer {
+impl WiiRenderServer {
     ///
     /// Create a new renderer.
     ///
@@ -165,7 +165,7 @@ impl WiiRenderer {
     }
 }
 
-impl Drop for WiiRenderer {
+impl Drop for WiiRenderServer {
     /// Cleanup the renderer
     fn drop(&mut self) {
         println!("Dropping Renderer");
@@ -178,7 +178,7 @@ impl Drop for WiiRenderer {
 /**
  * Implement the render state implementation for the game to use.
  */
-impl Renderer for WiiRenderer {
+impl RenderServer for WiiRenderServer {
     fn render_state(&mut self, state: &GameState) {
         self.render_world(&state.world);
     }

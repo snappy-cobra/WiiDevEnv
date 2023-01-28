@@ -1,17 +1,18 @@
 use crate::game_state::{changes::ChangeProvider, GameState};
 use crate::game_states::{GameStateName, GameStateFactory};
+use crate::servers::ServerProvider;
 
 /**
  * Main game loop struct that should handle the game flow, with help from
  * provided change provider and renderer. 
  */
-pub struct Game<C, R> {
+pub struct Game<C> {
     state: GameState,
     change_provider: C,
-    renderer: R
+    server_provider: ServerProvider   
 }
 
-impl<C: ChangeProvider, R: Renderer> Game<C, R> {
+impl<C: ChangeProvider> Game<C> {
     /**
      * Construct a new game with the initial game state 
      * and wii specific change provider + renderer.
@@ -19,12 +20,12 @@ impl<C: ChangeProvider, R: Renderer> Game<C, R> {
     pub fn new(
         start_state: GameStateName, 
         change_provider: C, 
-        renderer: R
+        server_provider: ServerProvider
     ) -> Self {
-        return Game {
+        return Self {
             state: GameStateFactory::to_state(start_state),
             change_provider,
-            renderer
+            server_provider
         };
     }
 
@@ -41,7 +42,7 @@ impl<C: ChangeProvider, R: Renderer> Game<C, R> {
         }
 
         // We are still running, so do the rest.
-        self.renderer.render_state(& self.state);
+        self.server_provider.render_server.render_state(& self.state);
 
         match &self.state.next_state {
             Some(next_state) => {
@@ -54,11 +55,4 @@ impl<C: ChangeProvider, R: Renderer> Game<C, R> {
 
         return true;
     }
-}
-
-/**
- * Simple trait for implementing the wii specific renderer.
- */
-pub trait Renderer {
-    fn render_state(&mut self, state: &GameState);
 }

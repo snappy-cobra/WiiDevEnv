@@ -16,15 +16,17 @@ mod change_provider;
 mod input;
 mod rendering;
 mod target_tests;
+mod audio;
 
 use change_provider::WiiChangeProvider;
 use core::sync::atomic::{AtomicBool, Ordering};
-use gamelib::{game::Game, game_states::GameStateName};
+use gamelib::{game::Game, game_states::GameStateName, servers::{ServerProvider, audio::AudioServer, renderer::RenderServer}};
 use grrustlib::{STM_ShutdownToStandby, SYS_SetPowerCallback};
 use input::InputManager;
 use libc::exit;
 use ogc_rs::prelude::*;
-use rendering::renderer::WiiRenderer;
+use audio::ogg_server::WiiOGGServer;
+use rendering::render_server::WiiRenderServer;
 
 /// Global flag to signal to the main game loop when the game should quit.
 ///
@@ -49,10 +51,19 @@ fn main(_argc: isize, _argv: *const *const u8) -> isize {
 
 fn main_game() -> isize {
     register_power_callback();
+
+    let mut audio_server = WiiOGGServer::new(Asnd::init());
+    let mut render_server = WiiRenderServer::new();
+
+    let server_provider = ServerProvider::new(
+        audio_server, 
+        render_server
+    );    
+
     let mut game = Game::new(
         GameStateName::BouncingCubes,
         WiiChangeProvider::new(InputManager::new()),
-        WiiRenderer::new(),
+        server_provider
     );
 
     while KEEP_RUNNING.load(Ordering::SeqCst) {
