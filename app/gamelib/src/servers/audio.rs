@@ -3,6 +3,7 @@ use crate::data_store::asset_name::AssetName;
 /**
  * Defines how you want the file to be played.
  */
+#[derive(Debug, Clone)]
 pub enum PlayMode {
     Infinite,
     OneTime,

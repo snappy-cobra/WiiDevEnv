@@ -1,6 +1,6 @@
-use gamelib::data_store::asset_name::AssetName;
 use crate::rendering::model_factory::ModelFactory;
 use crate::rendering::textured_model::TexturedModelName;
+use gamelib::data_store::asset_name::AssetName;
 use hashbrown::HashMap;
 
 /**

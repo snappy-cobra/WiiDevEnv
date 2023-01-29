@@ -1,9 +1,9 @@
-use gamelib::data_store::asset_name::AssetName;
 use alloc::sync::Arc;
+use gamelib::data_store::asset_name::AssetName;
+use gamelib::servers::audio::{AudioServer, PlayMode};
 use libc::c_void;
 use ogc_rs::prelude::Asnd;
 use ogglib::*;
-use gamelib::servers::audio::{AudioServer, PlayMode};
 
 /**
  * OGG audio file player. Interfaces with the ogglib doing the actual work.
@@ -20,7 +20,7 @@ impl WiiOGGServer {
         Self {
             _asnd: Arc::<Asnd>::new(asnd),
         }
-    }    
+    }
 
     fn play_mode_to_ogg_mode(play_mode: PlayMode) -> i32 {
         match play_mode {
@@ -39,7 +39,12 @@ impl AudioServer for WiiOGGServer {
         let buffer_length = buffer.len() as i32;
         let buffer_ptr = buffer.as_ptr().cast_mut() as *mut c_void;
         unsafe {
-            PlayOgg(buffer_ptr, buffer_length, 0, Self::play_mode_to_ogg_mode(play_mode));
+            PlayOgg(
+                buffer_ptr,
+                buffer_length,
+                0,
+                Self::play_mode_to_ogg_mode(play_mode),
+            );
         }
     }
 

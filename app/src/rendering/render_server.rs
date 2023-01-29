@@ -4,8 +4,8 @@ use super::model_factory::ModelFactory;
 use super::textured_model::{TexturedModel, TexturedModelName};
 use gamelib::data_store::asset_name::AssetName;
 use gamelib::{
-    servers::renderer::RenderServer, game_state::components::motion::Position,
-    game_state::components::motion::Velocity, game_state::GameState,
+    game_state::components::motion::Position, game_state::components::motion::Velocity,
+    game_state::GameState, servers::renderer::RenderServer,
 };
 use grrustlib::*;
 use hecs::*;

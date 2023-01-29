@@ -47,12 +47,18 @@ impl<C: ChangeProvider> Game<C> {
         match &self.state.next_state {
             Some(next_state) => {
                 // TODO : this is where you'd save the current scene, if you wanted that support.
-                self.state = GameStateFactory::to_state(next_state.clone())
+                let mut new_state = GameStateFactory::to_state(next_state.clone());
+                self.inject_state_dependencies(&mut new_state);
+                self.state = new_state;
                 // TODO: this is where you'd load a potential earlier save of the newly load scene, if you wanted that support.
             },
             None => ()
         }
 
         return true;
+    }
+
+    fn inject_state_dependencies(&self, state: &mut GameState) {
+        state.server_provider = Some(self.server_provider);
     }
 }
