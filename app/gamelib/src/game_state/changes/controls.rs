@@ -1,7 +1,5 @@
 use alloc::vec::Vec;
 use alloc::vec;
-use crate::game_state::changes::motion::Direction;
-
 /// Represents the state of one or multiple Wii controllers w.r.t. the game
 ///
 /// Its fields are public so they can be filled in from outside the library
@@ -39,4 +37,14 @@ pub struct MotionControl {
     pub direction: Direction,
     pub started: bool,
     pub ended: bool,
+}
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum Direction {
+    Xp,
+    Xn,
+    Yp,
+    Yn,
+    Zp,
+    Zn,
 }

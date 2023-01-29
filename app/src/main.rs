@@ -13,7 +13,6 @@
 extern crate alloc;
 
 mod change_provider;
-mod controller;
 mod input;
 mod raw_data_store;
 mod rendering;
