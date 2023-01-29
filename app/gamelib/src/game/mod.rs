@@ -1,19 +1,23 @@
-// use ogc_rs::println;
-// use ogc_rs::print;
+#[cfg(feature = "wii")]
+use alloc::rc::Rc;
+#[cfg(not(feature = "wii"))]
+use std::rc::Rc;
+use core::cell::RefCell;
 use crate::game_state::{changes::ChangeProvider, GameState};
 use crate::game_states::{GameStateName, GameStateFactory};
+use crate::servers::ServerProvider;
 
 /**
  * Main game loop struct that should handle the game flow, with help from
  * provided change provider and renderer. 
  */
-pub struct Game<C, R> {
+pub struct Game<C> {
     state: GameState,
     change_provider: C,
-    renderer: R
+    server_provider: Rc<RefCell<ServerProvider>>   
 }
 
-impl<C: ChangeProvider, R: Renderer> Game<C, R> {
+impl<C: ChangeProvider> Game<C> {
     /**
      * Construct a new game with the initial game state 
      * and wii specific change provider + renderer.
@@ -21,13 +25,17 @@ impl<C: ChangeProvider, R: Renderer> Game<C, R> {
     pub fn new(
         start_state: GameStateName, 
         change_provider: C, 
-        renderer: R
+        server_provider: ServerProvider
     ) -> Self {
-        return Game {
-            state: GameStateFactory::to_state(start_state),
+        let mut state = GameStateFactory::to_state(start_state);
+        let server_ref = Rc::new(RefCell::new(server_provider));
+        state.server_provider = Some(server_ref.clone());
+        let res = Self {
+            state,
             change_provider,
-            renderer
+            server_provider: server_ref
         };
+        res
     }
 
     /**
@@ -43,12 +51,15 @@ impl<C: ChangeProvider, R: Renderer> Game<C, R> {
         }
 
         // We are still running, so do the rest.
-        self.renderer.render_state(& self.state);
+        let mut server_provider = self.server_provider.as_ref().borrow_mut();
+        server_provider.render_server.render_state(& self.state);
 
         match &self.state.next_state {
             Some(next_state) => {
                 // TODO : this is where you'd save the current scene, if you wanted that support.
-                self.state = GameStateFactory::to_state(next_state.clone())
+                let mut new_state = GameStateFactory::to_state(next_state.clone());
+                new_state.server_provider = Some(self.server_provider.clone());
+                self.state = new_state;
                 // TODO: this is where you'd load a potential earlier save of the newly load scene, if you wanted that support.
             },
             None => ()
@@ -56,11 +67,4 @@ impl<C: ChangeProvider, R: Renderer> Game<C, R> {
 
         return true;
     }
-}
-
-/**
- * Simple trait for implementing the wii specific renderer.
- */
-pub trait Renderer {
-    fn render_state(&mut self, state: &GameState);
 }
