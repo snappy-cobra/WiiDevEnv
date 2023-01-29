@@ -1,3 +1,5 @@
+use core::cell::RefCell;
+use alloc::rc::Rc;
 use crate::game_state::{changes::ChangeProvider, GameState};
 use crate::game_states::{GameStateName, GameStateFactory};
 use crate::servers::ServerProvider;
@@ -9,7 +11,7 @@ use crate::servers::ServerProvider;
 pub struct Game<C> {
     state: GameState,
     change_provider: C,
-    server_provider: ServerProvider   
+    server_provider: Rc<RefCell<ServerProvider>>   
 }
 
 impl<C: ChangeProvider> Game<C> {
@@ -22,11 +24,15 @@ impl<C: ChangeProvider> Game<C> {
         change_provider: C, 
         server_provider: ServerProvider
     ) -> Self {
-        return Self {
-            state: GameStateFactory::to_state(start_state),
+        let mut state = GameStateFactory::to_state(start_state);
+        let server_ref = Rc::new(RefCell::new(server_provider));
+        state.server_provider = Some(server_ref.clone());
+        let res = Self {
+            state,
             change_provider,
-            server_provider
+            server_provider: server_ref
         };
+        res
     }
 
     /**
@@ -42,13 +48,14 @@ impl<C: ChangeProvider> Game<C> {
         }
 
         // We are still running, so do the rest.
-        self.server_provider.render_server.render_state(& self.state);
+        let mut server_provider = self.server_provider.as_ref().borrow_mut();
+        server_provider.render_server.render_state(& self.state);
 
         match &self.state.next_state {
             Some(next_state) => {
                 // TODO : this is where you'd save the current scene, if you wanted that support.
                 let mut new_state = GameStateFactory::to_state(next_state.clone());
-                self.inject_state_dependencies(&mut new_state);
+                new_state.server_provider = Some(self.server_provider.clone());
                 self.state = new_state;
                 // TODO: this is where you'd load a potential earlier save of the newly load scene, if you wanted that support.
             },
@@ -56,9 +63,5 @@ impl<C: ChangeProvider> Game<C> {
         }
 
         return true;
-    }
-
-    fn inject_state_dependencies(&self, state: &mut GameState) {
-        state.server_provider = Some(self.server_provider);
     }
 }

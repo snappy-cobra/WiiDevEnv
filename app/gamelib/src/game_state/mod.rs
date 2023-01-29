@@ -2,9 +2,11 @@ pub mod systems;
 pub mod changes;
 pub mod components;
 
+use alloc::rc::Rc;
 use hecs::World;
 #[cfg(feature = "wii")]
 use ogc_rs::prelude::Vec;
+use core::cell::RefCell;
 #[cfg(not(feature = "wii"))]
 use std::vec::Vec;
 use changes::Changes;
@@ -19,7 +21,7 @@ pub struct GameState {
     pub changes: Changes,
     pub next_state: Option<GameStateName>,
     pub is_running: bool,
-    pub server_provider: Option<ServerProvider>,
+    pub server_provider: Option<Rc<RefCell<ServerProvider>>>,
     systems: Vec<SystemName>,
 }
 
