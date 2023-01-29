@@ -15,6 +15,7 @@ pub fn build() -> GameState {
     let mut state = GameState::new();
     state.add_system(SystemName::ExitAction);
     state.add_system(SystemName::ShakeAction);
+    state.add_system(SystemName::ShakeAction2);
     state.add_system(SystemName::IntegrateMotion);
     state.add_system(SystemName::BounceBounds);
     batch_spawn_entities(&mut state.world, 10);

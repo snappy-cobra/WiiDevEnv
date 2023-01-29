@@ -1,3 +1,5 @@
+use ogc_rs::print;
+use ogc_rs::println;
 use crate::game_state::GameState;
 use crate::game_state::components::motion::Velocity;
 use rand::rngs::SmallRng;
@@ -21,8 +23,10 @@ pub fn system_shake_action(state: &mut GameState) {
     if state.changes.controls.wii_mote_control[0].one_button_down {
         let mut small_rng = SmallRng::seed_from_u64(10u64);
         for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
-            velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
-            velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
+            // velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
+            velocity.x = 0.0;
+            // velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
+            velocity.y = 0.0;
         }
     }
 }
@@ -31,11 +35,22 @@ pub fn system_shake_action_2(state: &mut GameState) {
     match &state.changes.controls.wii_mote_control[0].motion {
         None => (),
         Some(motion) => {
-            if motion.direction == Direction::Zp {
+            println!("MOTIONNN");
+            if motion.started {
+                println!("changing");
                 let mut small_rng = SmallRng::seed_from_u64(10u64);
+                let c = small_rng.next_u32() as f32 / u32::MAX as f32 * 0.5 - 0.1;
+                // let c = 3.0; // small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
                 for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
-                    velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
-                    velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
+                    match motion.direction {
+                        Direction::Zp => velocity.y += c,
+                        Direction::Zn => velocity.y -= c,
+                        Direction::Xp => velocity.x -= c,
+                        Direction::Xn => velocity.x += c,
+                        _ => {
+                            println!("nothing to do");
+                        },
+                    };
                 }
             }
         }
