@@ -14,7 +14,6 @@ pub fn system_play_audio(state: &mut GameState) {
     server_provider.audio_server.set_volume(100);
     for (_entity, audio) in audios {
         if !audio.is_processed {
-            //server_provider.audio_server.play(&AssetName::DemoMusic, PlayMode::Infinite);
             server_provider.audio_server.play(&audio.asset_name, audio.play_mode.clone());
             audio.is_processed = true;
         }
