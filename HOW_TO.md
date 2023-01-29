@@ -15,6 +15,7 @@ It's probably a bit difficult to take all this code and know how to work with it
 - `app/gamelib/src/game_state/components` : this is is where you add **components**.
 - `app/gamelib/src/game_state/systems` : this is where you add new **systems** that work on different components. Be sure to define a system name in `system_name.rs`
 - `app/gamelib/src/game_states` : this is where you add new **game states** that define a given world with **entities**.
+- `app/gamelib/servers/mod.rs` : this contains the `ServerProvider`, which you'll be able to get from the `GameState` passed to your system function. From here you'll be able to access several **servers** for information and global actions like playing sound.
 
 ### Components and Entities
 
@@ -28,3 +29,7 @@ When adding a system be sure to add it to `SystemName` too. You can reference th
 ### Game States
 
 The core addition to `hecs`'s ECS is that we can easily define `GameState`s. One state can move to another state, and multiple states can reference the same systems and components.
+
+### Servers
+
+In the context of this code, a server is something that provides _a service_. One of those services is playing sound.
