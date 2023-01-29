@@ -27,6 +27,7 @@ pub fn system_shake_action(state: &mut GameState) {
             velocity.x = 0.0;
             // velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
             velocity.y = 0.0;
+            velocity.z = 0.0;
         }
     }
 }
@@ -35,21 +36,17 @@ pub fn system_shake_action_2(state: &mut GameState) {
     match &state.changes.controls.wii_mote_control[0].motion {
         None => (),
         Some(motion) => {
-            println!("MOTIONNN");
             if motion.started {
-                println!("changing");
                 let mut small_rng = SmallRng::seed_from_u64(10u64);
                 let c = small_rng.next_u32() as f32 / u32::MAX as f32 * 0.5 - 0.1;
-                // let c = 3.0; // small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
                 for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
                     match motion.direction {
                         Direction::Zp => velocity.y += c,
                         Direction::Zn => velocity.y -= c,
                         Direction::Xp => velocity.x -= c,
                         Direction::Xn => velocity.x += c,
-                        _ => {
-                            println!("nothing to do");
-                        },
+                        Direction::Yp => velocity.z += c,
+                        Direction::Yn => velocity.z -= c,
                     };
                 }
             }

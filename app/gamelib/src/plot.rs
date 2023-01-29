@@ -76,12 +76,14 @@ impl Plot {
 /// Allows for clean tracking of the logs being created.
 pub struct PlotsHolder {
     plots: HashMap<String, Plot>,
+    pub motion_plot: bool // Debug boolean to toggle creating plots from each motion.
 }
 
 impl PlotsHolder {
-    pub fn new() -> PlotsHolder {
+    pub fn new(motion_plot: bool) -> PlotsHolder {
         PlotsHolder {
             plots: HashMap::new(),
+            motion_plot,
         }
     }
 

@@ -16,20 +16,14 @@ impl InputManager {
     pub fn new() -> Self {
         // Setup the wiimote
         Input::init(ControllerType::Wii);
-        // let mut wii_mote_states: [WiiMoteState; 4] = ;
-        // let controller_ports = [
-        //     ControllerPort::One,
-        //     ControllerPort::Two,
-        //     ControllerPort::Three,
-        //     ControllerPort::Four,
-        // ];
-        let wii_mote_states = [
-            create_wii_mote(ControllerPort::One),
-            create_wii_mote(ControllerPort::Two),
-            create_wii_mote(ControllerPort::Three),
-            create_wii_mote(ControllerPort::Four),
+        let controller_ports = [
+            ControllerPort::One,
+            ControllerPort::Two,
+            ControllerPort::Three,
+            ControllerPort::Four,
         ];
-        let plots_holder = PlotsHolder::new();
+        let wii_mote_states = controller_ports.map(create_wii_mote);
+        let plots_holder = PlotsHolder::new(false);
         Self {
             wii_mote_states,
             plots_holder,

@@ -34,16 +34,18 @@ impl Motion {
                 "Motion started: {:?} {:?} {}",
                 dir, corrected_gforce, total_gforce
             );
-            plots_holder.add_measurement(
-                "movement",
-                vec!["x", "y", "z", "total"],
-                vec![
-                    corrected_gforce.0,
-                    corrected_gforce.1,
-                    corrected_gforce.2,
-                    total_gforce,
-                ],
-            );
+            if plots_holder.motion_plot {
+                plots_holder.add_measurement(
+                    "movement",
+                    vec!["x", "y", "z", "total"],
+                    vec![
+                        corrected_gforce.0,
+                        corrected_gforce.1,
+                        corrected_gforce.2,
+                        total_gforce,
+                    ],
+                );
+            }
             let m = Motion::new(dir);
             Some(m)
         } else {
@@ -76,7 +78,9 @@ impl Motion {
         if total_gforce < 1.0 {
             self.ended = true;
             println!("Motion ended: {:?} {}", self.direction, total_gforce);
-            plots_holder.plots_to_logs()
+            if plots_holder.motion_plot {
+                plots_holder.plots_to_logs()
+            }
         }
     }
 
