@@ -2,6 +2,9 @@ use crate::game_state::{GameState, components::audio::Audio};
 use hecs::Entity;
 use ogc_rs::prelude::Vec;
 
+/**
+ * Main audio system that plays audio components.
+ */
 pub fn system_play_audio(state: &mut GameState) {
     if state.changes.delta_time.is_zero() {
         return;
