@@ -1,6 +1,9 @@
 use crate::game_state::{GameState, components::audio::Audio};
 use hecs::Entity;
+#[cfg(feature = "wii")]
 use ogc_rs::prelude::Vec;
+#[cfg(not(feature = "wii"))]
+use std::vec::Vec;
 
 /**
  * Main audio system that plays audio components.

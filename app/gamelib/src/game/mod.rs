@@ -1,5 +1,8 @@
-use core::cell::RefCell;
+#[cfg(feature = "wii")]
 use alloc::rc::Rc;
+#[cfg(not(feature = "wii"))]
+use std::rc::Rc;
+use core::cell::RefCell;
 use crate::game_state::{changes::ChangeProvider, GameState};
 use crate::game_states::{GameStateName, GameStateFactory};
 use crate::servers::ServerProvider;
