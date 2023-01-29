@@ -1,5 +1,6 @@
 use alloc::vec::Vec;
 use alloc::vec;
+use crate::game_state::changes::motion::Direction;
 
 /// Represents the state of one or multiple Wii controllers w.r.t. the game
 ///
@@ -19,6 +20,7 @@ impl Controls {
 }
 
 pub struct WiiMoteControl {
+    pub motion: Option<MotionControl>,
     pub home_button_down: bool,
     pub one_button_down: bool,
 }
@@ -26,8 +28,15 @@ pub struct WiiMoteControl {
 impl WiiMoteControl {
     pub fn nothing() -> WiiMoteControl {
         return WiiMoteControl {
+            motion: None,
             home_button_down: false,
             one_button_down: false,
         }
     }
+}
+
+pub struct MotionControl {
+    pub direction: Direction,
+    pub started: bool,
+    pub ended: bool,
 }

@@ -3,6 +3,7 @@ use ogc_rs::println;
 use ogc_rs::print;
 use crate::plot::PlotsHolder;
 use micromath::F32Ext;
+use crate::game_state::changes::controls::MotionControl;
 
 pub struct Motion {
     pub direction: Direction,
@@ -78,9 +79,18 @@ impl Motion {
             plots_holder.plots_to_logs()
         }
     }
+
+    pub fn to_motion_control(&self) -> MotionControl {
+        MotionControl {
+            direction: self.direction,
+            started: self.started,
+            ended: self.ended,
+        }
+    }
+
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Direction {
     Xp,
     Xn,

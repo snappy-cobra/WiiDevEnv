@@ -3,6 +3,7 @@ use crate::game_state::components::motion::Velocity;
 use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
+use crate::game_state::changes::motion::Direction;
 
 /**
  * Stop the game from running if the home buttons is pressed.
@@ -22,6 +23,21 @@ pub fn system_shake_action(state: &mut GameState) {
         for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
             velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
             velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
+        }
+    }
+}
+
+pub fn system_shake_action_2(state: &mut GameState) {
+    match &state.changes.controls.wii_mote_control[0].motion {
+        None => (),
+        Some(motion) => {
+            if motion.direction == Direction::Zp {
+                let mut small_rng = SmallRng::seed_from_u64(10u64);
+                for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
+                    velocity.x += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
+                    velocity.y += small_rng.next_u32() as f32 / u32::MAX as f32 * 0.2 - 0.1;
+                }
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 use core::fmt;
-use gamelib::game_state::changes::controls::{Controls, WiiMoteControl};
+use gamelib::game_state::changes::controls::{Controls, MotionControl, WiiMoteControl};
 use gamelib::game_state::changes::motion::Motion;
 use gamelib::plot::PlotsHolder;
 use libc::fprintf;
@@ -124,7 +124,14 @@ impl WiiMoteState {
     }
 
     fn to_wii_mote_control(&self) -> WiiMoteControl {
+        let motion_control: Option<MotionControl>;
+        match &self.motion {
+            None => motion_control = None,
+            Some(m) => motion_control = Some(m.to_motion_control()),
+        }
+
         return WiiMoteControl {
+            motion: motion_control,
             home_button_down: self.wii_mote.is_button_down(Button::Home),
             one_button_down: self.wii_mote.is_button_down(Button::One),
         };
