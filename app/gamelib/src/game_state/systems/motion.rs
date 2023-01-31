@@ -24,7 +24,6 @@ pub fn system_integrate_motion(state: &mut GameState) {
  * Bounce the cubes against the bounds.
  */
 pub fn system_bounce_bounds(state: &mut GameState) {
-    let boing = Audio::new(AssetName::BoingSFX, PlayMode::OneTime);
     let mut play_boing = false;
     
     for (_id, (position, velocity)) in state.world.query_mut::<(&mut Position, &mut Velocity)>() {
@@ -62,6 +61,7 @@ pub fn system_bounce_bounds(state: &mut GameState) {
     }
 
     if play_boing {
+        let boing = Audio::new(AssetName::BoingSFX, PlayMode::OneTime);
         state.world.spawn((boing,));
     }
 }
