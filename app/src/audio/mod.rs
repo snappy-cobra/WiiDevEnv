@@ -1,1 +1,1 @@
-pub mod ogg_player;
+pub mod ogg_server;

@@ -2,14 +2,20 @@ pub mod systems;
 pub mod changes;
 pub mod components;
 
-use hecs::World;
 #[cfg(feature = "wii")]
 use ogc_rs::prelude::Vec;
 #[cfg(not(feature = "wii"))]
 use std::vec::Vec;
+#[cfg(feature = "wii")]
+use alloc::rc::Rc;
+#[cfg(not(feature = "wii"))]
+use std::rc::Rc;
+
+use hecs::World;
+use core::cell::RefCell;
 use changes::Changes;
 use systems::system_name::SystemName;
-use crate::game_states::GameStateName;
+use crate::{game_states::GameStateName, servers::ServerProvider};
 
 /// Represents the state of the game
 ///
@@ -19,6 +25,7 @@ pub struct GameState {
     pub changes: Changes,
     pub next_state: Option<GameStateName>,
     pub is_running: bool,
+    pub server_provider: Option<Rc<RefCell<ServerProvider>>>,
     systems: Vec<SystemName>,
 }
 
@@ -32,6 +39,7 @@ impl GameState {
             changes: Changes::nothing(),
             systems: Vec::new(),
             is_running: true,
+            server_provider: None::<Rc<RefCell<ServerProvider>>>,
             next_state: None,
         }
     }
