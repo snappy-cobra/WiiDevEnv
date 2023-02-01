@@ -4,8 +4,10 @@ use alloc::vec;
 use alloc::string::String;
 use crate::alloc::string::ToString;
 use hashbrown::HashMap;
-use ogc_rs::println;
-use ogc_rs::print;
+#[cfg(feature = "wii")]
+pub use ogc_rs::{print, println};
+#[cfg(not(feature = "wii"))]
+pub use std::{print, println};
 
 
 /// Allow for easy creation of plots to the logs.

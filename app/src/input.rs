@@ -14,6 +14,12 @@ pub struct InputManager {
     plots_holder: PlotsHolder,
 }
 
+impl Default for InputManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl InputManager {
     pub fn new() -> Self {
         // Setup the wiimote
@@ -32,23 +38,26 @@ impl InputManager {
         }
     }
 
+    /// Loops over all the controllers to update them and then retrieve their state
     pub fn update(&mut self) -> Controls {
         Input::update(ControllerType::Wii);
+        // Update
         self.wii_mote_states
             .iter_mut()
             .for_each(|x| x.update_motion(&mut self.plots_holder));
+        // Retrieving the state
         let wii_mote_controls = self
             .wii_mote_states
             .iter()
             .map(|x| x.to_wii_mote_control())
             .collect::<Vec<WiiMoteControl>>();
-        // let a = wii_mote_controls.try_into<[WiiMoteControl;4]>();
         return Controls {
-            wii_mote_control: wii_mote_controls,
+            wii_mote_controls: wii_mote_controls,
         };
     }
 }
 
+///Initializes a Wii mote and returns its corresponding WiiMoteState
 fn create_wii_mote(controller_port: ControllerPort) -> WiiMoteState {
     let wii_mote = Input::new(ControllerType::Wii, controller_port);
     wii_mote
@@ -59,12 +68,8 @@ fn create_wii_mote(controller_port: ControllerPort) -> WiiMoteState {
     WiiMoteState::new(wii_mote)
 }
 
-impl Default for InputManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
+/// Holds the current state of the wii controller
+/// _prev_gforce holds the n previous gforce measurements
 pub struct WiiMoteState {
     wii_mote: Input,
     motion: Option<Motion>,
@@ -81,14 +86,16 @@ impl WiiMoteState {
     }
 
     pub fn update_motion(&mut self, plots_holder: &mut PlotsHolder) {
+        // These values are used to define the minimum and maximum size of _prev_gforce
         const measurement_lenght: usize = 3;
         const min_neutral_lenght: usize = 3;
         const max_neutral_length: usize = 9;
 
+        // Get the latest gforce measurement
         let cur_gforce = self.wii_mote.as_wpad().gforce();
-
         self._prev_gforce.push(cur_gforce);
         if self._prev_gforce.len() > max_neutral_length + measurement_lenght {
+            // _prev_gforce is to long, drop the last one
             self._prev_gforce.drain(..1);
         }
 
@@ -96,19 +103,26 @@ impl WiiMoteState {
             // Not enough measurements yet to do anything usefull
             return;
         }
+
         let (neutral_gforce_measurements, movement_gforce_measurements) = self
             ._prev_gforce
             .split_at(self._prev_gforce.len() - measurement_lenght);
 
+        // neutral_gforce is the average of the oldest max_neutral_length measurements
+        // it represents the wii_mote "at rest" so we can compensate for gravity.
         let neutral_gforce = find_average(neutral_gforce_measurements);
+        // movement_gforce is the average of the newest measurement_lenght measurements
+        // this value might contain a potential movement.
         let movement_gforce = find_average(movement_gforce_measurements);
 
         match self.motion {
             None => {
+                // There is not yet a movement, check if a movement has just started.
                 self.motion =
                     Motion::create_if_needed(neutral_gforce, movement_gforce, plots_holder)
             }
             Some(ref mut motion) => {
+                // There is currently a movement, check if it has ended and otherwise update it.
                 if motion.ended {
                     self.motion = None;
                     self._prev_gforce = Vec::new();
@@ -119,6 +133,7 @@ impl WiiMoteState {
         }
     }
 
+    // Maps the content of this object to a WiiMoteControl object.
     fn to_wii_mote_control(&self) -> WiiMoteControl {
         let motion_control: Option<MotionControl>;
         match &self.motion {
@@ -134,6 +149,7 @@ impl WiiMoteState {
     }
 }
 
+/// Finds the average for each of the 3 dimensions
 fn find_average(gforce_vec: &[(f32, f32, f32)]) -> (f32, f32, f32) {
     let mut x_sum: f32 = 0.0;
     let mut y_sum: f32 = 0.0;
@@ -149,6 +165,7 @@ fn find_average(gforce_vec: &[(f32, f32, f32)]) -> (f32, f32, f32) {
     }
 }
 
+/// Holds the state of an Motion.
 pub struct Motion {
     pub direction: Direction,
     pub started: bool,
@@ -166,6 +183,7 @@ impl Motion {
         }
     }
 
+    // Check if currently a motion has started.
     pub fn create_if_needed(
         neutral_gforce: (f32, f32, f32),
         movement_gforce: (f32, f32, f32),
@@ -197,6 +215,7 @@ impl Motion {
         };
     }
 
+    // Checks if the motion is still ongoing or if it stopped.
     pub fn update(
         &mut self,
         neutral_gforce: (f32, f32, f32),
@@ -228,6 +247,7 @@ impl Motion {
         }
     }
 
+    // Maps itself to a MotionControl object used in the gamelib.
     pub fn to_motion_control(&self) -> MotionControl {
         MotionControl {
             direction: self.direction,
@@ -237,6 +257,7 @@ impl Motion {
     }
 }
 
+/// Corrects the movement with the neutral an then calculates the vector length.
 fn process_gforce(
     neutral_gforce: (f32, f32, f32),
     movement_gforce: (f32, f32, f32),
@@ -255,6 +276,7 @@ fn process_gforce(
     return (total_gforce, corrected_gforce);
 }
 
+/// Finds the largest absolute value of the three dimensions and checks if it is positive or negative.
 fn find_direction(gforce: (f32, f32, f32)) -> Direction {
     let x = gforce.0;
     let y = gforce.1;

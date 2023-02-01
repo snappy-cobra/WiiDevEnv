@@ -6,13 +6,13 @@ use alloc::vec;
 /// (before `GameState::update` is called)
 
 pub struct Controls {
-    pub wii_mote_control: Vec<WiiMoteControl>
+    pub wii_mote_controls: Vec<WiiMoteControl>
 }
 
 impl Controls {
     pub fn nothing() -> Controls {
         return Controls {
-            wii_mote_control: vec![WiiMoteControl::nothing(), WiiMoteControl::nothing(), WiiMoteControl::nothing(), WiiMoteControl::nothing()]
+            wii_mote_controls: vec![WiiMoteControl::nothing(), WiiMoteControl::nothing(), WiiMoteControl::nothing(), WiiMoteControl::nothing()]
         }
     }
 }
@@ -39,6 +39,14 @@ pub struct MotionControl {
     pub ended: bool,
 }
 
+/**Represents the direction that the Wii controller is moved.
+ * Xp is left
+ * Xn is right
+ * Yp is to yourself
+ * Yn is away from you
+ * Zp is up
+ * Zn is down
+ */
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Direction {
     Xp,

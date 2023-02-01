@@ -1,5 +1,3 @@
-// use ogc_rs::print;
-// use ogc_rs::println;
 use crate::game_state::GameState;
 use crate::game_state::components::motion::Velocity;
 use rand::rngs::SmallRng;
@@ -12,15 +10,15 @@ use crate::game_state::changes::controls::Direction;
  */
 pub fn system_exit_action(state: &mut GameState) {
     if state.is_running {
-        state.is_running = !state.changes.controls.wii_mote_control[0].home_button_down;
+        state.is_running = !state.changes.controls.wii_mote_controls[0].home_button_down;
     }
 }
 
 /**
- * Create velocity in random directions if 'one' is pressed.
+ * Sets all velocities to 0 if 'one' is pressed.
  */
 pub fn system_stop_action(state: &mut GameState) {
-    if state.changes.controls.wii_mote_control[0].one_button_down {
+    if state.changes.controls.wii_mote_controls[0].one_button_down {
         for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
             velocity.x = 0.0;
             velocity.y = 0.0;
@@ -29,8 +27,11 @@ pub fn system_stop_action(state: &mut GameState) {
     }
 }
 
+/**
+ * Checks if a motion has been made with controller One if this is the cases all velocities are increased in that direction.
+ */
 pub fn system_shake_action(state: &mut GameState) {
-    match &state.changes.controls.wii_mote_control[0].motion {
+    match &state.changes.controls.wii_mote_controls[0].motion {
         None => (),
         Some(motion) => {
             if motion.started {
@@ -63,7 +64,7 @@ mod tests {
         assert_eq!(state.is_running, true);
 
         // Pressing the home button should exit the game.
-        state.changes.controls.wii_mote_control[0].home_button_down = true;
+        state.changes.controls.wii_mote_controls[0].home_button_down = true;
         assert_eq!(state.is_running, true);
         super::system_exit_action(&mut state);
         assert_eq!(state.is_running, false);
