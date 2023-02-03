@@ -1,11 +1,5 @@
 use alloc::format;
-#[cfg(feature = "wii")]
-use ogc_rs::prelude::Vec;
-#[cfg(feature = "wii")]
-use ogc_rs::prelude::vec;
-#[cfg(not(feature = "wii"))]
 use alloc::vec::Vec;
-#[cfg(not(feature = "wii"))]
 use alloc::vec;
 use alloc::string::String;
 use crate::alloc::string::ToString;
