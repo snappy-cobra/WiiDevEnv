@@ -11,5 +11,8 @@
         "ogglib",
         "realloc",
         "VTXFMT"
-    ]
+    ],
+    "files.associations": {
+        "tiny_physics.h": "c"
+    }
 }

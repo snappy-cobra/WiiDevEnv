@@ -1,0 +1,14 @@
+[package]
+name = "physicslib"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name="physicslib"
+
+[dependencies]
+libc = "0.2"
+
+[build-dependencies]
+bindgen = "0.61"
+regex = "1.5"
