@@ -10,6 +10,7 @@ use super::actions::*;
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum SystemName {
     ExitAction,
+    StopAction,
     ShakeAction,
     IntegrateMotion,
     BounceBounds,
@@ -21,6 +22,7 @@ impl SystemName {
     pub const fn to_function(&self) -> &'static dyn Fn(&mut GameState) {
         match self {
             SystemName::ExitAction => &system_exit_action,
+            SystemName::StopAction => &system_stop_action,
             SystemName::ShakeAction => &system_shake_action,
             SystemName::IntegrateMotion => &system_integrate_motion,
             SystemName::BounceBounds => &system_bounce_bounds,
