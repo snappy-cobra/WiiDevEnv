@@ -72,6 +72,12 @@ rust-cargo-chef:
   RUN make clean all install
   WORKDIR /
 
+   # Install OGGPlayer lib
+  COPY docker/tiny_physics tiny_physics
+  WORKDIR tiny_physics
+  RUN make clean all install
+  WORKDIR /
+
   SAVE IMAGE --cache-hint
 
 
@@ -287,6 +293,12 @@ build-watch-builder:
   COPY docker/oggplayer oggplayer
   WORKDIR oggplayer
   RUN sudo dkp-pacman --sync --needed --noconfirm ppc-libvorbisidec
+  RUN make clean all install
+  WORKDIR /
+
+   # Install OGGPlayer lib
+  COPY docker/tiny_physics tiny_physics
+  WORKDIR tiny_physics
   RUN make clean all install
   WORKDIR /
 
