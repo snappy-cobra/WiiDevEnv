@@ -17,11 +17,11 @@ struct Unit(f32);
 impl Unit {
     /// float to int
     pub fn to_internal(&self) -> TPE_Unit {
-        self.0 * TPE_F
+        self.0 * (TPE_F as i32)
     }
     /// int to float
     pub fn from_internal(val: TPE_Unit) -> Self {
-        Self(val / TPE_F)
+        Self(val / (TPE_F as i32))
     }
 }
 
@@ -85,19 +85,19 @@ impl Body {
         Vec3::from_internal(unsafe { TPE_bodyGetCenterOfMass(self.0) })
     }
 
-    /// True if any forces are working on the body
-    pub fn is_active(&self) -> bool {
-        unsafe { TPE_bodyIsActive(self.0) }
-    }
+    // /// True if any forces are working on the body
+    // pub fn is_active(&self) -> bool {
+    //     unsafe { TPE_bodyIsActive(self.0) }
+    // }
 }
 
 #[derive(Debug, Clone)]
 pub struct World(TPE_World);
 
 impl World {
-    pub fn new(bodies: &[Bodies]) -> Self {
+    pub fn new(bodies: &[Body]) -> Self {
         let mut world = MaybeUninit::zeroed();
-        unsafe { TPE_worldInit(world.as_mut_ptr(), bodies, bodies.len(), &infinitePlaneEnvDistance)};
+        unsafe { TPE_worldInit(world.as_mut_ptr(), bodies, bodies.len(), infinitePlaneEnvDistance.as_ptr())};
         let world = unsafe { world.assume_init() };
         World(world)
     }
@@ -108,7 +108,7 @@ impl World {
     #[doc = "time length of the step is relative to all other units but it's ideal if it is"]
     #[doc = "1/30th of a second."]
     pub fn step(&mut self) {
-        unsafe { TPE_worldStep(self.0) };
+        unsafe { TPE_worldStep(self.0.as_mut_ptr() ) };
     }
 }
 
