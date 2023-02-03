@@ -12,41 +12,42 @@ use core::mem::MaybeUninit;
 include!("physics.rs");
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-struct Unit(f32);
+pub struct Unit(f32);
 
 impl Unit {
     /// float to int
     pub fn to_internal(&self) -> TPE_Unit {
-        self.0 * (TPE_F as i32)
+        (self.0 * (TPE_F as f32)) as i32
     }
     /// int to float
     pub fn from_internal(val: TPE_Unit) -> Self {
-        Self(val / (TPE_F as i32))
+        Self((val as f32) / (TPE_F as f32))
     }
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-struct Vec3(f32, f32, f32);
+pub struct Vec3(f32, f32, f32);
 
 impl Vec3 {
     pub fn to_internal(&self) -> TPE_Vec3 {
         TPE_Vec3 {
-            x: self.0.to_internal(),
-            y: self.1.to_internal(),
-            z: self.2.to_internal(),
+            x: Unit(self.0).to_internal(),
+            y: Unit(self.1).to_internal(),
+            z: Unit(self.2).to_internal(),
         }
     }
 
     pub fn from_internal(val: TPE_Vec3) -> Self {
         Self(
-            Unit::from_internal(val.x),
-            Unit::from_internal(val.y),
-            Unit::from_internal(val.z),
+            Unit::from_internal(val.x).0,
+            Unit::from_internal(val.y).0,
+            Unit::from_internal(val.z).0,
         )
     }
 }
 
 #[derive(Debug, Clone)]
+#[repr(transparent)]
 pub struct Joint(TPE_Joint);
 
 impl Joint {
@@ -57,32 +58,40 @@ impl Joint {
 }
 
 #[derive(Debug, Clone)]
+#[repr(transparent)]
 pub struct Connection(TPE_Connection);
 
 impl Connection {
     pub fn new(joint1_index: u8, joint2_index: u8, length: u16) -> Self {
-        Connection(TPE_Connection { joint1: joint_a_index, joint2: joint_b_index, length })
+        Connection(TPE_Connection { joint1: joint1_index, joint2: joint2_index, length })
     }
 }
 
 #[derive(Debug, Clone)]
+#[repr(transparent)]
 pub struct Body(TPE_Body);
 
 impl Body {
     pub fn new(joints: &[Joint], connections: &[Connection], mass: Unit) -> Self {
         let mut body = MaybeUninit::zeroed();
-        unsafe { TPE_bodyInit(body.as_mut_ptr(), joints, joints.len(), connections, connections.len(), mass) };
+        let joints: &[TPE_Joint] = unsafe { core::mem::transmute(joints) };
+        let joints_ptr = &joints[0] as *const TPE_Joint;
+
+        let connections: &[TPE_Connection] = unsafe { core::mem::transmute(connections) };
+        let connections_ptr = &connections[0] as *const TPE_Connection;
+
+        unsafe { TPE_bodyInit(body.as_mut_ptr(), joints_ptr as *mut TPE_Joint, joints.len().try_into().unwrap(), connections_ptr as *mut TPE_Connection, connections.len().try_into().unwrap(), mass.to_internal()) };
         let body = unsafe { body.assume_init() };
         Body(body)
     }
 
     pub fn apply_gravity(&mut self, downwards_acceleration: Unit) {
-        unsafe { TPE_bodyApplyGravity(self.0, downwards_acceleration.to_internal()) };
+        unsafe { TPE_bodyApplyGravity(&mut self.0, downwards_acceleration.to_internal()) };
     }
 
     /// Compute the center of mass for a body; average position of all joints.
     pub fn center_of_mass(&self) -> Vec3 {
-        Vec3::from_internal(unsafe { TPE_bodyGetCenterOfMass(self.0) })
+        Vec3::from_internal(unsafe { TPE_bodyGetCenterOfMass(&self.0) })
     }
 
     // /// True if any forces are working on the body
@@ -96,8 +105,10 @@ pub struct World(TPE_World);
 
 impl World {
     pub fn new(bodies: &[Body]) -> Self {
+        let bodies: & [TPE_Body] = unsafe { core::mem::transmute(bodies) };
+        let bodies_ptr = &bodies[0] as *const TPE_Body;
         let mut world = MaybeUninit::zeroed();
-        unsafe { TPE_worldInit(world.as_mut_ptr(), bodies, bodies.len(), infinitePlaneEnvDistance.as_ptr())};
+        unsafe { TPE_worldInit(world.as_mut_ptr(), bodies_ptr as *mut TPE_Body, bodies.len().try_into().unwrap(), Some(infinitePlaneEnvDistance))};
         let world = unsafe { world.assume_init() };
         World(world)
     }
@@ -108,12 +119,13 @@ impl World {
     #[doc = "time length of the step is relative to all other units but it's ideal if it is"]
     #[doc = "1/30th of a second."]
     pub fn step(&mut self) {
-        unsafe { TPE_worldStep(self.0.as_mut_ptr() ) };
+        unsafe { TPE_worldStep(&mut self.0) };
     }
 }
 
 /// Taken from the simple example code
-fn infinitePlaneEnvDistance(point: TPE_Vec3, maxDistance: TPE_Unit) -> TPE_Vec3
+#[no_mangle]
+pub extern "C" fn infinitePlaneEnvDistance(point: TPE_Vec3, _maxDistance: TPE_Unit) -> TPE_Vec3
 {
     unsafe { TPE_envGround(point,0) } // just an infinite flat plane
 }
