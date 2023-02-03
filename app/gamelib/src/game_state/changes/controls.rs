@@ -1,4 +1,8 @@
+#[cfg(feature = "wii")]
+use ogc_rs::prelude::Vec;
+#[cfg(not(feature = "wii"))]
 use alloc::vec::Vec;
+#[cfg(not(feature = "wii"))]
 use alloc::vec;
 /// Represents the state of one or multiple Wii controllers w.r.t. the game
 ///
