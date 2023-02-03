@@ -84,6 +84,11 @@ impl Body {
     pub fn center_of_mass(&self) -> Vec3 {
         Vec3::from_internal(unsafe { TPE_bodyGetCenterOfMass(self.0) })
     }
+
+    /// True if any forces are working on the body
+    pub fn is_active(&self) -> bool {
+        unsafe { TPE_bodyIsActive(self.0) }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -111,4 +116,34 @@ impl World {
 fn infinitePlaneEnvDistance(point: TPE_Vec3, maxDistance: TPE_Unit) -> TPE_Vec3
 {
     unsafe { TPE_envGround(point,0) } // just an infinite flat plane
+}
+
+#[cfg(test)]
+pub mod tests{
+    use libc::putchar;
+
+    use super::*;
+
+    #[test]
+    pub fn example() {
+        let joint = Joint::new(Vec3(0.0, 8.0, 0.0), 1.0);
+        let mut body = Body::new(&[joint], &[], 2.0);
+        let mut world = World::new(&[body]);
+
+        let frame: usize = 0;
+        while body.is_active() {
+            if (frame % 6 == 0) {
+                let height = body.center_of_mass().1;
+                for _index in 0..(height * 4) {
+                    print!(' ');
+                }
+                print!("*");
+            }
+
+            body.apply_gravity(1.0 / 100);
+            world.step();
+        }
+        println!("body deactivated");
+        assert!(false);
+    }
 }
