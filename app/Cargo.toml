@@ -23,6 +23,7 @@ gamelib = { path = "./gamelib", features = ["wii"]}
 grrustlib = { path = "./grrustlib" }
 micromath = { version = "2.0.0"} # mathematical functions for f32
 ogglib = { path = "./ogglib" }
+physicslib = { path = "./physicslib" }
 modulator = { path = "./modulator", features = []}
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
 #micromath = { version = "1.0.1" }

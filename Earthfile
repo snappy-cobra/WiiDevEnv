@@ -72,6 +72,12 @@ rust-cargo-chef:
   RUN make clean all install
   WORKDIR /
 
+   # Install TinyPhysics lib
+  COPY docker/tiny_physics tiny_physics
+  WORKDIR tiny_physics
+  RUN make clean all install
+  WORKDIR /
+
   SAVE IMAGE --cache-hint
 
 
@@ -128,8 +134,19 @@ build-prepare:
   RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
   SAVE IMAGE --cache-hint
 
-  # Only copy the rest of /app/gamelib afterwards:
+  # Only copy the rest of /app/ogglib afterwards:
   COPY ./app/ogglib/ .
+  SAVE IMAGE --cache-hint
+
+    # Build only app/physicslib/ dependencies, cacheable:
+  WORKDIR /app/physicslib/
+  COPY +app-lib-deps/recipe.json ./
+  COPY ./app/powerpc-unknown-eabi.json ./
+  RUN cargo +nightly chef cook --no-std --recipe-path recipe.json --features=wii -Z build-std=core,alloc --target powerpc-unknown-eabi.json
+  SAVE IMAGE --cache-hint
+
+  # Only copy the rest of /app/physicslib afterwards:
+  COPY ./app/physicslib/ .
   SAVE IMAGE --cache-hint
 
   WORKDIR /app/
@@ -287,6 +304,12 @@ build-watch-builder:
   COPY docker/oggplayer oggplayer
   WORKDIR oggplayer
   RUN sudo dkp-pacman --sync --needed --noconfirm ppc-libvorbisidec
+  RUN make clean all install
+  WORKDIR /
+
+   # Install TinyPhysics lib
+  COPY docker/tiny_physics tiny_physics
+  WORKDIR tiny_physics
   RUN make clean all install
   WORKDIR /
 
