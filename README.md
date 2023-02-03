@@ -1,6 +1,8 @@
-# WiiDevEnv
+# GGJ23
 
-Docker setup with a file watch auto-build to allow for quick and easy Wii development.
+Wii game implementation for the Global Game Jam of 2023.
+
+This repository contains a Docker setup with a file watch auto-build to allow for quick and easy Wii development.
 
 Programming is done in Rust. The `src` folder of this project shows a small demo application.
 The Rust environment is pre-configured to get you creating games as soon as possible.
