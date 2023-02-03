@@ -51,8 +51,8 @@ impl Vec3 {
 pub struct Joint(TPE_Joint);
 
 impl Joint {
-    pub fn new(position: Vec3, size: Unit) -> Self {
-        let joint = unsafe { TPE_joint(position.to_internal(), size.to_internal()) };
+    pub fn new(position: Vec3, size: f32) -> Self {
+        let joint = unsafe { TPE_joint(position.to_internal(), Unit(size).to_internal()) };
         Self(joint)
     }
 }
@@ -72,7 +72,7 @@ impl Connection {
 pub struct Body(TPE_Body);
 
 impl Body {
-    pub fn new(joints: &[Joint], connections: &[Connection], mass: Unit) -> Self {
+    pub fn new(joints: &[Joint], connections: &[Connection], mass: f32) -> Self {
         let mut body = MaybeUninit::zeroed();
         let joints: &[TPE_Joint] = unsafe { core::mem::transmute(joints) };
         let joints_ptr = &joints[0] as *const TPE_Joint;
@@ -80,13 +80,13 @@ impl Body {
         let connections: &[TPE_Connection] = unsafe { core::mem::transmute(connections) };
         let connections_ptr = &connections[0] as *const TPE_Connection;
 
-        unsafe { TPE_bodyInit(body.as_mut_ptr(), joints_ptr as *mut TPE_Joint, joints.len().try_into().unwrap(), connections_ptr as *mut TPE_Connection, connections.len().try_into().unwrap(), mass.to_internal()) };
+        unsafe { TPE_bodyInit(body.as_mut_ptr(), joints_ptr as *mut TPE_Joint, joints.len().try_into().unwrap(), connections_ptr as *mut TPE_Connection, connections.len().try_into().unwrap(), Unit(mass).to_internal()) };
         let body = unsafe { body.assume_init() };
         Body(body)
     }
 
-    pub fn apply_gravity(&mut self, downwards_acceleration: Unit) {
-        unsafe { TPE_bodyApplyGravity(&mut self.0, downwards_acceleration.to_internal()) };
+    pub fn apply_gravity(&mut self, downwards_acceleration: f32) {
+        unsafe { TPE_bodyApplyGravity(&mut self.0, Unit(downwards_acceleration).to_internal()) };
     }
 
     /// Compute the center of mass for a body; average position of all joints.
@@ -95,9 +95,9 @@ impl Body {
     }
 
     // /// True if any forces are working on the body
-    // pub fn is_active(&self) -> bool {
-    //     unsafe { TPE_bodyIsActive(self.0) }
-    // }
+    pub fn is_active(&self) -> bool {
+        unsafe { TPE_bodyIsActive(self.0) }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -132,27 +132,28 @@ pub extern "C" fn infinitePlaneEnvDistance(point: TPE_Vec3, _maxDistance: TPE_Un
 
 #[cfg(test)]
 pub mod tests{
-    use libc::putchar;
 
     use super::*;
 
     #[test]
     pub fn example() {
         let joint = Joint::new(Vec3(0.0, 8.0, 0.0), 1.0);
-        let mut body = Body::new(&[joint], &[], 2.0);
-        let mut world = World::new(&[body]);
+        let mut bodies = vec![Body::new(&[joint], &[], 2.0)];
+        let mut world = World::new(&bodies);
+        let body = &mut bodies[0];
 
         let frame: usize = 0;
         while body.is_active() {
-            if (frame % 6 == 0) {
+        // loop {
+            if frame % 6 == 0 {
                 let height = body.center_of_mass().1;
-                for _index in 0..(height * 4) {
-                    print!(' ');
+                for _index in 0..((height * 4.0) as u32) {
+                    print!(" ");
                 }
                 print!("*");
             }
 
-            body.apply_gravity(1.0 / 100);
+            body.apply_gravity(1.0 / 100.0);
             world.step();
         }
         println!("body deactivated");
