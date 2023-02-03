@@ -18,6 +18,7 @@ pub fn build() -> GameState {
     let mut state = GameState::new();
     state.add_system(SystemName::PlayAudio);
     state.add_system(SystemName::ExitAction);
+    state.add_system(SystemName::StopAction);
     state.add_system(SystemName::ShakeAction);
     state.add_system(SystemName::IntegrateMotion);
     state.add_system(SystemName::BounceBounds);

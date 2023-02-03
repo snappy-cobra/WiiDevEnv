@@ -21,10 +21,11 @@ wavefront = { version = "0.2.3", default-features = false}
 hashbrown = { version = "0.13.1" } # no_std hashmaps
 gamelib = { path = "./gamelib", features = ["wii"]}
 grrustlib = { path = "./grrustlib" }
+micromath = { version = "2.0.0"} # mathematical functions for f32
 ogglib = { path = "./ogglib" }
 modulator = { path = "./modulator", features = []}
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
-micromath = { version = "1.0.1" }
+#micromath = { version = "1.0.1" }
 strum = { version = "0.24.1", default-features = false }
 strum_macros = "0.24"
 
