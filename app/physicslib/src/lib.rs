@@ -75,6 +75,15 @@ impl Body {
         let body = unsafe { body.assume_init() };
         Body(body)
     }
+
+    pub fn apply_gravity(&mut self, downwards_acceleration: Unit) {
+        unsafe { TPE_bodyApplyGravity(self.0, downwards_acceleration.to_internal()) };
+    }
+
+    /// Compute the center of mass for a body; average position of all joints.
+    pub fn center_of_mass(&self) -> Vec3 {
+        Vec3::from_internal(unsafe { TPE_bodyGetCenterOfMass(self.0) })
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -86,6 +95,15 @@ impl World {
         unsafe { TPE_worldInit(world.as_mut_ptr(), bodies, bodies.len(), &infinitePlaneEnvDistance)};
         let world = unsafe { world.assume_init() };
         World(world)
+    }
+
+    #[doc = " Performs one step (tick, frame, ...) of the physics world simulation"]
+    #[doc = "including updating positions and velocities of bodies, collision detection and"]
+    #[doc = "resolution, possible reshaping or deactivation of inactive bodies etc. The"]
+    #[doc = "time length of the step is relative to all other units but it's ideal if it is"]
+    #[doc = "1/30th of a second."]
+    pub fn step(&mut self) {
+        unsafe { TPE_worldStep(self.0) };
     }
 }
 
