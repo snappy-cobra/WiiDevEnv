@@ -1,5 +1,5 @@
 use crate::rendering::display_cache::DisplayCache;
-use crate::rendering::textured_model::TexturedModelName;
+use gamelib::data_store::textured_model_name::TexturedModelName;
 use hashbrown::HashMap;
 
 /**
