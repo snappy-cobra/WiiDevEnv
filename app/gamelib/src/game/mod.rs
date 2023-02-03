@@ -51,9 +51,6 @@ impl<C: ChangeProvider> Game<C> {
         }
 
         // We are still running, so do the rest.
-        let mut server_provider = self.server_provider.as_ref().borrow_mut();
-        server_provider.render_server.render_state(& self.state);
-
         match &self.state.next_state {
             Some(next_state) => {
                 // TODO : this is where you'd save the current scene, if you wanted that support.

@@ -13,6 +13,8 @@ rand = { version = "0.8.4", features = ["small_rng"], default-features = false }
 num = { version = "0.4.0", default-features = false}
 hashbrown = "0.12"
 micromath = { version = "2.0.0"} # mathematical functions for f32
+strum = { version = "0.24.1", default-features = false }
+strum_macros = "0.24"
 
 [features]
 default = []

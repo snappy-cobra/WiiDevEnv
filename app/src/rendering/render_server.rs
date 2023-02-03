@@ -1,8 +1,10 @@
 use super::display_cache::DisplayCache;
 use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 use super::model_factory::ModelFactory;
-use super::textured_model::{TexturedModel, TexturedModelName};
+use super::textured_model::TexturedModel;
 use gamelib::data_store::asset_name::AssetName;
+use gamelib::data_store::textured_model_name::TexturedModelName;
+use gamelib::game_state::components::render::MeshInstance;
 use gamelib::{
     game_state::components::motion::Position, game_state::components::motion::Velocity,
     game_state::GameState, servers::renderer::RenderServer,
@@ -55,24 +57,8 @@ impl WiiRenderServer {
         }
     }
 
-    /**
-     * Render the entire scene.
-     * As part of this, refreshes the graphics buffer and wait for the next frame.
-     */
-    pub fn render_world(&mut self, world: &World) {
-        for (entity, (position, _velocity)) in &mut world.query::<(&Position, &Velocity)>() {
-            self.render_entity(&TexturedModelName::Suzanne, entity, position);
-        }
-        self.redraw_world();
-    }
-
     /// Render a single entity
-    fn render_entity(
-        &mut self,
-        model_name: &TexturedModelName,
-        _entity: Entity,
-        position: &Position,
-    ) {
+    fn render_entity(&mut self, model_name: &TexturedModelName, position: &Position) {
         unsafe {
             GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
             GRRLIB_ObjectView(
@@ -154,15 +140,6 @@ impl WiiRenderServer {
             GX_End();
         }
     }
-
-    /// Refreshes the visible graphics;
-    /// Usually called as part of `render_world`
-    /// but separately exposed for easier testing.
-    pub fn redraw_world(&self) {
-        unsafe {
-            GRRLIB_Render();
-        }
-    }
 }
 
 impl Drop for WiiRenderServer {
@@ -179,7 +156,22 @@ impl Drop for WiiRenderServer {
  * Implement the render state implementation for the game to use.
  */
 impl RenderServer for WiiRenderServer {
-    fn render_state(&mut self, state: &GameState) {
-        self.render_world(&state.world);
+    /*
+     * Render all given meshes.
+     * As part of this, refreshes the graphics buffer and wait for the next frame.
+     */
+    fn render_meshes(&mut self, meshes: Vec<(&MeshInstance, &Position)>) {
+        for (mesh_instance, position) in meshes {
+            self.render_entity(&mesh_instance.model_name, position);
+        }
+    }
+
+    /**
+     * Render a new frame.
+     */
+    fn render_frame(&mut self) {
+        unsafe {
+            GRRLIB_Render();
+        }
     }
 }

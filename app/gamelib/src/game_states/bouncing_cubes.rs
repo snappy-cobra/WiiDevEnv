@@ -22,6 +22,7 @@ pub fn build() -> GameState {
     state.add_system(SystemName::ShakeAction);
     state.add_system(SystemName::IntegrateMotion);
     state.add_system(SystemName::BounceBounds);
+    state.add_system(SystemName::RenderMeshes);
     batch_spawn_entities(&mut state.world, 10);
     spawn_main_music(&mut state.world);
     return state;

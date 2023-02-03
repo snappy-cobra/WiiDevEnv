@@ -1,5 +1,5 @@
-use super::textured_model::TexturedModelName;
 use alloc::collections::BTreeMap;
+use gamelib::data_store::textured_model_name::TexturedModelName;
 use grrustlib::{DCInvalidateRange, GX_BeginDispList, GX_CallDispList, GX_EndDispList};
 use libc::{c_void, free, memalign, realloc};
 

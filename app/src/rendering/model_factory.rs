@@ -9,7 +9,8 @@ use gamelib::data_store::asset_name::AssetName;
 
 use super::indexed_model::IndexedModel;
 use super::texture::Texture;
-use super::textured_model::{TexturedModel, TexturedModelName};
+use super::textured_model::TexturedModel;
+use gamelib::data_store::textured_model_name::TexturedModelName;
 
 /**
  * Data structure for the model factory.
