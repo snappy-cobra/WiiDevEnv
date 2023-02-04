@@ -11,6 +11,11 @@ pub enum TexturedModelName {
     Triangle,
     Suzanne,
     Potato,
+    HandFist,
+    HandHolding,
+    HandOne,
+    HandTwo,
+    HandThree,
 }
 
 impl TexturedModelName {
@@ -21,6 +26,11 @@ impl TexturedModelName {
             TexturedModelName::Triangle => (AssetName::Triangle, AssetName::TriangleTexture),
             TexturedModelName::Suzanne => (AssetName::Suzanne, AssetName::SuzanneTexture),
             TexturedModelName::Potato => (AssetName::Potato, AssetName::PotatoTexture),
+            TexturedModelName::HandFist => (AssetName::HandFist, AssetName::HandFistTexture),
+            TexturedModelName::HandHolding => (AssetName::HandHolding, AssetName::HandHoldingTexture),
+            TexturedModelName::HandOne => (AssetName::HandOne, AssetName::HandOneTexture),
+            TexturedModelName::HandTwo => (AssetName::HandTwo, AssetName::HandTwoTexture),
+            TexturedModelName::HandThree => (AssetName::HandThree, AssetName::HandThreeTexture),
         }
     }
 }

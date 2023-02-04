@@ -8,12 +8,22 @@ pub enum AssetName {
     Suzanne,
     Triangle,
     Potato,
+    HandHolding,
+    HandOne,
+    HandTwo,
+    HandThree,
+    HandFist,
     CubeTexture,
     TriangleTexture,
     SuzanneTexture,
     PotatoTexture,
     DemoMusic,
-    BoingSFX
+    BoingSFX,
+    HandHoldingTexture,
+    HandOneTexture,
+    HandTwoTexture,
+    HandThreeTexture,
+    HandFistTexture,
 }
 
 impl AssetName {
@@ -33,6 +43,20 @@ impl AssetName {
             AssetName::PotatoTexture => include_bytes!("data/Potato.png"),
             AssetName::DemoMusic => include_bytes!("data/DemoMusic.ogg"),
             AssetName::BoingSFX => include_bytes!("data/Boing.ogg"),
+            AssetName::HandHolding => include_bytes!("data/Hand/Hand_holding.obj"),
+            AssetName::HandOne => include_bytes!("data/Hand/Hand_one.obj"),
+            AssetName::HandTwo => include_bytes!("data/Hand/Hand_two.obj"),
+            AssetName::HandThree => include_bytes!("data/Hand/Hand_three.obj"),
+            AssetName::HandFist => include_bytes!("data/Hand/Hand_fist.obj"), 
+            AssetName::HandHolding => include_bytes!("data/Hand/Hand_holding.obj"),
+            AssetName::HandOne => include_bytes!("data/Hand/Hand_one.obj"),
+            AssetName::HandTwo => include_bytes!("data/Hand/Hand_two.obj"),
+            AssetName::HandThree => include_bytes!("data/Hand/Hand_three.obj"),
+            AssetName::HandFistTexture => include_bytes!("data/Hand/Hand_fist.png"),
+            AssetName::HandHoldingTexture => include_bytes!("data/Hand/Hand_holding.png"),
+            AssetName::HandOneTexture => include_bytes!("data/Hand/Hand_one.png"),
+            AssetName::HandTwoTexture => include_bytes!("data/Hand/Hand_two.png"),
+            AssetName::HandThreeTexture => include_bytes!("data/Hand/Hand_three.png"),
         }
     }
 }
