@@ -1,5 +1,6 @@
 use crate::game_state::GameState;
 use crate::game_state::components::motion::{Position, Rotation};
+use crate::game_state::components::physics::SphereCollider;
 use crate::game_state::components::render::MeshInstance;
 #[cfg(feature = "wii")]
 use ogc_rs::prelude::Vec;
@@ -14,4 +15,11 @@ pub fn system_render_meshes(state: &mut GameState) {
     let mesh_instances: Vec<(&MeshInstance, &Position, &Rotation)> = query.iter().map(|(_e, (m, p, r))| (m, p, r)).collect();
     let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
     server_provider.render_server.render_meshes(mesh_instances);
+}
+
+pub fn system_render_debug_physics(state: &mut GameState) {
+    let mut query = state.world.query::<(&Position, &SphereCollider, &Rotation)>();
+    let data = query.iter().map(|(_e, d)| d).collect();
+    let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
+    server_provider.render_server.render_debug(data);
 }

@@ -5,6 +5,7 @@ use super::textured_model::TexturedModel;
 use alloc::vec;
 use gamelib::data_store::asset_name::AssetName;
 use gamelib::data_store::textured_model_name::TexturedModelName;
+use gamelib::game_state::changes::controls::Direction;
 use gamelib::game_state::components::motion::Rotation;
 use gamelib::game_state::components::physics::SphereCollider;
 use gamelib::game_state::components::render::MeshInstance;
@@ -189,6 +190,12 @@ impl RenderServer for WiiRenderServer {
         }
     }
 
+    fn render_debug(&mut self, data: Vec<(&Position, &SphereCollider, &Rotation)>) {
+        for (pos, collider, rot) in data {
+            self.render_entity(&TexturedModelName::Cube, pos, rot);
+        }
+    }
+
     /**
      * Render a new frame.
      */
@@ -252,5 +259,43 @@ impl RenderServer for WiiRenderServer {
             rot.y = rotation.1;
             rot.z = rotation.2;
         }
+    }
+
+    fn apply_movement(&mut self, obj: &SphereCollider, dir: Direction) {
+        let body = self.world_wrapper.get_body(obj.body_index);
+        let rotation = match dir {
+            Direction::Xp => Vec3 {
+                0: 1.0,
+                1: 0.0,
+                2: 0.0,
+            },
+            Direction::Xn => Vec3 {
+                0: -1.0,
+                1: 0.0,
+                2: 0.0,
+            },
+            Direction::Yp => Vec3 {
+                0: 0.0,
+                1: 1.0,
+                2: 0.0,
+            },
+            Direction::Yn => Vec3 {
+                0: 0.0,
+                1: -1.0,
+                2: 0.0,
+            },
+            Direction::Zp => Vec3 {
+                0: 0.0,
+                1: 0.0,
+                2: 1.0,
+            },
+            Direction::Zn => Vec3 {
+                0: 0.0,
+                1: 0.0,
+                2: -1.0,
+            },
+        };
+        println!("nananan");
+        body.accelerate(rotation);
     }
 }
