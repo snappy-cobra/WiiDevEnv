@@ -202,12 +202,12 @@ TPE_Unit TPE_vec2Angle(TPE_Unit x, TPE_Unit y);
   smoothing. */
 TPE_Unit TPE_keepInRange(TPE_Unit x, TPE_Unit xMin, TPE_Unit xMax);
 
-static inline TPE_Unit TPE_abs(TPE_Unit x);
-static inline TPE_Unit TPE_max(TPE_Unit a, TPE_Unit b);
-static inline TPE_Unit TPE_min(TPE_Unit a, TPE_Unit b);
-static inline TPE_Unit TPE_nonZero(TPE_Unit x);
-static inline TPE_Unit TPE_dist(TPE_Vec3 p1, TPE_Vec3 p2);
-static inline TPE_Unit TPE_distApprox(TPE_Vec3 p1, TPE_Vec3 p2);
+ TPE_Unit TPE_abs(TPE_Unit x);
+ TPE_Unit TPE_max(TPE_Unit a, TPE_Unit b);
+ TPE_Unit TPE_min(TPE_Unit a, TPE_Unit b);
+ TPE_Unit TPE_nonZero(TPE_Unit x);
+ TPE_Unit TPE_dist(TPE_Vec3 p1, TPE_Vec3 p2);
+ TPE_Unit TPE_distApprox(TPE_Vec3 p1, TPE_Vec3 p2);
 TPE_Unit TPE_sqrt(TPE_Unit x);
 
 /** Compute sine, TPE_FRACTIONS_PER_UNIT as argument corresponds to 2 * PI
@@ -343,7 +343,7 @@ TPE_Vec3 TPE_rotationInverse(TPE_Vec3 rotation);
 
 /** Returns a connection tension, i.e. a signed percentage difference against
   desired length (TPE_FRACTIONS_PER_UNIT means 100%). */
-static inline TPE_Unit TPE_connectionTension(TPE_Unit length,
+ TPE_Unit TPE_connectionTension(TPE_Unit length,
   TPE_Unit desiredLength);
 
 /** Rotates a rotation specified in Euler angles by given axis + angle (see
@@ -469,7 +469,7 @@ void TPE_bodyLimitAverageSpeed(TPE_Body *body, TPE_Unit speedMin,
   up). */
 void TPE_bodyDeactivate(TPE_Body *body);
 
-static inline uint8_t TPE_bodyIsActive(const TPE_Body *body);
+ uint8_t TPE_bodyIsActive(const TPE_Body *body);
 
 /** Attempts to shift the joints of a soft body so that the tension of all
   springs becomes zero while keeping the joints near their current position.
@@ -627,12 +627,12 @@ TPE_Vec3 TPE_envAATriPrism(TPE_Vec3 point, TPE_Vec3 center,
 uint16_t _TPE_body1Index, _TPE_body2Index, _TPE_joint1Index, _TPE_joint2Index;
 TPE_CollisionCallback _TPE_collisionCallback;
 
-static inline TPE_Unit TPE_nonZero(TPE_Unit x)
+ TPE_Unit TPE_nonZero(TPE_Unit x)
 {
   return x != 0 ? x : 1;
 }
 
-static inline TPE_Unit TPE_connectionTension(TPE_Unit length,
+ TPE_Unit TPE_connectionTension(TPE_Unit length,
   TPE_Unit desiredLength)
 {
   return (length * TPE_F) / desiredLength
@@ -3295,7 +3295,7 @@ TPE_Vec3 TPE_envCone(TPE_Vec3 point, TPE_Vec3 center, TPE_Vec3 direction,
   return TPE_vec3Plus(point,center);
 }
 
-static inline uint8_t TPE_bodyIsActive(const TPE_Body *body)
+ uint8_t TPE_bodyIsActive(const TPE_Body *body)
 {
   return !(body->flags & TPE_BODY_FLAG_DEACTIVATED);
 }

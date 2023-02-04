@@ -11,6 +11,7 @@ pub enum TexturedModelName {
     Triangle,
     Suzanne,
     Potato,
+    Plate,
 }
 
 impl TexturedModelName {
@@ -21,6 +22,7 @@ impl TexturedModelName {
             TexturedModelName::Triangle => (AssetName::Triangle, AssetName::TriangleTexture),
             TexturedModelName::Suzanne => (AssetName::Suzanne, AssetName::SuzanneTexture),
             TexturedModelName::Potato => (AssetName::Potato, AssetName::PotatoTexture),
+            TexturedModelName::Plate => (AssetName::Plate, AssetName::PlateTexture),
         }
     }
 }
