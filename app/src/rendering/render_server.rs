@@ -172,6 +172,12 @@ impl RenderServer for WiiRenderServer {
         }
     }
 
+    fn render_debug(&mut self, data: Vec<(&Position, &SphereCollider)>) {
+        for (pos, collider) in data {
+            self.render_entity(&TexturedModelName::Cube, pos);
+        }
+    }
+
     /**
      * Render a new frame.
      */

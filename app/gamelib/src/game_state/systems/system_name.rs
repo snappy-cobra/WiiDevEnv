@@ -3,7 +3,7 @@ use crate::game_state::systems::physics::system_register_collider;
 use super::audio::system_play_audio;
 use super::motion::*;
 use super::actions::*;
-use super::render::system_render_meshes;
+use super::render::*;
 
 /**
  * Enumerates all systems that exist in the project.
@@ -11,6 +11,7 @@ use super::render::system_render_meshes;
  */
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum SystemName {
+    DebugPhysics,
     ExitAction,
     StopAction,
     ShakeAction,
@@ -25,6 +26,7 @@ impl SystemName {
     /// Returns the function of this particular SystemName
     pub const fn to_function(&self) -> &'static dyn Fn(&mut GameState) {
         match self {
+            SystemName::DebugPhysics => &system_render_debug_physics,
             SystemName::ExitAction => &system_exit_action,
             SystemName::StopAction => &system_stop_action,
             SystemName::ShakeAction => &system_shake_action,
