@@ -29,7 +29,7 @@ pub fn build() -> GameState {
     state.add_system(SystemName::PhysicsToPosition);
     state.add_system(SystemName::RenderMeshes);
 
-    batch_spawn_entities(&mut state.world, 2);
+    batch_spawn_entities(&mut state.world, 8);
     spawn_main_music(&mut state.world);
     return state;
 }

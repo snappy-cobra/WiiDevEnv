@@ -187,6 +187,12 @@ impl RenderServer for WiiRenderServer {
             if !collider.has_been_registered {
                 let mut joints = vec![Joint::new(Vec3(0.0, 8.0, 0.0), 1.0)];
                 collider.body_index = self.world_wrapper.add_body(joints, vec![], collider.radius);
+                let body = self.world_wrapper.get_body(collider.body_index);
+                body.move_by(Vec3(
+                    collider.body_index as f32 * 0.5,
+                    collider.body_index as f32 * 0.5,
+                    collider.body_index as f32 * 0.5,
+                ));
                 collider.has_been_registered = true;
             }
         }
@@ -197,7 +203,6 @@ impl RenderServer for WiiRenderServer {
             body.apply_gravity(1.0 / 100.0)
         }
         self.world_wrapper.step();
-        println!("{:?}", self.world_wrapper.get_body(0).center_of_mass());
     }
 
     fn physics_to_position(&mut self, objs: &mut Vec<(&mut SphereCollider, &mut Position)>) {
