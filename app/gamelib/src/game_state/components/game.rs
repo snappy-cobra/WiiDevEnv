@@ -3,11 +3,17 @@ pub struct Platform {
 }
 
 pub enum OnAnimationFinish {
-    Despawn
+    Despawn,
+    Repeat,
+    Hand2,
+    Hand1,
+    Hand0,
+    Start
 }
 
 pub enum AnimationType {
-    Test
+    None,
+    Test,
 }
 
 pub struct Animation {
