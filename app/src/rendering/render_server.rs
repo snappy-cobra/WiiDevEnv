@@ -199,4 +199,13 @@ impl RenderServer for WiiRenderServer {
         self.world_wrapper.step();
         println!("{:?}", self.world_wrapper.get_body(0).center_of_mass());
     }
+
+    fn physics_to_position(&mut self, objs: &mut Vec<(&mut SphereCollider, &mut Position)>) {
+        for (col, pos) in objs.iter_mut() {
+            let body = self.world_wrapper.get_body(col.body_index);
+            pos.x = body.center_of_mass().0;
+            pos.y = body.center_of_mass().1;
+            pos.z = body.center_of_mass().2;
+        }
+    }
 }
