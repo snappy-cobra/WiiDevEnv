@@ -11,5 +11,6 @@ use crate::game_state::components::physics::SphereCollider;
 pub trait RenderServer {
     fn render_meshes(&mut self, meshes: Vec::<(&MeshInstance, &Position)>);
     fn render_frame(&mut self);
-    fn register_collider(&mut self, colliders: Vec::<&SphereCollider>);
+    fn register_collider(&mut self, colliders: &mut Vec::<&mut SphereCollider>);
+    fn world_step(&mut self);
 }

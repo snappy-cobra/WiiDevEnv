@@ -146,11 +146,6 @@ impl WiiRenderServer {
             GX_End();
         }
     }
-
-    pub fn world_step(&mut self) {
-        for body in self.world_wrapper
-        self.world_wrapper.step();
-    }
 }
 
 impl Drop for WiiRenderServer {
@@ -186,13 +181,22 @@ impl RenderServer for WiiRenderServer {
         }
     }
 
-    fn register_collider(&mut self, colliders: Vec<&SphereCollider>) {
-        println!("Hier zijn we");
-        for collider in colliders {
+    fn register_collider(&mut self, colliders: &mut Vec<&mut SphereCollider>) {
+        // TODO: make this not happen every iteration
+        for collider in colliders.iter_mut() {
             if !collider.has_been_registered {
                 let mut joints = vec![Joint::new(Vec3(0.0, 8.0, 0.0), 1.0)];
-                self.world_wrapper.add_body(joints, vec![], collider.radius);
+                collider.body_index = self.world_wrapper.add_body(joints, vec![], collider.radius);
+                collider.has_been_registered = true;
             }
         }
+    }
+
+    fn world_step(&mut self) {
+        for body in self.world_wrapper.bodies_iter() {
+            body.apply_gravity(1.0 / 100.0)
+        }
+        self.world_wrapper.step();
+        println!("{:?}", self.world_wrapper.get_body(0).center_of_mass());
     }
 }

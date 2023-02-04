@@ -19,7 +19,6 @@ pub enum SystemName {
     PlayAudio,
     RenderMeshes,
     RegisterCollider,
-    Gravity,
 }
 
 impl SystemName {
@@ -34,7 +33,6 @@ impl SystemName {
             SystemName::PlayAudio => &system_play_audio,
             SystemName::RenderMeshes => &system_render_meshes,
             SystemName::RegisterCollider => &system_register_collider,
-            SystemName::Gravity => &system_apply_gravity,
         }
     }
 }

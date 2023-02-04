@@ -7,15 +7,8 @@ use alloc::vec::Vec;
  * Main render system that renders meshinstance components.
  */
 pub fn system_register_collider(state: &mut GameState) {
-    let mut query = state.world.query::<& SphereCollider>();
-    let colliders: Vec<& SphereCollider> = query.iter().map(|(_e, (c))| (c)).collect();
+    let mut query = state.world.query::<&mut SphereCollider>();
+    let mut colliders = query.iter().map(|(_e, c)| c).collect();
     let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
-    server_provider.render_server.register_collider(colliders);
-}
-
-pub fn system_apply_gravity(state: &mut GameState) {
-    let mut query = state.world.query::<& SphereCollider>();
-    let colliders: Vec<& SphereCollider> = query.iter().map(|(_e, (c))| (c)).collect();
-    let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
-    server_provider.render_server.apply_gravity(colliders);
+    server_provider.render_server.register_collider(&mut colliders);
 }
