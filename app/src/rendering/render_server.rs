@@ -2,8 +2,10 @@ use super::display_cache::DisplayCache;
 use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 use super::model_factory::ModelFactory;
 use super::textured_model::TexturedModel;
+use alloc::vec;
 use gamelib::data_store::asset_name::AssetName;
 use gamelib::data_store::textured_model_name::TexturedModelName;
+use gamelib::game_state::components::physics::SphereCollider;
 use gamelib::game_state::components::render::MeshInstance;
 use gamelib::{
     game_state::components::motion::Position, game_state::components::motion::Velocity,
@@ -14,6 +16,7 @@ use hecs::*;
 use libc::c_void;
 use ogc_rs::prelude::Vec;
 use ogc_rs::{print, println};
+use physicslib::{Joint, TPE_Body, TPE_Joint, TPE_World, TPE_worldInit, Vec3};
 use wavefront::{Obj, Vertex};
 
 /// Representation of the graphics rendering subsystem of the device
@@ -26,6 +29,9 @@ use wavefront::{Obj, Vertex};
 pub struct WiiRenderServer {
     model_factory: ModelFactory,
     display_cache: DisplayCache,
+    joint_array: [TPE_Joint; 100],
+    body_array: [TPE_Body; 100],
+    world: TPE_World,
 }
 
 impl WiiRenderServer {
@@ -36,9 +42,15 @@ impl WiiRenderServer {
     /// - the graphics chip is initialized in the expected rendering mode.
     /// - The available models are constructed and indexed. (c.f. `ModelFactory`)
     pub fn new() -> Self {
+        let joint_array = [TPE_Joint::default(); 100];
+        let body_array = [TPE_Body::default(); 100];
+        let world = TPE_World{}
         let res = Self {
             model_factory: ModelFactory::new(),
             display_cache: DisplayCache::new(),
+            joint_array,
+            body_array,
+            world,
         };
         res.init_render();
         res
@@ -172,6 +184,28 @@ impl RenderServer for WiiRenderServer {
     fn render_frame(&mut self) {
         unsafe {
             GRRLIB_Render();
+        }
+    }
+
+    fn register_collider(&mut self, colliders: Vec<&SphereCollider>) {
+        println!("Hier zijn we");
+        for collider in colliders {
+            if !collider.has_been_registered {
+                let v = Vec3 {
+                    0: 0.0,
+                    1: 0.0,
+                    2: 0.0,
+                };
+                let j = Joint::new(v, collider.radius);
+                self.joint_array.push(j);
+                TPE_World{
+                    bodies: (),
+                    bodyCount: 0,
+                    environmentFunction: None,
+                    collisionCallback: None,
+                }
+                self.tpe_world = TPE_worldInit()
+            }
         }
     }
 }

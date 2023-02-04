@@ -76,7 +76,7 @@ impl Connection {
 pub struct Body(TPE_Body);
 
 impl Body {
-    pub fn new(joints: &[Joint], connections: &[Connection], mass: f32) -> Self {
+    pub fn new(joints: &mut [Joint], connections: &mut [Connection], mass: f32) -> Self {
         let mut body = MaybeUninit::zeroed();
         let joints: &[TPE_Joint] = unsafe { core::mem::transmute(joints) };
         let joints_ptr = joints.as_ptr();
