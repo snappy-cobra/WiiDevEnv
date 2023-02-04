@@ -29,6 +29,7 @@ lazy_static = { version = "1.4.0", default-features = false, features = ["spin_n
 #micromath = { version = "1.0.1" }
 strum = { version = "0.24.1", default-features = false }
 strum_macros = "0.24"
+typed-arena = { version = "1.4.1", default-features = false }
 
 [features]
 run_target_tests = []

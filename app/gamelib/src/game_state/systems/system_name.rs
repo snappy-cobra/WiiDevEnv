@@ -1,4 +1,5 @@
 use crate::game_state::GameState;
+use crate::game_state::systems::physics::*;
 use super::audio::system_play_audio;
 use super::motion::*;
 use super::actions::*;
@@ -18,7 +19,9 @@ pub enum SystemName {
     IntegrateMotion,
     BounceBounds,
     PlayAudio,
-    RenderMeshes
+    RenderMeshes,
+    RegisterCollider,
+    PhysicsToPosition,
 }
 
 impl SystemName {
@@ -28,11 +31,13 @@ impl SystemName {
             SystemName::ExitAction => &system_exit_action,
             SystemName::MovingPlatform => &system_moving_platform,
             SystemName::StopAction => &system_stop_action,
+            SystemName::RegisterCollider => &system_register_collider,
             SystemName::ShakeAction => &system_shake_action,
             SystemName::IntegrateMotion => &system_integrate_motion,
             SystemName::BounceBounds => &system_bounce_bounds,
             SystemName::PlayAudio => &system_play_audio,
             SystemName::RenderMeshes => &system_render_meshes,
+            SystemName::PhysicsToPosition => &system_physics_to_position,
         }
     }
 }

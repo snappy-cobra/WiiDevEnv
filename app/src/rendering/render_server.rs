@@ -2,8 +2,10 @@ use super::display_cache::DisplayCache;
 use super::indexed_model::{BYTE_SIZE_POSITION, BYTE_SIZE_TEX_COORD};
 use super::model_factory::ModelFactory;
 use super::textured_model::TexturedModel;
+use alloc::vec;
 use gamelib::data_store::asset_name::AssetName;
 use gamelib::data_store::textured_model_name::TexturedModelName;
+use gamelib::game_state::components::physics::SphereCollider;
 use gamelib::game_state::components::render::MeshInstance;
 use gamelib::{
     game_state::components::motion::Position, game_state::components::motion::Velocity,
@@ -14,6 +16,7 @@ use hecs::*;
 use libc::c_void;
 use ogc_rs::prelude::Vec;
 use ogc_rs::{print, println};
+use physicslib::{Joint, TPE_Body, TPE_Joint, TPE_World, TPE_worldInit, Vec3, WorldWrapper};
 use wavefront::{Obj, Vertex};
 
 /// Representation of the graphics rendering subsystem of the device
@@ -26,6 +29,7 @@ use wavefront::{Obj, Vertex};
 pub struct WiiRenderServer {
     model_factory: ModelFactory,
     display_cache: DisplayCache,
+    world_wrapper: WorldWrapper,
 }
 
 impl WiiRenderServer {
@@ -36,9 +40,11 @@ impl WiiRenderServer {
     /// - the graphics chip is initialized in the expected rendering mode.
     /// - The available models are constructed and indexed. (c.f. `ModelFactory`)
     pub fn new() -> Self {
+        let world_wrapper = WorldWrapper::new();
         let res = Self {
             model_factory: ModelFactory::new(),
             display_cache: DisplayCache::new(),
+            world_wrapper,
         };
         res.init_render();
         res
@@ -172,6 +178,39 @@ impl RenderServer for WiiRenderServer {
     fn render_frame(&mut self) {
         unsafe {
             GRRLIB_Render();
+        }
+    }
+
+    fn register_collider(&mut self, colliders: &mut Vec<&mut SphereCollider>) {
+        // TODO: make this not happen every iteration
+        for collider in colliders.iter_mut() {
+            if !collider.has_been_registered {
+                let mut joints = vec![Joint::new(Vec3(0.0, 8.0, 0.0), 1.0)];
+                collider.body_index = self.world_wrapper.add_body(joints, vec![], collider.radius);
+                let body = self.world_wrapper.get_body(collider.body_index);
+                body.move_by(Vec3(
+                    collider.body_index as f32 * 0.5,
+                    collider.body_index as f32 * 0.5,
+                    collider.body_index as f32 * 0.5,
+                ));
+                collider.has_been_registered = true;
+            }
+        }
+    }
+
+    fn world_step(&mut self) {
+        for body in self.world_wrapper.bodies_iter() {
+            body.apply_gravity(1.0 / 100.0)
+        }
+        self.world_wrapper.step();
+    }
+
+    fn physics_to_position(&mut self, objs: &mut Vec<(&mut SphereCollider, &mut Position)>) {
+        for (col, pos) in objs.iter_mut() {
+            let body = self.world_wrapper.get_body(col.body_index);
+            pos.x = body.center_of_mass().0;
+            pos.y = body.center_of_mass().1;
+            pos.z = body.center_of_mass().2;
         }
     }
 }
