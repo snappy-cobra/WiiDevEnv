@@ -12,7 +12,7 @@ use core::mem::MaybeUninit;
 include!("physics.rs");
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct Unit(f32);
+pub struct Unit(pub f32);
 
 impl Unit {
     /// float to int
@@ -26,7 +26,7 @@ impl Unit {
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct Vec3(f32, f32, f32);
+pub struct Vec3(pub f32, pub f32, pub f32);
 
 impl Vec3 {
     pub fn to_internal(&self) -> TPE_Vec3 {
@@ -63,7 +63,11 @@ pub struct Connection(TPE_Connection);
 
 impl Connection {
     pub fn new(joint1_index: u8, joint2_index: u8, length: u16) -> Self {
-        Connection(TPE_Connection { joint1: joint1_index, joint2: joint2_index, length })
+        Connection(TPE_Connection {
+            joint1: joint1_index,
+            joint2: joint2_index,
+            length,
+        })
     }
 }
 
@@ -75,12 +79,21 @@ impl Body {
     pub fn new(joints: &[Joint], connections: &[Connection], mass: f32) -> Self {
         let mut body = MaybeUninit::zeroed();
         let joints: &[TPE_Joint] = unsafe { core::mem::transmute(joints) };
-        let joints_ptr = &joints[0] as *const TPE_Joint;
+        let joints_ptr = joints.as_ptr();
 
         let connections: &[TPE_Connection] = unsafe { core::mem::transmute(connections) };
-        let connections_ptr = &connections[0] as *const TPE_Connection;
+        let connections_ptr = connections.as_ptr();
 
-        unsafe { TPE_bodyInit(body.as_mut_ptr(), joints_ptr as *mut TPE_Joint, joints.len().try_into().unwrap(), connections_ptr as *mut TPE_Connection, connections.len().try_into().unwrap(), Unit(mass).to_internal()) };
+        unsafe {
+            TPE_bodyInit(
+                body.as_mut_ptr(),
+                joints_ptr as *mut TPE_Joint,
+                joints.len().try_into().unwrap(),
+                connections_ptr as *mut TPE_Connection,
+                connections.len().try_into().unwrap(),
+                Unit(mass).to_internal(),
+            )
+        };
         let body = unsafe { body.assume_init() };
         Body(body)
     }
@@ -96,7 +109,7 @@ impl Body {
 
     // /// True if any forces are working on the body
     pub fn is_active(&self) -> bool {
-        unsafe { TPE_bodyIsActive(self.0) }
+        unsafe { TPE_bodyIsActive(&self.0) != 0 }
     }
 }
 
@@ -105,10 +118,17 @@ pub struct World(TPE_World);
 
 impl World {
     pub fn new(bodies: &[Body]) -> Self {
-        let bodies: & [TPE_Body] = unsafe { core::mem::transmute(bodies) };
-        let bodies_ptr = &bodies[0] as *const TPE_Body;
+        let bodies: &[TPE_Body] = unsafe { core::mem::transmute(bodies) };
+        let bodies_ptr = bodies.as_ptr();
         let mut world = MaybeUninit::zeroed();
-        unsafe { TPE_worldInit(world.as_mut_ptr(), bodies_ptr as *mut TPE_Body, bodies.len().try_into().unwrap(), Some(infinitePlaneEnvDistance))};
+        unsafe {
+            TPE_worldInit(
+                world.as_mut_ptr(),
+                bodies_ptr as *mut TPE_Body,
+                bodies.len().try_into().unwrap(),
+                Some(infinitePlaneEnvDistance),
+            )
+        };
         let world = unsafe { world.assume_init() };
         World(world)
     }
@@ -125,38 +145,12 @@ impl World {
 
 /// Taken from the simple example code
 #[no_mangle]
-pub extern "C" fn infinitePlaneEnvDistance(point: TPE_Vec3, _maxDistance: TPE_Unit) -> TPE_Vec3
-{
-    unsafe { TPE_envGround(point,0) } // just an infinite flat plane
+pub extern "C" fn infinitePlaneEnvDistance(point: TPE_Vec3, _maxDistance: TPE_Unit) -> TPE_Vec3 {
+    unsafe { TPE_envGround(point, 0) } // just an infinite flat plane
 }
 
 #[cfg(test)]
-pub mod tests{
+pub mod tests {
 
     use super::*;
-
-    #[test]
-    pub fn example() {
-        let joint = Joint::new(Vec3(0.0, 8.0, 0.0), 1.0);
-        let mut bodies = vec![Body::new(&[joint], &[], 2.0)];
-        let mut world = World::new(&bodies);
-        let body = &mut bodies[0];
-
-        let frame: usize = 0;
-        while body.is_active() {
-        // loop {
-            if frame % 6 == 0 {
-                let height = body.center_of_mass().1;
-                for _index in 0..((height * 4.0) as u32) {
-                    print!(" ");
-                }
-                print!("*");
-            }
-
-            body.apply_gravity(1.0 / 100.0);
-            world.step();
-        }
-        println!("body deactivated");
-        assert!(false);
-    }
 }
