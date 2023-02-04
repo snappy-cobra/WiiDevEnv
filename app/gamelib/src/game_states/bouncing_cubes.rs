@@ -1,4 +1,5 @@
 use hecs::World;
+use num::ToPrimitive;
 
 use crate::data_store::asset_name::AssetName;
 use crate::game_state::GameState;
@@ -13,6 +14,7 @@ use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
 use crate::game_state::components::physics::SphereCollider;
+use crate::game_state::components::controller_assignment::ControllerAssignment;
 
 /**
  * Build the bouncing cubes game state.
@@ -65,5 +67,10 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         let mesh_instance = MeshInstance { model_name: TexturedModelName::Suzanne };
         let sphere_collider = SphereCollider{radius: 1.0, gravity: true, body_index: 0, has_been_registered: false};
         world.spawn((mesh_instance, position, velocity, sphere_collider));
+        let controller_assignment = ControllerAssignment{
+            id: small_rng.next_u32().to_usize().unwrap()%4,
+        };
+        let mesh_instance = MeshInstance { model_name: TexturedModelName::Potato };
+        world.spawn((mesh_instance, position, velocity, controller_assignment));
     }
 }
