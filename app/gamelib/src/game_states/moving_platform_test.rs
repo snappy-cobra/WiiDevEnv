@@ -36,7 +36,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         y: 0.0,
         z: 0.0,
     };
-    let mesh_instance = MeshInstance { model_name: TexturedModelName::Suzanne };
+    let mesh_instance = MeshInstance { model_name: TexturedModelName::Plate };
 
 
     world.spawn((position, mesh_instance));

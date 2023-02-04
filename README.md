@@ -88,6 +88,10 @@ However, the current process is not perfect for nested crates (which we have, su
 4. Make a pull-request to merge your branch into `develop`. Somebody needs to approve it.
 5. Once merged, delete your branch.
 
+# Clean everything:
+run `docker system prune --all --force`
+run `earthly prune --all
+
 # License
 
 This project is MIT licensed.

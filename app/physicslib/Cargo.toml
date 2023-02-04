@@ -8,6 +8,7 @@ name="physicslib"
 
 [dependencies]
 libc = "0.2"
+typed-arena = { version = "2.0.2", default-features = false }
 
 [build-dependencies]
 bindgen = "0.61"
