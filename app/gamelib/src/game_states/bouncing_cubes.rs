@@ -34,6 +34,8 @@ pub fn build() -> GameState {
 
     batch_spawn_entities(&mut state.world, 8);
     spawn_main_music(&mut state.world);
+    
+    state.add_system(SystemName::DebugPhysics);
     return state;
 }
 
