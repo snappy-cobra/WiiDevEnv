@@ -69,7 +69,7 @@ impl WiiRenderServer {
             GRRLIB_Settings.antialias = true;
 
             GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
-            GRRLIB_Camera3dSettings(0.0, 50.0, 50.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+            GRRLIB_Camera3dSettings(0.0, 40.0, 10.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
         }
     }
 
@@ -240,10 +240,21 @@ impl RenderServer for WiiRenderServer {
 
     fn world_step(&mut self) {
         for body in self.world_wrapper.bodies_iter() {
-            if body.center_of_mass().1 < -50.0 {
-                continue;
+            plate_height = 0.0;
+            let pos = body.center_of_mass();
+            let distance_from_center = pos.0 * pos.0 + pos.2 * pos.2;
+            let max_dis_from_center = 11.0;
+            if distance_from_center < max_dis_from_center * max_dis_from_center
+                && body.center_of_mass().1 < plate_height
+                && body.center_of_mass().1 > plate_height - 2.0
+            {
+                let mut pos = body.center_of_mass();
+                pos.1 = plate_height;
+                // TODO Add friction. using velocity
+                body.move_to(pos)
+            } else {
+                body.apply_gravity(1.0 / 100.0)
             }
-            body.apply_gravity(1.0 / 200.0)
         }
         self.world_wrapper.step();
     }
@@ -269,9 +280,9 @@ impl RenderServer for WiiRenderServer {
 
     fn apply_movement(&mut self, obj: &SphereCollider, dir: Direction) {
         let body = self.world_wrapper.get_body(obj.body_index);
-        let move_magnitude = 0.5;
-        let move_help_jump_magnitude = 0.1;
-        let jump_magnitude = 0.5;
+        let move_magnitude = 0.1;
+        let move_help_jump_magnitude = 0.05;
+        let jump_magnitude = 0.3;
         let jump_down_magnitude = 0.2;
         let rotation = match dir {
             Direction::Xp => Vec3 {
@@ -284,26 +295,26 @@ impl RenderServer for WiiRenderServer {
                 1: move_help_jump_magnitude,
                 2: 0.0,
             },
-            Direction::Yp => Vec3 {
+            Direction::Yp | Direction::Zp => Vec3 {
                 0: 0.0,
                 1: move_help_jump_magnitude,
                 2: move_magnitude,
             },
-            Direction::Yn => Vec3 {
+            Direction::Yn | Direction::Zn => Vec3 {
                 0: 0.0,
                 1: move_help_jump_magnitude,
                 2: -move_magnitude,
             },
-            Direction::Zp => Vec3 {
-                0: 0.0,
-                1: jump_magnitude,
-                2: 0.0,
-            },
-            Direction::Zn => Vec3 {
-                0: 0.0,
-                1: -jump_down_magnitude,
-                2: 0.0,
-            },
+            // Direction::Zp => Vec3 {
+            //     0: 0.0,
+            //     1: jump_magnitude,
+            //     2: 0.0,
+            // },
+            // Direction::Zn => Vec3 {
+            //     0: 0.0,
+            //     1: -jump_down_magnitude,
+            //     2: 0.0,
+            // },
         };
         body.accelerate(rotation);
     }

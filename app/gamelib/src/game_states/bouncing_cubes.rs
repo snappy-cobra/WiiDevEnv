@@ -72,7 +72,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         let mesh_instance = MeshInstance { model_name: TexturedModelName::Potato };
         let sphere_collider = SphereCollider{radius: 1.0, gravity: true, body_index: 0, has_been_registered: false};
         let controller_assignment = ControllerAssignment{
-            id: small_rng.next_u32().to_usize().unwrap()%4,
+            id: 0,
         };
         world.spawn((mesh_instance, position, velocity, rotation, sphere_collider, controller_assignment));
     }
@@ -88,7 +88,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     let p_mesh = MeshInstance { model_name: TexturedModelName::Suzanne };
     let p_position = Position{
         x: 0.0,
-        y: -10.0,
+        y: 0.0,
         z: 0.0,
     };
     let p_collider = SphereCollider{radius: 10.0, gravity: false, body_index: 0, has_been_registered: false};
