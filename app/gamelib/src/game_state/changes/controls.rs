@@ -1,3 +1,5 @@
+use crate::game_state::components::controller_assignment::ControllerAssignment;
+
 #[cfg(feature = "wii")]
 use ogc_rs::prelude::Vec;
 #[cfg(feature = "wii")]
@@ -20,6 +22,10 @@ impl Controls {
         return Controls {
             wii_mote_controls: vec![WiiMoteControl::nothing(), WiiMoteControl::nothing(), WiiMoteControl::nothing(), WiiMoteControl::nothing()]
         }
+    }
+
+    pub fn get_wii_mote_control(&self, controller_assignment: &ControllerAssignment) -> &WiiMoteControl {
+        return &self.wii_mote_controls[controller_assignment.id]
     }
 }
 
