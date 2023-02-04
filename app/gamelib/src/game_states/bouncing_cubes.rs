@@ -61,7 +61,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
             z: small_rng.next_u32() as f32 / u32::MAX as f32 * 0.1,
         };
         let mesh_instance = MeshInstance { model_name: TexturedModelName::Suzanne };
-        let sphere_collider = SphereCollider{radius: 10.0, has_been_registered: false};
+        let sphere_collider = SphereCollider{radius: 10.0, gravity: true, has_been_registered: false};
         world.spawn((mesh_instance, position, velocity, sphere_collider));
     }
 }

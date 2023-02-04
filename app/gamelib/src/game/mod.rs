@@ -52,6 +52,7 @@ impl<C: ChangeProvider> Game<C> {
 
         // We are still running, so do the rest.
         let mut server_provider = self.server_provider.as_ref().borrow_mut();
+        server_provider.render_server.world_step();
         server_provider.render_server.render_frame();
 
         match &self.state.next_state {

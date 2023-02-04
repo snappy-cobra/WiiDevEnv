@@ -44,7 +44,7 @@ impl WiiRenderServer {
         let res = Self {
             model_factory: ModelFactory::new(),
             display_cache: DisplayCache::new(),
-            world_wrapper
+            world_wrapper,
         };
         res.init_render();
         res
@@ -146,6 +146,11 @@ impl WiiRenderServer {
             GX_End();
         }
     }
+
+    pub fn world_step(&mut self) {
+        for body in self.world_wrapper
+        self.world_wrapper.step();
+    }
 }
 
 impl Drop for WiiRenderServer {
@@ -185,20 +190,8 @@ impl RenderServer for WiiRenderServer {
         println!("Hier zijn we");
         for collider in colliders {
             if !collider.has_been_registered {
-                let v = Vec3 {
-                    0: 0.0,
-                    1: 0.0,
-                    2: 0.0,
-                };
-                let j = Joint::new(v, collider.radius);
-                self.joint_array.push(j);
-                TPE_World{
-                    bodies: (),
-                    bodyCount: 0,
-                    environmentFunction: None,
-                    collisionCallback: None,
-                }
-                self.tpe_world = TPE_worldInit()
+                let mut joints = vec![Joint::new(Vec3(0.0, 8.0, 0.0), 1.0)];
+                self.world_wrapper.add_body(joints, vec![], collider.radius);
             }
         }
     }
