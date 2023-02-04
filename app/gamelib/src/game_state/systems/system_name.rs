@@ -39,11 +39,7 @@ impl SystemName {
             SystemName::BounceBounds => &system_bounce_bounds,
             SystemName::PlayAudio => &system_play_audio,
             SystemName::RenderMeshes => &system_render_meshes,
-<<<<<<< Updated upstream
             SystemName::PhysicsToPosition => &system_physics_to_position,
-=======
-            SystemName::DebugPhysics => &system_render_debug_physics,
->>>>>>> Stashed changes
         }
     }
 }
