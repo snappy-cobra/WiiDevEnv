@@ -62,7 +62,7 @@ fn main_game() -> isize {
     let server_provider = ServerProvider::new(audio_server, render_server);
 
     let mut game = Game::new(
-        GameStateName::MovingPlatform,
+        GameStateName::BouncingCubes,
         WiiChangeProvider::new(InputManager::new()),
         server_provider,
     );
