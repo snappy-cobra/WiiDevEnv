@@ -230,7 +230,7 @@ extern "C" {
     pub fn TPE_atan(x: TPE_Unit) -> TPE_Unit;
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone, Default)]
+#[derive(Debug, Copy, Clone)]
 pub struct TPE_Joint {
     pub position: TPE_Vec3,
     #[doc = "< not TPE_Vec3 to save size"]
@@ -273,7 +273,7 @@ pub type TPE_DebugDrawFunction =
 #[doc = " Physics body made of spheres (each of same weight but possibly different"]
 #[doc = "radia) connected by elastic springs."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone, Default)]
+#[derive(Debug, Copy, Clone)]
 pub struct TPE_Body {
     pub joints: *mut TPE_Joint,
     pub jointCount: u8,

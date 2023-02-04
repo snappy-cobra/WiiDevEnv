@@ -16,7 +16,7 @@ use hecs::*;
 use libc::c_void;
 use ogc_rs::prelude::Vec;
 use ogc_rs::{print, println};
-use physicslib::{Joint, TPE_Body, TPE_Joint, TPE_World, TPE_worldInit, Vec3};
+use physicslib::{Joint, TPE_Body, TPE_Joint, TPE_World, TPE_worldInit, Vec3, WorldWrapper};
 use wavefront::{Obj, Vertex};
 
 /// Representation of the graphics rendering subsystem of the device
@@ -29,9 +29,7 @@ use wavefront::{Obj, Vertex};
 pub struct WiiRenderServer {
     model_factory: ModelFactory,
     display_cache: DisplayCache,
-    joint_array: [TPE_Joint; 100],
-    body_array: [TPE_Body; 100],
-    world: TPE_World,
+    world_wrapper: WorldWrapper,
 }
 
 impl WiiRenderServer {
@@ -42,15 +40,11 @@ impl WiiRenderServer {
     /// - the graphics chip is initialized in the expected rendering mode.
     /// - The available models are constructed and indexed. (c.f. `ModelFactory`)
     pub fn new() -> Self {
-        let joint_array = [TPE_Joint::default(); 100];
-        let body_array = [TPE_Body::default(); 100];
-        let world = TPE_World{}
+        let world_wrapper = WorldWrapper::new();
         let res = Self {
             model_factory: ModelFactory::new(),
             display_cache: DisplayCache::new(),
-            joint_array,
-            body_array,
-            world,
+            world_wrapper
         };
         res.init_render();
         res
