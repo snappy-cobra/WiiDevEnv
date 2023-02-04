@@ -211,9 +211,9 @@ impl RenderServer for WiiRenderServer {
             if !collider.has_been_registered {
                 /// POOTAATOO
                 let joints = vec![
-                    Joint::new(Vec3(0.0, 7.7, 0.0), 0.4),
-                    Joint::new(Vec3(0.0, 8.0, 0.0), 1.0),
-                    Joint::new(Vec3(0.0, 8.3, 0.0), 0.5),
+                    Joint::new(Vec3(0.0, 19.7, 0.0), 0.4),
+                    Joint::new(Vec3(0.0, 20.0, 0.0), 1.0),
+                    Joint::new(Vec3(0.0, 20.3, 0.0), 0.5),
                 ];
                 let connections = vec![
                     Connection::new(0, 1, 0.5),
