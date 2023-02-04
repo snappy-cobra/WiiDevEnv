@@ -305,7 +305,7 @@ impl World {
 /// Taken from the simple example code
 #[no_mangle]
 pub extern "C" fn infinitePlaneEnvDistance(point: TPE_Vec3, _maxDistance: TPE_Unit) -> TPE_Vec3 {
-    unsafe { TPE_envGround(point, 0) } // just an infinite flat plane
+    unsafe { TPE_envGround(point, -300000) } // just an infinite flat plane
 }
 
 use typed_arena::Arena;

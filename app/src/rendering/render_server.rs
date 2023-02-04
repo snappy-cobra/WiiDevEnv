@@ -45,7 +45,12 @@ impl WiiRenderServer {
     /// - the graphics chip is initialized in the expected rendering mode.
     /// - The available models are constructed and indexed. (c.f. `ModelFactory`)
     pub fn new() -> Self {
-        let world_wrapper = WorldWrapper::new();
+        let mut world_wrapper = WorldWrapper::new();
+        // world_wrapper.add_body(
+        //     vec![Joint::new(Vec3(0.0, -500.0, 0.0), 1000.0)],
+        //     vec![],
+        //     100000.0,
+        // );
         let res = Self {
             model_factory: ModelFactory::new(),
             display_cache: DisplayCache::new(),
@@ -235,6 +240,9 @@ impl RenderServer for WiiRenderServer {
 
     fn world_step(&mut self) {
         for body in self.world_wrapper.bodies_iter() {
+            if body.center_of_mass().1 < -50.0 {
+                continue;
+            }
             body.apply_gravity(1.0 / 200.0)
         }
         self.world_wrapper.step();
