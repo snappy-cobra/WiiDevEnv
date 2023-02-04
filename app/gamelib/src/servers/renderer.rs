@@ -3,6 +3,7 @@ use crate::game_state::components::{render::MeshInstance, motion::Position};
 use ogc_rs::prelude::Vec;
 #[cfg(not(feature = "wii"))]
 use std::vec::Vec;
+use crate::game_state::changes::controls::Direction;
 use crate::game_state::components::physics::SphereCollider;
 
 /**
@@ -14,4 +15,5 @@ pub trait RenderServer {
     fn register_collider(&mut self, colliders: &mut Vec::<&mut SphereCollider>);
     fn world_step(&mut self);
     fn physics_to_position(&mut self, temp: &mut Vec<(&mut SphereCollider, &mut Position)>);
+    fn apply_movement(&mut self, obj: &SphereCollider, dir: Direction);
 }

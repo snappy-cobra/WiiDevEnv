@@ -28,6 +28,7 @@ pub fn build() -> GameState {
     // state.add_system(SystemName::ShakeAction);
     // state.add_system(SystemName::IntegrateMotion);
     // state.add_system(SystemName::BounceBounds);
+    state.add_system(SystemName::PatatoControl);
     state.add_system(SystemName::PhysicsToPosition);
     state.add_system(SystemName::RenderMeshes);
 
