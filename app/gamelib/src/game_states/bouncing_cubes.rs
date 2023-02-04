@@ -58,7 +58,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
             y: small_rng.next_u32() as f32 / u32::MAX as f32 * 0.1,
             z: small_rng.next_u32() as f32 / u32::MAX as f32 * 0.1,
         };
-        let mesh_instance = MeshInstance { model_name: TexturedModelName::Suzanne };
+        let mesh_instance = MeshInstance { model_name: TexturedModelName::Potato };
         world.spawn((mesh_instance, position, velocity));
     }
 }
