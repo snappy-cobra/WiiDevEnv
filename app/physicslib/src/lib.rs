@@ -140,6 +140,134 @@ impl Body {
         assert!(self.0.jointCount >= 3);
         Vec3::from_internal(unsafe { TPE_bodyGetRotation(&self.0, 0, 1, 2) })
     }
+
+    /// Moves a body by a certain offset
+    pub fn move_by(&mut self, offset: Vec3) {
+        unsafe { TPE_bodyMoveBy(&mut self.0, offset.to_internal())};
+    }
+
+    /// Moves a body (its center of mass) to a given position
+    pub fn move_to(&mut self, position: Vec3) {
+        unsafe { TPE_bodyMoveTo(&mut self.0, position.to_internal())};
+    }
+
+    /// Adds a velcoity to a soft body
+    pub fn accelerate(&mut self, velocity: Vec3) {
+        unsafe { TPE_bodyAccelerate(&mut self.0, velocity.to_internal())};
+    }
+
+    /// Untested...
+    pub fn make_box(width: f32, depth: f32, height: f32, joint_size: f32) -> (Vec<Joint>, Vec<Connection>) {
+        let mut joints : [MaybeUninit<TPE_Joint>; 8] = unsafe { MaybeUninit::zeroed().assume_init() };
+        let mut connections : [MaybeUninit<TPE_Connection>; 16] = unsafe { MaybeUninit::zeroed().assume_init() };
+        unsafe { TPE_makeBox(
+            MaybeUninit::slice_as_mut_ptr(&mut joints),
+            MaybeUninit::slice_as_mut_ptr(&mut connections),
+            Unit(width).to_internal(),
+            Unit(depth).to_internal(),
+            Unit(height).to_internal(),
+            Unit(joint_size).to_internal()
+        ) };
+        let joints = unsafe { core::mem::transmute::<_, [Joint; 8]>(joints) };
+        let connections = unsafe { core::mem::transmute::<_, [Connection; 16]>(connections) };
+        (joints.to_vec(), connections.to_vec())
+    }
+
+    /// Untested...
+    pub fn make_center_box(width: f32, depth: f32, height: f32, joint_size: f32) -> (Vec<Joint>, Vec<Connection>) {
+        let mut joints : [MaybeUninit<TPE_Joint>; 9] = unsafe { MaybeUninit::zeroed().assume_init() };
+        let mut connections : [MaybeUninit<TPE_Connection>; 18] = unsafe { MaybeUninit::zeroed().assume_init() };
+        unsafe { TPE_makeCenterBox(
+            MaybeUninit::slice_as_mut_ptr(&mut joints),
+            MaybeUninit::slice_as_mut_ptr(&mut connections),
+            Unit(width).to_internal(),
+            Unit(depth).to_internal(),
+            Unit(height).to_internal(),
+            Unit(joint_size).to_internal()
+        ) };
+        let joints = unsafe { core::mem::transmute::<_, [Joint; 9]>(joints) };
+        let connections = unsafe { core::mem::transmute::<_, [Connection; 18]>(connections) };
+        (joints.to_vec(), connections.to_vec())
+    }
+    /// Untested...
+    pub fn make_rect(width: f32, depth: f32, height: f32, joint_size: f32) -> (Vec<Joint>, Vec<Connection>) {
+        let mut joints : [MaybeUninit<TPE_Joint>; 4] = unsafe { MaybeUninit::zeroed().assume_init() };
+        let mut connections : [MaybeUninit<TPE_Connection>; 6] = unsafe { MaybeUninit::zeroed().assume_init() };
+        unsafe { TPE_makeCenterBox(
+            MaybeUninit::slice_as_mut_ptr(&mut joints),
+            MaybeUninit::slice_as_mut_ptr(&mut connections),
+            Unit(width).to_internal(),
+            Unit(depth).to_internal(),
+            Unit(height).to_internal(),
+            Unit(joint_size).to_internal()
+        ) };
+        let joints = unsafe { core::mem::transmute::<_, [Joint; 4]>(joints) };
+        let connections = unsafe { core::mem::transmute::<_, [Connection; 6]>(connections) };
+        (joints.to_vec(), connections.to_vec())
+    }
+
+    /// Untested...
+    pub fn make_center_rect(width: f32, depth: f32, joint_size: f32) -> (Vec<Joint>, Vec<Connection>) {
+        let mut joints : [MaybeUninit<TPE_Joint>; 5] = unsafe { MaybeUninit::zeroed().assume_init() };
+        let mut connections : [MaybeUninit<TPE_Connection>; 10] = unsafe { MaybeUninit::zeroed().assume_init() };
+        unsafe { TPE_makeCenterRect(
+            MaybeUninit::slice_as_mut_ptr(&mut joints),
+            MaybeUninit::slice_as_mut_ptr(&mut connections),
+            Unit(width).to_internal(),
+            Unit(depth).to_internal(),
+            Unit(joint_size).to_internal()
+        ) };
+        let joints = unsafe { core::mem::transmute::<_, [Joint; 5]>(joints) };
+        let connections = unsafe { core::mem::transmute::<_, [Connection; 10]>(connections) };
+        (joints.to_vec(), connections.to_vec())
+    }
+
+    /// Untested...
+    pub fn make_center_rect_full(width: f32, depth: f32, joint_size: f32) -> (Vec<Joint>, Vec<Connection>) {
+        let mut joints : [MaybeUninit<TPE_Joint>; 5] = unsafe { MaybeUninit::zeroed().assume_init() };
+        let mut connections : [MaybeUninit<TPE_Connection>; 10] = unsafe { MaybeUninit::zeroed().assume_init() };
+        unsafe { TPE_makeCenterRectFull(
+            MaybeUninit::slice_as_mut_ptr(&mut joints),
+            MaybeUninit::slice_as_mut_ptr(&mut connections),
+            Unit(width).to_internal(),
+            Unit(depth).to_internal(),
+            Unit(joint_size).to_internal()
+        ) };
+        let joints = unsafe { core::mem::transmute::<_, [Joint; 5]>(joints) };
+        let connections = unsafe { core::mem::transmute::<_, [Connection; 10]>(connections) };
+        (joints.to_vec(), connections.to_vec())
+    }
+
+    /// Untested...
+    pub fn make_triangle(side_length: f32, joint_size: f32) -> (Vec<Joint>, Vec<Connection>) {
+        let mut joints : [MaybeUninit<TPE_Joint>; 3] = unsafe { MaybeUninit::zeroed().assume_init() };
+        let mut connections : [MaybeUninit<TPE_Connection>; 3] = unsafe { MaybeUninit::zeroed().assume_init() };
+        unsafe { TPE_makeTriangle(
+            MaybeUninit::slice_as_mut_ptr(&mut joints),
+            MaybeUninit::slice_as_mut_ptr(&mut connections),
+            Unit(side_length).to_internal(),
+            Unit(joint_size).to_internal()
+        ) };
+        let joints = unsafe { core::mem::transmute::<_, [Joint; 3]>(joints) };
+        let connections = unsafe { core::mem::transmute::<_, [Connection; 3]>(connections) };
+        (joints.to_vec(), connections.to_vec())
+    }
+
+
+    /// Untested...
+    pub fn make2line(length: f32, joint_size: f32) -> (Vec<Joint>, Vec<Connection>) {
+        let mut joints : [MaybeUninit<TPE_Joint>; 2] = unsafe { MaybeUninit::zeroed().assume_init() };
+        let mut connections : [MaybeUninit<TPE_Connection>; 1] = unsafe { MaybeUninit::zeroed().assume_init() };
+        unsafe { TPE_make2Line(
+            MaybeUninit::slice_as_mut_ptr(&mut joints),
+            MaybeUninit::slice_as_mut_ptr(&mut connections),
+            Unit(length).to_internal(),
+            Unit(joint_size).to_internal()
+        ) };
+        let joints = unsafe { core::mem::transmute::<_, [Joint; 2]>(joints) };
+        let connections = unsafe { core::mem::transmute::<_, [Connection; 1]>(connections) };
+        (joints.to_vec(), connections.to_vec())
+    }
 }
 
 #[derive(Debug, Clone)]
