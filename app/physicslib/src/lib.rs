@@ -5,8 +5,11 @@
 #![allow(unaligned_references)]
 #![allow(unused_imports)]
 #![no_std]
-
 #![allow(clippy::all)]
+
+extern crate alloc;
+use alloc::vec;
+use alloc::vec::Vec;
 
 use core::mem::MaybeUninit;
 include!("physics.rs");
@@ -76,20 +79,20 @@ impl Connection {
 pub struct Body(TPE_Body);
 
 impl Body {
-    pub fn new(joints: &[Joint], connections: &[Connection], mass: f32) -> Self {
+    pub fn new(joints: &mut [Joint], connections: &mut [Connection], mass: f32) -> Self {
         let mut body = MaybeUninit::zeroed();
-        let joints: &[TPE_Joint] = unsafe { core::mem::transmute(joints) };
-        let joints_ptr = joints.as_ptr();
+        let joints: &mut [TPE_Joint] = unsafe { core::mem::transmute(joints) };
+        let joints_ptr = joints.as_mut_ptr();
 
-        let connections: &[TPE_Connection] = unsafe { core::mem::transmute(connections) };
-        let connections_ptr = connections.as_ptr();
+        let connections: &mut [TPE_Connection] = unsafe { core::mem::transmute(connections) };
+        let connections_ptr = connections.as_mut_ptr();
 
         unsafe {
             TPE_bodyInit(
                 body.as_mut_ptr(),
-                joints_ptr as *mut TPE_Joint,
+                joints_ptr,
                 joints.len().try_into().unwrap(),
-                connections_ptr as *mut TPE_Connection,
+                connections_ptr,
                 connections.len().try_into().unwrap(),
                 Unit(mass).to_internal(),
             )
@@ -117,14 +120,14 @@ impl Body {
 pub struct World(TPE_World);
 
 impl World {
-    pub fn new(bodies: &[Body]) -> Self {
-        let bodies: &[TPE_Body] = unsafe { core::mem::transmute(bodies) };
-        let bodies_ptr = bodies.as_ptr();
+    pub fn new(bodies: &mut [Body]) -> Self {
+        let bodies: &mut [TPE_Body] = unsafe { core::mem::transmute(bodies) };
+        let bodies_ptr = bodies.as_mut_ptr();
         let mut world = MaybeUninit::zeroed();
         unsafe {
             TPE_worldInit(
                 world.as_mut_ptr(),
-                bodies_ptr as *mut TPE_Body,
+                bodies_ptr,
                 bodies.len().try_into().unwrap(),
                 Some(infinitePlaneEnvDistance),
             )
@@ -147,6 +150,44 @@ impl World {
 #[no_mangle]
 pub extern "C" fn infinitePlaneEnvDistance(point: TPE_Vec3, _maxDistance: TPE_Unit) -> TPE_Vec3 {
     unsafe { TPE_envGround(point, 0) } // just an infinite flat plane
+}
+
+use typed_arena::Arena;
+
+pub struct WorldWrapper {
+    joints_arena: typed_arena::Arena<Vec<Joint>>,
+    connections_arena: typed_arena::Arena<Vec<Connection>>,
+    bodies_vec: Vec<Body>,
+    world: World,
+}
+
+impl WorldWrapper {
+    pub fn new() -> Self{
+        Self {
+            joints_arena: Arena::new(),
+            connections_arena: Arena::new(),
+            bodies_vec: vec![],
+            world: World::new(&mut vec![]),
+        }
+    }
+
+    pub fn add_body(&mut self, joints: Vec<Joint>, connections: Vec<Connection>, mass: f32) {
+        let joints = self.joints_arena.alloc(joints);
+        let connections = self.connections_arena.alloc(connections);
+        let body = Body::new(joints, connections, mass);
+        self.bodies_vec.push(body);
+        self.fix_world_bodies_ptr();
+    }
+
+    fn fix_world_bodies_ptr(&mut self) {
+        let ptr: *mut TPE_Body = unsafe { core::mem::transmute(self.bodies_vec.as_mut_ptr())};
+        self.world.0.bodies = ptr;
+        self.world.0.bodyCount = self.bodies_vec.len() as u16;
+    }
+
+    pub fn step(&mut self) {
+        self.world.step();
+    }
 }
 
 #[cfg(test)]

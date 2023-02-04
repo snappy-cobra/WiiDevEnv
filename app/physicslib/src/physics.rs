@@ -197,6 +197,24 @@ extern "C" {
     pub fn TPE_keepInRange(x: TPE_Unit, xMin: TPE_Unit, xMax: TPE_Unit) -> TPE_Unit;
 }
 extern "C" {
+    pub fn TPE_abs(x: TPE_Unit) -> TPE_Unit;
+}
+extern "C" {
+    pub fn TPE_max(a: TPE_Unit, b: TPE_Unit) -> TPE_Unit;
+}
+extern "C" {
+    pub fn TPE_min(a: TPE_Unit, b: TPE_Unit) -> TPE_Unit;
+}
+extern "C" {
+    pub fn TPE_nonZero(x: TPE_Unit) -> TPE_Unit;
+}
+extern "C" {
+    pub fn TPE_dist(p1: TPE_Vec3, p2: TPE_Vec3) -> TPE_Unit;
+}
+extern "C" {
+    pub fn TPE_distApprox(p1: TPE_Vec3, p2: TPE_Vec3) -> TPE_Unit;
+}
+extern "C" {
     pub fn TPE_sqrt(x: TPE_Unit) -> TPE_Unit;
 }
 extern "C" {
@@ -344,6 +362,11 @@ extern "C" {
     #[doc = " Returns an inverse rotation to given rotation, in Euler angles (see rotation"]
     #[doc = "conventions)."]
     pub fn TPE_rotationInverse(rotation: TPE_Vec3) -> TPE_Vec3;
+}
+extern "C" {
+    #[doc = " Returns a connection tension, i.e. a signed percentage difference against"]
+    #[doc = "desired length (TPE_FRACTIONS_PER_UNIT means 100%)."]
+    pub fn TPE_connectionTension(length: TPE_Unit, desiredLength: TPE_Unit) -> TPE_Unit;
 }
 extern "C" {
     #[doc = " Rotates a rotation specified in Euler angles by given axis + angle (see"]
@@ -537,6 +560,9 @@ extern "C" {
     #[doc = " Deactivates a body (puts it to sleep until another collision or force wake"]
     #[doc = "up)."]
     pub fn TPE_bodyDeactivate(body: *mut TPE_Body);
+}
+extern "C" {
+    pub fn TPE_bodyIsActive(body: *const TPE_Body) -> u8;
 }
 extern "C" {
     #[doc = " Attempts to shift the joints of a soft body so that the tension of all"]
