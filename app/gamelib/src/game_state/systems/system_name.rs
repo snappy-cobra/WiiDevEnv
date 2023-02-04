@@ -13,6 +13,7 @@ use super::gamemaster::*;
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum SystemName {
     DebugPhysics,
+    GameMaster,
     ExitAction,
     MovingPlatform,
     StopAction,
@@ -31,6 +32,7 @@ impl SystemName {
     pub const fn to_function(&self) -> &'static dyn Fn(&mut GameState) {
         match self {
             SystemName::DebugPhysics => &system_render_debug_physics,
+            SystemName::GameMaster => &system_gamemaster,
             SystemName::ExitAction => &system_exit_action,
             SystemName::MovingPlatform => &system_moving_platform,
             SystemName::StopAction => &system_stop_action,
