@@ -1,3 +1,5 @@
+use ogc_rs::println;
+use ogc_rs::print;
 use crate::game_state::GameState;
 use crate::game_state::components::motion::Velocity;
 use crate::game_state::components::controller_assignment::ControllerAssignment;
@@ -5,6 +7,9 @@ use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
 use crate::game_state::changes::controls::Direction;
+use crate::game_state::components::physics::SphereCollider;
+
+
 
 /**
  * Stop the game from running if the home buttons is pressed.
@@ -49,6 +54,22 @@ pub fn system_shake_action(state: &mut GameState) {
                         Direction::Yp => velocity.z += c,
                         Direction::Yn => velocity.z -= c,
                     };
+                }
+            }
+        }
+    }
+}
+
+pub fn system_control_potato(state: &mut GameState) {
+    for (_id, (obj, controller_id)) in state.world.query_mut::<(&mut SphereCollider, & ControllerAssignment)>() {
+        let controller_state = state.changes.controls.get_wii_mote_control(controller_id);
+        match &controller_state.motion {
+            None => (),
+            Some(motion) => {
+                println!("testtesttest");
+                if motion.started {
+                    let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
+                    server_provider.render_server.apply_movement(obj, motion.direction)
                 }
             }
         }

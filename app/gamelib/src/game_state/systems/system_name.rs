@@ -24,6 +24,7 @@ pub enum SystemName {
     RenderMeshes,
     RegisterCollider,
     PhysicsToPosition,
+    PatatoControl,
 }
 
 impl SystemName {
@@ -42,6 +43,7 @@ impl SystemName {
             SystemName::PlayAudio => &system_play_audio,
             SystemName::RenderMeshes => &system_render_meshes,
             SystemName::PhysicsToPosition => &system_physics_to_position,
+            SystemName::PatatoControl => &system_control_potato
         }
     }
 }

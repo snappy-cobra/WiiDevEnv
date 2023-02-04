@@ -67,11 +67,11 @@ impl Joint {
 pub struct Connection(TPE_Connection);
 
 impl Connection {
-    pub fn new(joint1_index: u8, joint2_index: u8, length: u16) -> Self {
+    pub fn new(joint1_index: u8, joint2_index: u8, length: f32) -> Self {
         Connection(TPE_Connection {
             joint1: joint1_index,
             joint2: joint2_index,
-            length,
+            length: (length / 512.0) as u16,
         })
     }
 }
