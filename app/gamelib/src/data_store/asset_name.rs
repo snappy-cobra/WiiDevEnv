@@ -15,6 +15,9 @@ pub enum AssetName {
     HandFist,
     Plate,
     FryPan,
+    OilBubble,
+    OilSea,
+    SweetPotato,
     CubeTexture,
     TriangleTexture,
     SuzanneTexture,
@@ -28,6 +31,9 @@ pub enum AssetName {
     HandThreeTexture,
     HandFistTexture,
     FryPanTexture,
+    OilBubbleTexture,
+    OilSeaTexture,
+    SweetPotatoTexture,
 }
 
 impl AssetName {
@@ -56,6 +62,9 @@ impl AssetName {
             AssetName::HandFist => include_bytes!("data/Hand/Hand_fist.obj"), 
             AssetName::HandHolding => include_bytes!("data/Hand/Hand_holding.obj"),
             AssetName::FryPan => include_bytes!("data/FryPan.obj"),
+            AssetName::OilBubble => include_bytes!("data/OilBubble.obj"),
+            AssetName::OilSea => include_bytes!("data/OilSea.obj"),
+            AssetName::SweetPotato => include_bytes!("data/SweetPotato.obj"),
             AssetName::HandOne => include_bytes!("data/Hand/Hand_one.obj"),
             AssetName::HandTwo => include_bytes!("data/Hand/Hand_two.obj"),
             AssetName::HandThree => include_bytes!("data/Hand/Hand_three.obj"),
@@ -66,6 +75,9 @@ impl AssetName {
             AssetName::HandTwoTexture => include_bytes!("data/Hand/Hand_two.png"),
             AssetName::HandThreeTexture => include_bytes!("data/Hand/Hand_three.png"),
             AssetName::FryPanTexture => include_bytes!("data/FryPan.png"),
+            AssetName::OilBubbleTexture => include_bytes!("data/OilBubble.png"),
+            AssetName::OilSeaTexture => include_bytes!("data/OilSea.png"),
+            AssetName::SweetPotatoTexture => include_bytes!("data/SweetPotato.png"),
         }
     }
 }
