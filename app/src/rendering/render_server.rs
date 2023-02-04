@@ -9,6 +9,7 @@ use gamelib::game_state::changes::controls::Direction;
 use gamelib::game_state::components::motion::Rotation;
 use gamelib::game_state::components::physics::SphereCollider;
 use gamelib::game_state::components::render::MeshInstance;
+use gamelib::game_states::GameStateName;
 use gamelib::{
     game_state::components::motion::Position, game_state::components::motion::Velocity,
     game_state::GameState, servers::renderer::RenderServer,
@@ -69,7 +70,7 @@ impl WiiRenderServer {
             GRRLIB_Settings.antialias = true;
 
             GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
-            GRRLIB_Camera3dSettings(0.0, 40.0, 10.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+            GRRLIB_Camera3dSettings(0.0, 35.0, 10.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
         }
     }
 
@@ -240,7 +241,7 @@ impl RenderServer for WiiRenderServer {
 
     fn world_step(&mut self) {
         for body in self.world_wrapper.bodies_iter() {
-            plate_height = 0.0;
+            let plate_height = 0.0;
             let pos = body.center_of_mass();
             let distance_from_center = pos.0 * pos.0 + pos.2 * pos.2;
             let max_dis_from_center = 11.0;
@@ -317,5 +318,9 @@ impl RenderServer for WiiRenderServer {
             // },
         };
         body.accelerate(rotation);
+    }
+
+    fn reset_world(&mut self) {
+        self.world_wrapper = WorldWrapper::new();
     }
 }

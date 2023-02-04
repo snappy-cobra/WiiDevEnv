@@ -4,6 +4,8 @@ use ogc_rs::prelude::Vec;
 #[cfg(not(feature = "wii"))]
 use std::vec::Vec;
 use crate::game_state::changes::controls::Direction;
+use crate::game_state::GameState;
+use crate::game_states::GameStateName;
 
 /**
  * Simple trait for implementing the wii specific renderer.
@@ -16,4 +18,5 @@ pub trait RenderServer {
     fn world_step(&mut self);
     fn physics_to_position(&mut self, temp: &mut Vec<(&mut SphereCollider, &mut Position, &mut Rotation)>);
     fn apply_movement(&mut self, obj: &SphereCollider, dir: Direction);
+    fn reset_world(&mut self);
 }

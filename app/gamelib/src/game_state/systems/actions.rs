@@ -8,7 +8,8 @@ use rand::RngCore;
 use rand::SeedableRng;
 use crate::game_state::changes::controls::Direction;
 use crate::game_state::components::physics::SphereCollider;
-
+use crate::game_state::systems::system_name::SystemName::BounceBounds;
+use crate::game_states::GameStateName;
 
 
 /**
@@ -71,6 +72,17 @@ pub fn system_control_potato(state: &mut GameState) {
                     server_provider.render_server.apply_movement(obj, motion.direction)
                 }
             }
+        }
+    }
+}
+
+pub fn system_reset_level(state: &mut GameState) {
+    for wii_mote_control in state.changes.controls.wii_mote_controls.iter() {
+        if wii_mote_control.one_button_down {
+            println!("RESETTTTT");
+            let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
+            server_provider.render_server.reset_world();
+            state.next_state = Some(GameStateName::BouncingCubes);
         }
     }
 }
