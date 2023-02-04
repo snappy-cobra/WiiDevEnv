@@ -13,4 +13,5 @@ pub trait RenderServer {
     fn render_frame(&mut self);
     fn register_collider(&mut self, colliders: &mut Vec::<&mut SphereCollider>);
     fn world_step(&mut self);
+    fn physics_to_position(&mut self, temp: &mut Vec<(&mut SphereCollider, &mut Position)>);
 }

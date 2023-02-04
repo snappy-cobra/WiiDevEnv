@@ -1,4 +1,5 @@
 use hecs::World;
+use num::ToPrimitive;
 
 use crate::data_store::asset_name::AssetName;
 use crate::game_state::GameState;
@@ -13,6 +14,7 @@ use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
 use crate::game_state::components::physics::SphereCollider;
+use crate::game_state::components::controller_assignment::ControllerAssignment;
 
 /**
  * Build the bouncing cubes game state.
@@ -21,13 +23,15 @@ pub fn build() -> GameState {
     let mut state = GameState::new();
     state.add_system(SystemName::PlayAudio);
     state.add_system(SystemName::ExitAction);
-    state.add_system(SystemName::StopAction);
-    state.add_system(SystemName::ShakeAction);
-    state.add_system(SystemName::IntegrateMotion);
-    state.add_system(SystemName::BounceBounds);
-    state.add_system(SystemName::RenderMeshes);
     state.add_system(SystemName::RegisterCollider);
-    batch_spawn_entities(&mut state.world, 10);
+    state.add_system(SystemName::StopAction);
+    // state.add_system(SystemName::ShakeAction);
+    // state.add_system(SystemName::IntegrateMotion);
+    // state.add_system(SystemName::BounceBounds);
+    state.add_system(SystemName::PhysicsToPosition);
+    state.add_system(SystemName::RenderMeshes);
+
+    batch_spawn_entities(&mut state.world, 8);
     spawn_main_music(&mut state.world);
     
     state.add_system(SystemName::DebugPhysics);
@@ -62,8 +66,12 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
             y: small_rng.next_u32() as f32 / u32::MAX as f32 * 0.1,
             z: small_rng.next_u32() as f32 / u32::MAX as f32 * 0.1,
         };
-        let mesh_instance = MeshInstance { model_name: TexturedModelName::Suzanne };
-        let sphere_collider = SphereCollider{radius: 10.0, gravity: true, body_index: 0, has_been_registered: false};
-        world.spawn((mesh_instance, position, velocity, sphere_collider));
+
+        let mesh_instance = MeshInstance { model_name: TexturedModelName::Potato };
+        let sphere_collider = SphereCollider{radius: 1.0, gravity: true, body_index: 0, has_been_registered: false};
+        let controller_assignment = ControllerAssignment{
+            id: small_rng.next_u32().to_usize().unwrap()%4,
+        };
+        world.spawn((mesh_instance, position, velocity, sphere_collider, controller_assignment));
     }
 }
