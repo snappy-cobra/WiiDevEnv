@@ -226,6 +226,10 @@ impl WorldWrapper {
     pub fn get_body(&mut self, body_index: usize) -> &mut Body {
         &mut self.bodies_vec[body_index]
     }
+
+    pub fn bodies_iter(&mut self) -> impl Iterator<Item = &mut Body> {
+        self.bodies_vec.iter_mut()
+    }
 }
 
 #[cfg(test)]
