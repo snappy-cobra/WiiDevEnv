@@ -110,9 +110,35 @@ impl Body {
         Vec3::from_internal(unsafe { TPE_bodyGetCenterOfMass(&self.0) })
     }
 
-    // /// True if any forces are working on the body
+    /// True if any forces are working on the body
     pub fn is_active(&self) -> bool {
         unsafe { TPE_bodyIsActive(&self.0) != 0 }
+    }
+
+    /** Adds angular velocity to a soft body. The rotation vector specifies the axis
+        of rotation by its direction and angular velocity by its magnitude (magnitude
+        of 1.0 will add linear velocity of 2 PI
+        per tick to a point in the distance of 1.0 from the
+        rotation axis). */
+    pub fn spin(&mut self, rotation: Vec3) {
+        unsafe { TPE_bodySpin(&mut self.0, rotation.to_internal()) };
+    }
+
+    /// Similar to spin but around a different center
+    pub fn spin_with_center(&mut self, rotation: Vec3, center: Vec3) {
+        unsafe { TPE_bodySpinWithCenter(&mut self.0, rotation.to_internal(), center.to_internal()) };
+    }
+
+    /** Instantly rotates a body about an axis (see library conventions for
+    the rotation format). */
+    pub fn rotate_by_axis(&mut self, rotation: Vec3) {
+        unsafe { TPE_bodyRotateByAxis(&mut self.0, rotation.to_internal()) };
+    }
+
+    /// Gets rotation of body. Only works if there are at least three joints!
+    pub fn rotation(&self) -> Vec3 {
+        assert!(self.0.jointCount >= 3);
+        Vec3::from_internal(unsafe { TPE_bodyGetRotation(&self.0, 0, 1, 2) })
     }
 }
 
@@ -173,12 +199,16 @@ impl WorldWrapper {
 
     /// Add a body to the world.
     /// Removing a body (or altering its joints/connections) is intentionally not allowed
-    pub fn add_body(&mut self, joints: Vec<Joint>, connections: Vec<Connection>, mass: f32) {
+    ///
+    /// Returns the index that the body was added as
+    #[must_use]
+    pub fn add_body(&mut self, joints: Vec<Joint>, connections: Vec<Connection>, mass: f32) -> usize {
         let joints = self.joints_arena.alloc(joints);
         let connections = self.connections_arena.alloc(connections);
         let body = Body::new(joints, connections, mass);
         self.bodies_vec.push(body);
         self.fix_world_bodies_ptr();
+        self.bodies_vec.len() - 1
     }
 
     fn fix_world_bodies_ptr(&mut self) {
@@ -195,6 +225,10 @@ impl WorldWrapper {
     /// Access a single body so you can call body-mutating functions on it
     pub fn get_body(&mut self, body_index: usize) -> &mut Body {
         &mut self.bodies_vec[body_index]
+    }
+
+    pub fn bodies_iter(&mut self) -> impl Iterator<Item = &mut Body> {
+        self.bodies_vec.iter_mut()
     }
 }
 
