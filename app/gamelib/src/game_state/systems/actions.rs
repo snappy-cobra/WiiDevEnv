@@ -1,5 +1,6 @@
 use crate::game_state::GameState;
 use crate::game_state::components::motion::Velocity;
+use crate::game_state::components::controller_assignment::ControllerAssignment;
 use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
@@ -18,8 +19,9 @@ pub fn system_exit_action(state: &mut GameState) {
  * Sets all velocities to 0 if 'one' is pressed.
  */
 pub fn system_stop_action(state: &mut GameState) {
-    if state.changes.controls.wii_mote_controls[0].one_button_down {
-        for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
+    for (_id, (velocity, controller_id)) in state.world.query_mut::<(&mut Velocity, & ControllerAssignment)>() {
+        let controller_state = state.changes.controls.get_wii_mote_control(controller_id);
+        if controller_state.one_button_down {
             velocity.x = 0.0;
             velocity.y = 0.0;
             velocity.z = 0.0;
@@ -31,13 +33,14 @@ pub fn system_stop_action(state: &mut GameState) {
  * Checks if a motion has been made with controller One if this is the cases all velocities are increased in that direction.
  */
 pub fn system_shake_action(state: &mut GameState) {
-    match &state.changes.controls.wii_mote_controls[0].motion {
-        None => (),
-        Some(motion) => {
-            if motion.started {
-                let mut small_rng = SmallRng::seed_from_u64(10u64);
-                let c = small_rng.next_u32() as f32 / u32::MAX as f32 * 0.5 - 0.1;
-                for (_id, velocity) in state.world.query_mut::<&mut Velocity>() {
+    for (_id, (velocity, controller_id)) in state.world.query_mut::<(&mut Velocity, & ControllerAssignment)>() {
+        let controller_state = state.changes.controls.get_wii_mote_control(controller_id);
+        match &controller_state.motion {
+            None => (),
+            Some(motion) => {
+                if motion.started {
+                    let mut small_rng = SmallRng::seed_from_u64(10u64);
+                    let c = small_rng.next_u32() as f32 / u32::MAX as f32 * 0.5 - 0.1;
                     match motion.direction {
                         Direction::Zp => velocity.y += c,
                         Direction::Zn => velocity.y -= c,
