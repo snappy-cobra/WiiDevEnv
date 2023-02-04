@@ -2,6 +2,7 @@ use crate::game_state::GameState;
 use super::audio::system_play_audio;
 use super::motion::*;
 use super::actions::*;
+use super::gamemaster::*;
 use super::render::system_render_meshes;
 
 /**
@@ -11,6 +12,7 @@ use super::render::system_render_meshes;
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum SystemName {
     ExitAction,
+    MovingPlatform,
     StopAction,
     ShakeAction,
     IntegrateMotion,
@@ -24,6 +26,7 @@ impl SystemName {
     pub const fn to_function(&self) -> &'static dyn Fn(&mut GameState) {
         match self {
             SystemName::ExitAction => &system_exit_action,
+            SystemName::MovingPlatform => &system_moving_platform,
             SystemName::StopAction => &system_stop_action,
             SystemName::ShakeAction => &system_shake_action,
             SystemName::IntegrateMotion => &system_integrate_motion,

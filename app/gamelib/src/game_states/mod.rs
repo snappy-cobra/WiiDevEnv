@@ -1,6 +1,7 @@
 use crate::game_state::GameState;
 
 mod bouncing_cubes;
+mod moving_platform_test;
 
 /**
  * Enumerates all game states that exist in the project.
@@ -9,6 +10,7 @@ mod bouncing_cubes;
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum GameStateName {
     BouncingCubes,
+    MovingPlatform,
 }
 
 /**
@@ -19,6 +21,7 @@ impl GameStateFactory {
     pub fn to_state(name: GameStateName) -> GameState {
         match name {
             GameStateName::BouncingCubes => bouncing_cubes::build(),
+            GameStateName::MovingPlatform => moving_platform_test::build(),
         }
     }
 }
