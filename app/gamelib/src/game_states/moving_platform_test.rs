@@ -4,6 +4,7 @@ use num::ToPrimitive;
 use crate::data_store::asset_name::AssetName;
 use crate::game_state::GameState;
 use crate::game_state::components::audio::Audio;
+use crate::game_state::components::game::*;
 use crate::game_state::components::motion::{Position, Velocity};
 use crate::game_state::components::render::MeshInstance;
 use crate::game_state::systems::system_name::SystemName;
@@ -21,6 +22,7 @@ pub fn build() -> GameState {
     let mut state = GameState::new();
     state.add_system(SystemName::RenderMeshes);
     state.add_system(SystemName::MovingPlatform);
+    state.add_system(SystemName::GameMaster);
     batch_spawn_entities(&mut state.world, 10);
     return state;
 }
@@ -36,9 +38,14 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         y: 0.0,
         z: 0.0,
     };
+    let animation = Animation {
+        duration: 2.0,
+        past_time: 0.0,
+        animation_type: AnimationType::Test,
+        on_animation_finish: OnAnimationFinish::Despawn,
+    };
     let mesh_instance = MeshInstance { model_name: TexturedModelName::Plate };
-
-
-    world.spawn((position, mesh_instance));
+    
+    world.spawn((position, animation, mesh_instance));
 
 }
