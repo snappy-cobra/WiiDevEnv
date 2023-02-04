@@ -68,7 +68,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
             z: small_rng.next_u32() as f32 / u32::MAX as f32 * 0.1,
         };
         let rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
-
+        
         let mesh_instance = MeshInstance { model_name: TexturedModelName::Potato };
         let sphere_collider = SphereCollider{radius: 1.0, gravity: true, body_index: 0, has_been_registered: false};
         let controller_assignment = ControllerAssignment{
@@ -76,4 +76,12 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         };
         world.spawn((mesh_instance, position, velocity, rotation, sphere_collider, controller_assignment));
     }
+    let plate_mesh = MeshInstance { model_name: TexturedModelName::Plate };
+    let plate_position = Position{
+        x: 0.0,
+        y: 10.0,
+        z: 0.0,
+    };
+    let plate_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
+    world.spawn((plate_mesh, plate_position, plate_rotation));
 }

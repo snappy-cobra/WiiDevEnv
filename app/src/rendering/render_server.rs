@@ -221,9 +221,7 @@ impl RenderServer for WiiRenderServer {
                     Connection::new(1, 2, 0.5),
                 ];
 
-                collider.body_index =
-                    self.world_wrapper
-                        .add_body(joints, connections, collider.radius);
+                collider.body_index = self.world_wrapper.add_body(joints, connections, 10.0);
                 let body = self.world_wrapper.get_body(collider.body_index);
                 body.move_by(Vec3(
                     collider.body_index as f32 * 0.5,
@@ -237,7 +235,7 @@ impl RenderServer for WiiRenderServer {
 
     fn world_step(&mut self) {
         for body in self.world_wrapper.bodies_iter() {
-            body.apply_gravity(1.0 / 100.0)
+            body.apply_gravity(1.0 / 200.0)
         }
         self.world_wrapper.step();
     }
@@ -263,39 +261,42 @@ impl RenderServer for WiiRenderServer {
 
     fn apply_movement(&mut self, obj: &SphereCollider, dir: Direction) {
         let body = self.world_wrapper.get_body(obj.body_index);
+        let move_magnitude = 0.5;
+        let move_help_jump_magnitude = 0.1;
+        let jump_magnitude = 0.5;
+        let jump_down_magnitude = 0.2;
         let rotation = match dir {
             Direction::Xp => Vec3 {
-                0: 1.0,
-                1: 0.0,
+                0: -move_magnitude,
+                1: move_help_jump_magnitude,
                 2: 0.0,
             },
             Direction::Xn => Vec3 {
-                0: -1.0,
-                1: 0.0,
+                0: move_magnitude,
+                1: move_help_jump_magnitude,
                 2: 0.0,
             },
             Direction::Yp => Vec3 {
                 0: 0.0,
-                1: 1.0,
-                2: 0.0,
+                1: move_help_jump_magnitude,
+                2: move_magnitude,
             },
             Direction::Yn => Vec3 {
                 0: 0.0,
-                1: -1.0,
-                2: 0.0,
+                1: move_help_jump_magnitude,
+                2: -move_magnitude,
             },
             Direction::Zp => Vec3 {
                 0: 0.0,
-                1: 0.0,
-                2: 1.0,
+                1: jump_magnitude,
+                2: 0.0,
             },
             Direction::Zn => Vec3 {
                 0: 0.0,
-                1: 0.0,
-                2: -1.0,
+                1: -jump_down_magnitude,
+                2: 0.0,
             },
         };
-        println!("nananan");
         body.accelerate(rotation);
     }
 }

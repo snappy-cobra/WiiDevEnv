@@ -66,7 +66,6 @@ pub fn system_control_potato(state: &mut GameState) {
         match &controller_state.motion {
             None => (),
             Some(motion) => {
-                println!("testtesttest");
                 if motion.started {
                     let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
                     server_provider.render_server.apply_movement(obj, motion.direction)
