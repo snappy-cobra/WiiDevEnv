@@ -7,9 +7,11 @@ pub enum AssetName {
     Cube,
     Suzanne,
     Triangle,
+    Potato,
     CubeTexture,
     TriangleTexture,
     SuzanneTexture,
+    PotatoTexture,
     DemoMusic,
     BoingSFX
 }
@@ -24,9 +26,11 @@ impl AssetName {
             AssetName::Cube => include_bytes!("data/Cube.obj"),
             AssetName::Suzanne => include_bytes!("data/Suz.obj"),
             AssetName::Triangle => include_bytes!("data/Tri.obj"),
+            AssetName::Potato => include_bytes!("data/Potato.obj"),
             AssetName::CubeTexture => include_bytes!("data/Cube.png"),
             AssetName::TriangleTexture => include_bytes!("data/Tri.png"),
             AssetName::SuzanneTexture => include_bytes!("data/Suz.png"),
+            AssetName::PotatoTexture => include_bytes!("data/Potato.png"),
             AssetName::DemoMusic => include_bytes!("data/DemoMusic.ogg"),
             AssetName::BoingSFX => include_bytes!("data/Boing.ogg"),
         }
