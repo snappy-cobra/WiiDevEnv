@@ -14,6 +14,7 @@ use super::gamemaster::*;
 pub enum SystemName {
     DebugPhysics,
     GameMaster,
+    CameraUpdate,
     ExitAction,
     MovingPlatform,
     StopAction,
@@ -34,6 +35,7 @@ impl SystemName {
         match self {
             SystemName::DebugPhysics => &system_render_debug_physics,
             SystemName::GameMaster => &system_gamemaster,
+            SystemName::CameraUpdate => &system_camera_update,
             SystemName::ExitAction => &system_exit_action,
             SystemName::MovingPlatform => &system_moving_platform,
             SystemName::StopAction => &system_stop_action,

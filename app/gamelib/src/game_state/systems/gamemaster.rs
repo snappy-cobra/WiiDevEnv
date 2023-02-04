@@ -16,9 +16,15 @@ pub fn system_moving_platform(state: &mut GameState) {
 }
 
 pub fn system_gamemaster(state: &mut GameState) {
-    system_animation(state)
+    system_animation(state);
+    system_camera_movement(state);
 }
 
+pub fn system_camera_movement(state: &mut GameState) {
+    for (id, (pos, camera)) in state.world.query_mut::<(&mut Position, &mut Camera)>() {
+        pos.y -= state.changes.delta_time.as_secs_f32();
+    }
+}
 
 pub fn system_animation(state: &mut GameState) {
     let mut to_remove: Vec<Entity> = Vec::new();
@@ -35,6 +41,10 @@ pub fn system_animation(state: &mut GameState) {
                 pos.y += state.changes.delta_time.as_secs_f32();
                 pos.z += state.changes.delta_time.as_secs_f32();
             }
+            AnimationType::Bubble => {
+                pos.x += state.changes.delta_time.as_secs_f32();
+                pos.y += state.changes.delta_time.as_secs_f32();
+                pos.z += state.changes.delta_time.as_secs_f32();            }
         }
         
         if (animation.past_time >= animation.duration) {

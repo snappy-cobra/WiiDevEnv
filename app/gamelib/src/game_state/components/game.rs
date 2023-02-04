@@ -2,6 +2,18 @@
 pub struct Platform {
 }
 
+pub struct Camera {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+    pub up_x: f32,
+    pub up_y: f32,
+    pub up_z: f32,
+    pub lookat_x: f32,
+    pub lookat_y: f32,
+    pub lookat_z: f32,
+}
+
 pub enum OnAnimationFinish {
     Despawn,
     Repeat,
@@ -14,6 +26,7 @@ pub enum OnAnimationFinish {
 pub enum AnimationType {
     None,
     Test,
+    Bubble,
 }
 
 pub struct Animation {
