@@ -5,12 +5,14 @@ use super::textured_model::TexturedModel;
 use alloc::vec;
 use gamelib::data_store::asset_name::AssetName;
 use gamelib::data_store::textured_model_name::TexturedModelName;
+use gamelib::game_state::components::motion::Rotation;
 use gamelib::game_state::components::physics::SphereCollider;
 use gamelib::game_state::components::render::MeshInstance;
 use gamelib::{
     game_state::components::motion::Position, game_state::components::motion::Velocity,
     game_state::GameState, servers::renderer::RenderServer,
 };
+
 use grrustlib::*;
 use hecs::*;
 use libc::c_void;
@@ -66,11 +68,17 @@ impl WiiRenderServer {
     }
 
     /// Render a single entity
-    fn render_entity(&mut self, model_name: &TexturedModelName, position: &Position) {
+    fn render_entity(
+        &mut self,
+        model_name: &TexturedModelName,
+        position: &Position,
+        rotation: &Rotation,
+    ) {
         unsafe {
             GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
             GRRLIB_ObjectView(
-                position.x, position.y, position.z, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+                position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, 1.0, 1.0,
+                1.0,
             );
             self.render_textured_model(model_name);
         }
@@ -168,9 +176,9 @@ impl RenderServer for WiiRenderServer {
      * Render all given meshes.
      * As part of this, refreshes the graphics buffer and wait for the next frame.
      */
-    fn render_meshes(&mut self, meshes: Vec<(&MeshInstance, &Position)>) {
-        for (mesh_instance, position) in meshes {
-            self.render_entity(&mesh_instance.model_name, position);
+    fn render_meshes(&mut self, meshes: Vec<(&MeshInstance, &Position, &Rotation)>) {
+        for (mesh_instance, position, rotation) in meshes {
+            self.render_entity(&mesh_instance.model_name, position, rotation);
         }
     }
 
@@ -220,12 +228,22 @@ impl RenderServer for WiiRenderServer {
         self.world_wrapper.step();
     }
 
-    fn physics_to_position(&mut self, objs: &mut Vec<(&mut SphereCollider, &mut Position)>) {
-        for (col, pos) in objs.iter_mut() {
+    fn physics_to_position(
+        &mut self,
+        objs: &mut Vec<(&mut SphereCollider, &mut Position, &mut Rotation)>,
+    ) {
+        for (col, pos, rot) in objs.iter_mut() {
             let body = self.world_wrapper.get_body(col.body_index);
-            pos.x = body.center_of_mass().0;
-            pos.y = body.center_of_mass().1;
-            pos.z = body.center_of_mass().2;
+            let center_of_mass = body.center_of_mass();
+            pos.x = center_of_mass.0;
+            pos.y = center_of_mass.1;
+            pos.z = center_of_mass.2;
+
+            let rotation = body.rotation();
+
+            rot.x = rotation.0;
+            rot.y = rotation.1;
+            rot.z = rotation.2;
         }
     }
 }
