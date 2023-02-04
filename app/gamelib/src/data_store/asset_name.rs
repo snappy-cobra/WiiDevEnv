@@ -14,6 +14,7 @@ pub enum AssetName {
     HandThree,
     HandFist,
     Plate,
+    FryPan,
     CubeTexture,
     TriangleTexture,
     SuzanneTexture,
@@ -26,6 +27,7 @@ pub enum AssetName {
     HandTwoTexture,
     HandThreeTexture,
     HandFistTexture,
+    FryPanTexture,
 }
 
 impl AssetName {
@@ -53,14 +55,17 @@ impl AssetName {
             AssetName::HandThree => include_bytes!("data/Hand/Hand_three.obj"),
             AssetName::HandFist => include_bytes!("data/Hand/Hand_fist.obj"), 
             AssetName::HandHolding => include_bytes!("data/Hand/Hand_holding.obj"),
+            AssetName::FryPan => include_bytes!("data/Hand/FryPan.obj"),
             AssetName::HandOne => include_bytes!("data/Hand/Hand_one.obj"),
             AssetName::HandTwo => include_bytes!("data/Hand/Hand_two.obj"),
+            AssetName::HandThree => include_bytes!("data/Hand/Hand_three.obj"),
             AssetName::HandThree => include_bytes!("data/Hand/Hand_three.obj"),
             AssetName::HandFistTexture => include_bytes!("data/Hand/Hand_fist.png"),
             AssetName::HandHoldingTexture => include_bytes!("data/Hand/Hand_holding.png"),
             AssetName::HandOneTexture => include_bytes!("data/Hand/Hand_one.png"),
             AssetName::HandTwoTexture => include_bytes!("data/Hand/Hand_two.png"),
             AssetName::HandThreeTexture => include_bytes!("data/Hand/Hand_three.png"),
+            AssetName::FryPanTexture => include_bytes!("data/Hand/FryPan.png"),
         }
     }
 }
