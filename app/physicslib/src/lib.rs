@@ -173,12 +173,16 @@ impl WorldWrapper {
 
     /// Add a body to the world.
     /// Removing a body (or altering its joints/connections) is intentionally not allowed
-    pub fn add_body(&mut self, joints: Vec<Joint>, connections: Vec<Connection>, mass: f32) {
+    ///
+    /// Returns the index that the body was added as
+    #[must_use]
+    pub fn add_body(&mut self, joints: Vec<Joint>, connections: Vec<Connection>, mass: f32) -> usize {
         let joints = self.joints_arena.alloc(joints);
         let connections = self.connections_arena.alloc(connections);
         let body = Body::new(joints, connections, mass);
         self.bodies_vec.push(body);
         self.fix_world_bodies_ptr();
+        self.bodies_vec.len() - 1
     }
 
     fn fix_world_bodies_ptr(&mut self) {
