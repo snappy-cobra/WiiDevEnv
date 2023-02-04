@@ -16,7 +16,9 @@ use hecs::*;
 use libc::c_void;
 use ogc_rs::prelude::Vec;
 use ogc_rs::{print, println};
-use physicslib::{Joint, TPE_Body, TPE_Joint, TPE_World, TPE_worldInit, Vec3, WorldWrapper};
+use physicslib::{
+    Connection, Joint, TPE_Body, TPE_Joint, TPE_World, TPE_worldInit, Vec3, WorldWrapper,
+};
 use wavefront::{Obj, Vertex};
 
 /// Representation of the graphics rendering subsystem of the device
@@ -185,8 +187,21 @@ impl RenderServer for WiiRenderServer {
         // TODO: make this not happen every iteration
         for collider in colliders.iter_mut() {
             if !collider.has_been_registered {
-                let mut joints = vec![Joint::new(Vec3(0.0, 8.0, 0.0), 1.0)];
-                collider.body_index = self.world_wrapper.add_body(joints, vec![], collider.radius);
+                /// POOTAATOO
+                let joints = vec![
+                    Joint::new(Vec3(-0.3, 8.0, 0.0), 0.4),
+                    Joint::new(Vec3(0.0, 8.0, 0.0), 1.0),
+                    Joint::new(Vec3(0.3, 8.0, 0.0), 0.5),
+                ];
+                let connections = vec![
+                    Connection::new(0, 1, 0.5),
+                    Connection::new(0, 2, 0.5),
+                    Connection::new(1, 2, 0.5),
+                ];
+
+                collider.body_index =
+                    self.world_wrapper
+                        .add_body(joints, connections, collider.radius);
                 let body = self.world_wrapper.get_body(collider.body_index);
                 body.move_by(Vec3(
                     collider.body_index as f32 * 0.5,
