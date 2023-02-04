@@ -171,6 +171,8 @@ impl WorldWrapper {
         }
     }
 
+    /// Add a body to the world.
+    /// Removing a body (or altering its joints/connections) is intentionally not allowed
     pub fn add_body(&mut self, joints: Vec<Joint>, connections: Vec<Connection>, mass: f32) {
         let joints = self.joints_arena.alloc(joints);
         let connections = self.connections_arena.alloc(connections);
@@ -185,8 +187,14 @@ impl WorldWrapper {
         self.world.0.bodyCount = self.bodies_vec.len() as u16;
     }
 
+    /// Simulate one step of the world physics
     pub fn step(&mut self) {
         self.world.step();
+    }
+
+    /// Access a single body so you can call body-mutating functions on it
+    pub fn get_body(&mut self, body_index: usize) -> &mut Body {
+        &mut self.bodies_vec[body_index]
     }
 }
 
