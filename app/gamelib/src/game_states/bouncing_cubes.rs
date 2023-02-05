@@ -125,7 +125,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     world.spawn((oil_mesh, oil_position, oil_rotation));
 
 
-    for index in 0..40 {
+    for index in 0..20 {
         let bubble_mesh = MeshInstance { model_name: TexturedModelName::OilBubble };
         let x = (small_rng.next_u32() as f32 / u32::MAX as f32 - 0.5) * 40.0;
         let z = (small_rng.next_u32() as f32 / u32::MAX as f32 - 0.5) * 40.0;
@@ -136,8 +136,8 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
             z: z,
         };
         let bubble_animation = Animation {
-            duration: 2.0,
-            past_time: small_rng.next_u32() as f32 / u32::MAX as f32 * 0.5,
+            duration: small_rng.next_u32() as f32 / u32::MAX as f32 * 2.0,
+            past_time: small_rng.next_u32() as f32 / u32::MAX as f32 * 2.0,
             animation_type: AnimationType::Bubble,
             on_animation_finish: OnAnimationFinish::RepeatBubble,
             target_x: x,

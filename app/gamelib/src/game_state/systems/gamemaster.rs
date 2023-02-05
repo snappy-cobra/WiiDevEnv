@@ -8,10 +8,6 @@ use alloc::vec;
 use hecs::{DynamicBundle, Entity, Component};
 use ogc_rs::print;
 
-use rand::rngs::SmallRng;
-use rand::RngCore;
-use rand::SeedableRng;
-
 /**
  * Move the Platform.
  */
@@ -59,11 +55,12 @@ pub fn system_animation(state: &mut GameState) {
                     pos.z = animation.target_z; 
                 }
                 OnAnimationFinish::RepeatBubble => { 
-                    let mut small_rng = SmallRng::seed_from_u64(pos.x as u64);
+
                     animation.past_time -= animation.duration; 
-                    pos.x = (small_rng.next_u32() as f32 / u32::MAX as f32 - 0.5) * 40.0; 
+                    let tmp = pos.x;
+                    pos.x = pos.z; 
                     pos.y = animation.target_y; 
-                    pos.z = (small_rng.next_u32() as f32 / u32::MAX as f32 - 0.5) * 40.0; 
+                    pos.z = tmp; 
                 }
                 OnAnimationFinish::Despawn => { to_remove.push(id) }
                 OnAnimationFinish::Hand2 => { 

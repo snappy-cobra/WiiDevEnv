@@ -17,6 +17,7 @@ use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
 
+
 /**
  * Build the bouncing cubes game state.
  */
