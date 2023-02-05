@@ -28,6 +28,9 @@ pub enum AnimationType {
     None,
     Test,
     Bubble,
+    HandIn,
+    Hand,
+    HandOut,
 }
 
 pub struct Animation {

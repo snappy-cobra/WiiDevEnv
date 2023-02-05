@@ -68,7 +68,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     };
     world.spawn((camera, cam_position));
 
-
+    // Potato's
     let mut small_rng = SmallRng::seed_from_u64(10u64);
     for index in 0..n {
         const ROW_WIDTH: i32 = 10;
@@ -95,6 +95,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         world.spawn((mesh_instance, position, velocity, rotation, sphere_collider, controller_assignment));
     }
 
+    // Plate
     let plate_mesh = MeshInstance { model_name: TexturedModelName::Plate };
     let plate_position = Position{
         x: 0.0,
@@ -114,7 +115,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     let fry_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
     world.spawn((fry_mesh, fry_position, fry_rotation));
 
-
+    // Oil
     let oil_mesh = MeshInstance { model_name: TexturedModelName::OilSea };
     let oil_position = Position{
         x: 0.0,
@@ -125,6 +126,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     world.spawn((oil_mesh, oil_position, oil_rotation));
 
 
+    // OilBubble
     for index in 0..20 {
         let bubble_mesh = MeshInstance { model_name: TexturedModelName::OilBubble };
         let x = (small_rng.next_u32() as f32 / u32::MAX as f32 - 0.5) * 40.0;
@@ -147,4 +149,23 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         let bubble_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
         world.spawn((bubble_mesh, bubble_position, bubble_animation, bubble_rotation));
     }
+
+    // HAND
+    let hand_mesh = MeshInstance { model_name: TexturedModelName::HandThree };
+    let hand_position = Position{
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
+    let hand_animation = Animation {
+        duration: 1.5,
+        past_time: 0.0,
+        animation_type: AnimationType::HandIn,
+        on_animation_finish: OnAnimationFinish::Hand2,
+        target_x: 0.0,
+        target_y: 10.0,
+        target_z: 10.0,
+    };
+    let hand_rotation = Rotation { x: 0.0, y: 90.0, z: 0.0 };
+    world.spawn((hand_mesh, hand_position, hand_animation, hand_rotation));
 }
