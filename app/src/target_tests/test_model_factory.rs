@@ -19,14 +19,14 @@ fn test_textured_cube() {
     let textured_model = factory.get_model(&TexturedModelName::Cube).unwrap();
 
     // Check if the attributes are non-empty and of the right size
-    assert!(textured_model.model.positions.len() > 0);
+    assert!(!textured_model.model.positions.is_empty());
     assert!(textured_model.model.positions.len() % 3 == 0);
     assert!(textured_model.model.tex_coords.len() > 0);
     assert!(textured_model.model.tex_coords.len() % 2 == 0);
 
     // Check if the indexes are non-empty and of the same size
-    assert!(textured_model.model.position_indices.len() > 0);
-    assert!(textured_model.model.tex_coord_indices.len() > 0);
+    assert!(!textured_model.model.position_indices.is_empty());
+    assert!(!textured_model.model.tex_coord_indices.is_empty());
     assert!(
         textured_model.model.position_indices.len() == textured_model.model.tex_coord_indices.len()
     );

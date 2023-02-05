@@ -21,9 +21,13 @@ pub fn system_gamemaster(state: &mut GameState) {
 }
 
 pub fn system_camera_movement(state: &mut GameState) {
-    for (id, (pos, camera)) in state.world.query_mut::<(&mut Position, &mut Camera)>() {
+    for (_id, (_pos, _camera)) in state.world.query_mut::<(&mut Position, &mut Camera)>() {
         // pos.y -= state.changes.delta_time.as_secs_f32();
     }
+}
+
+pub fn lerp(a: f32, b: f32, t:f32) -> f32 {
+    return a + (b-a) * t; 
 }
 
 pub fn system_animation(state: &mut GameState) {
@@ -42,6 +46,15 @@ pub fn system_animation(state: &mut GameState) {
                 pos.z += state.changes.delta_time.as_secs_f32();
             }
             AnimationType::Bubble => {
+                pos.y += state.changes.delta_time.as_secs_f32();
+            }
+            AnimationType::HandIn | AnimationType::HandOut => {
+                let mut t = animation.past_time / animation.duration;
+                pos.x = lerp(pos.x, animation.target_x, t);
+                pos.y = lerp(pos.y, animation.target_y, t);
+                pos.z = lerp(pos.z, animation.target_z, t);
+            }
+            AnimationType::Hand => {
                 pos.y += state.changes.delta_time.as_secs_f32();
             }
         }
@@ -66,17 +79,17 @@ pub fn system_animation(state: &mut GameState) {
                 OnAnimationFinish::Hand2 => { 
                     print!("switch to hand 2");
                     let hand_position = Position {
-                        x: 0.0, y: 0.0, z: 0.0,
+                        x: animation.target_x, y: animation.target_y, z: animation.target_z,
                     };
                     let hand_rotation = Rotation {
                         x: 0.0, y: 90.0, z: 0.0,
                     };
                     let hand_animation = Animation {
-                        duration: 2.0,
+                        duration: 1.0,
                         past_time: 0.0,
                         animation_type: AnimationType::None,
-                        on_animation_finish: OnAnimationFinish::Start,
-                        target_x: 0.0, target_y: 0.0, target_z: 0.0, 
+                        on_animation_finish: OnAnimationFinish::Hand1,
+                        target_x: pos.x, target_y: pos.y, target_z: pos.z, 
                     };
                     let hand_mesh_instance = MeshInstance { model_name: TexturedModelName::HandTwo };
                     to_add.push((hand_position, hand_rotation, hand_animation, hand_mesh_instance)); 
@@ -86,17 +99,17 @@ pub fn system_animation(state: &mut GameState) {
                 OnAnimationFinish::Hand1 => { 
                     print!("switch to hand 1");
                     let hand_position = Position {
-                        x: 0.0, y: 0.0, z: 0.0,
+                        x: animation.target_x, y: animation.target_y, z: animation.target_z,
                     };
                     let hand_rotation = Rotation {
                         x: 0.0, y: 90.0, z: 0.0,
                     };
                     let hand_animation = Animation {
-                        duration: 2.0,
+                        duration: 1.0,
                         past_time: 0.0,
                         animation_type: AnimationType::None,
-                        on_animation_finish: OnAnimationFinish::Start,
-                        target_x: 0.0, target_y: 0.0, target_z: 0.0, 
+                        on_animation_finish: OnAnimationFinish::Hand0,
+                        target_x: pos.x, target_y: pos.y, target_z: pos.z, 
                     };
                     let hand_mesh_instance = MeshInstance { model_name: TexturedModelName::HandOne };
                     to_add.push((hand_position, hand_rotation, hand_animation, hand_mesh_instance)); 
@@ -106,17 +119,17 @@ pub fn system_animation(state: &mut GameState) {
                 OnAnimationFinish::Hand0 => { 
                     print!("switch to hand 0");
                     let hand_position = Position {
-                        x: 0.0, y: 0.0, z: 0.0,
+                        x: animation.target_x, y: animation.target_y, z: animation.target_z,
                     };
                     let hand_rotation = Rotation {
                         x: 0.0, y: 90.0, z: 0.0,
                     };
                     let hand_animation = Animation {
-                        duration: 2.0,
+                        duration: 0.5,
                         past_time: 0.0,
-                        animation_type: AnimationType::None,
+                        animation_type: AnimationType::HandOut,
                         on_animation_finish: OnAnimationFinish::Start,
-                        target_x: 0.0, target_y: 0.0, target_z: 0.0, 
+                        target_x: 0.0, target_y: pos.y -10.0, target_z: 40.0, 
                     };
                     let hand_mesh_instance = MeshInstance { model_name: TexturedModelName::HandFist };
                     to_add.push((hand_position, hand_rotation, hand_animation, hand_mesh_instance)); 
