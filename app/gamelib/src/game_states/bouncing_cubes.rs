@@ -128,7 +128,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
             z: z,
         };
         let bubble_animation = Animation {
-            duration: small_rng.next_u32() as f32 / u32::MAX as f32 * 2.0,
+            duration: 0.5 + small_rng.next_u32() as f32 / u32::MAX as f32 * 2.0,
             past_time: small_rng.next_u32() as f32 / u32::MAX as f32 * 2.0,
             animation_type: AnimationType::Bubble,
             on_animation_finish: OnAnimationFinish::RepeatBubble,
