@@ -6,6 +6,7 @@ use alloc::vec;
 use gamelib::data_store::asset_name::AssetName;
 use gamelib::data_store::textured_model_name::TexturedModelName;
 use gamelib::game_state::changes::controls::Direction;
+use gamelib::game_state::components::game::Camera;
 use gamelib::game_state::components::motion::Rotation;
 use gamelib::game_state::components::physics::SphereCollider;
 use gamelib::game_state::components::render::MeshInstance;
@@ -71,6 +72,26 @@ impl WiiRenderServer {
 
             GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
             GRRLIB_Camera3dSettings(0.0, 35.0, 10.0, 0.0, 1.0, 0.0, 10.0, 10.0, 0.0);
+        }
+    }
+
+    /// Render a single entity
+    fn set_camera(&mut self, camera: &Camera, pos: &Position) {
+        unsafe {
+            GRRLIB_Settings.antialias = true;
+
+            GRRLIB_SetBackgroundColour(camera.r, camera.g, camera.b, 0xFF);
+            GRRLIB_Camera3dSettings(
+                pos.x,
+                pos.y,
+                pos.z,
+                camera.up_x,
+                camera.up_y,
+                camera.up_z,
+                camera.lookat_x,
+                camera.lookat_y,
+                camera.lookat_z,
+            );
         }
     }
 
@@ -200,6 +221,10 @@ impl RenderServer for WiiRenderServer {
         for (pos, collider, rot) in data {
             self.render_entity(&TexturedModelName::Cube, pos, rot);
         }
+    }
+
+    fn update_camera(&mut self, pos: &Position, camera: &Camera) {
+        self.set_camera(camera, pos)
     }
 
     /**

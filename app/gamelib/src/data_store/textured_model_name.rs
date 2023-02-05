@@ -18,6 +18,9 @@ pub enum TexturedModelName {
     HandThree,
     Plate,
     FryPan,
+    OilBubble,
+    OilSea,
+    SweetPotato,
 }
 
 impl TexturedModelName {
@@ -35,6 +38,9 @@ impl TexturedModelName {
             TexturedModelName::HandThree => (AssetName::HandThree, AssetName::HandThreeTexture),
             TexturedModelName::Plate => (AssetName::Plate, AssetName::PlateTexture),
             TexturedModelName::FryPan => (AssetName::FryPan, AssetName::FryPanTexture),
+            TexturedModelName::OilBubble => (AssetName::OilBubble, AssetName::OilBubbleTexture),
+            TexturedModelName::OilSea => (AssetName::OilSea, AssetName::OilSeaTexture),
+            TexturedModelName::SweetPotato => (AssetName::SweetPotato, AssetName::SweetPotatoTexture),
         }
     }
 }
