@@ -64,6 +64,9 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         past_time: 0.0,
         animation_type: AnimationType::Test,
         on_animation_finish: OnAnimationFinish::Hand2,
+        target_x: 0.0,
+        target_y: 0.0,
+        target_z: 0.0,
     };
     let hand_mesh_instance = MeshInstance { model_name: TexturedModelName::HandThree };
     world.spawn((hand_position, hand_rotation, hand_animation, hand_mesh_instance));

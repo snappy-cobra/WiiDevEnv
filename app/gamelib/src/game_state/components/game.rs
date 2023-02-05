@@ -17,6 +17,7 @@ pub struct Camera {
 pub enum OnAnimationFinish {
     Despawn,
     Repeat,
+    RepeatBubble,
     Hand2,
     Hand1,
     Hand0,
@@ -34,4 +35,7 @@ pub struct Animation {
     pub past_time: f32,
     pub animation_type: AnimationType,
     pub on_animation_finish: OnAnimationFinish,
+    pub target_x: f32,
+    pub target_y: f32,
+    pub target_z: f32,
 }

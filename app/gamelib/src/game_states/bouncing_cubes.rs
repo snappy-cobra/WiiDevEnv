@@ -1,5 +1,6 @@
 use hecs::World;
 use num::ToPrimitive;
+use ogc_rs::print;
 
 use crate::data_store::asset_name::AssetName;
 use crate::game_state::GameState;
@@ -57,8 +58,8 @@ fn spawn_main_music(world: &mut World) {
 fn batch_spawn_entities(world: &mut World, n: i32) {
     let cam_position = Position {
         x: 0.0,
-        y: 35.0,
-        z: 10.0,
+        y: 22.5,
+        z: 20.0,
     };
     let camera = Camera {
         r: 0x00,        g: 0x00,        b: 0x00,
@@ -124,18 +125,24 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     world.spawn((oil_mesh, oil_position, oil_rotation));
 
 
-    for index in 0..10 {
+    for index in 0..40 {
         let bubble_mesh = MeshInstance { model_name: TexturedModelName::OilBubble };
+        let x = (small_rng.next_u32() as f32 / u32::MAX as f32 - 0.5) * 40.0;
+        let z = (small_rng.next_u32() as f32 / u32::MAX as f32 - 0.5) * 40.0;
+
         let bubble_position = Position{
-            x: small_rng.next_u32() as f32 % 20.0 as f32 -10.0,
-            y: 0.0,
-            z: small_rng.next_u32() as f32 % 20.0 as f32 -10.0,
+            x: x,
+            y: -6.0,
+            z: z,
         };
         let bubble_animation = Animation {
-            duration: 3.0,
-            past_time: small_rng.next_u32() as f32 % 3.0 as f32,
+            duration: 2.0,
+            past_time: small_rng.next_u32() as f32 / u32::MAX as f32 * 0.5,
             animation_type: AnimationType::Bubble,
-            on_animation_finish: OnAnimationFinish::Repeat,
+            on_animation_finish: OnAnimationFinish::RepeatBubble,
+            target_x: x,
+            target_y: -6.0,
+            target_z: z,
         };
         let bubble_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
         world.spawn((bubble_mesh, bubble_position, bubble_animation, bubble_rotation));
