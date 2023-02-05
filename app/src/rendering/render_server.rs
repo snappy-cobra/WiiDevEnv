@@ -107,14 +107,7 @@ impl WiiRenderServer {
         unsafe {
             GRRLIB_3dMode(0.1, 1000.0, 45.0, false, false);
             GRRLIB_ObjectView(
-                position.x,
-                position.y,
-                position.z,
-                rotation.x * 360.0,
-                rotation.y * 360.0,
-                rotation.z * 360.0,
-                1.0,
-                1.0,
+                position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, 1.0, 1.0,
                 1.0,
             );
             self.render_textured_model(model_name);
