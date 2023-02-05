@@ -106,7 +106,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     world.spawn((plate_mesh, plate_position, plate_rotation));
 
 
-    let fry_mesh = MeshInstance { model_name: TexturedModelName::FryPan };
+    let fry_mesh = MeshInstance { model_name: TexturedModelName::FryPanBlue };
     let fry_position = Position{
         x: 0.0,
         y: -11.0,
