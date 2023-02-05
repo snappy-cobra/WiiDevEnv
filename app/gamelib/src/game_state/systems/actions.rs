@@ -2,7 +2,7 @@ use ogc_rs::println;
 use ogc_rs::print;
 use crate::game_state::GameState;
 use crate::game_state::components::motion::Velocity;
-use crate::game_state::components::controller_assignment::ControllerAssignment;
+use crate::game_state::components::game::*;
 use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;

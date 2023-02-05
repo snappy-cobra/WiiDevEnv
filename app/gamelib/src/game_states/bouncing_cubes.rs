@@ -16,7 +16,6 @@ use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
 use crate::game_state::components::physics::SphereCollider;
-use crate::game_state::components::controller_assignment::{ControllerAssignment, FryAssignment};
 
 /**
  * Build the bouncing cubes game state.
@@ -105,19 +104,6 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     };
     let plate_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
     world.spawn((plate_mesh, plate_position, plate_rotation));
-
-    //Creating fryingpans
-    for i in 0..3 {
-        let fry_mesh = MeshInstance { model_name: TexturedModelName::FryPanBlack };
-        let fry_position = Position{
-            x: i as f32 *10.0-15.0,
-            y: 0.0,
-            z: 0.0,
-        };
-        let fry_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
-        let fry_assignment = FryAssignment{id: i, score: 0};
-        world.spawn((fry_mesh, fry_position, fry_rotation, fry_assignment));
-    }
 
     // Oil
     let oil_mesh = MeshInstance { model_name: TexturedModelName::OilSea };

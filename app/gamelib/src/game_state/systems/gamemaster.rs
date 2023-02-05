@@ -1,4 +1,4 @@
-use crate::game_state::components::render::MeshInstance;
+    use crate::game_state::components::render::MeshInstance;
 use crate::game_state::*;
 use crate::game_state::components::motion::*;
 use crate::game_state::components::game::*;
@@ -7,7 +7,7 @@ use alloc::vec::Vec;
 use alloc::vec;
 use hecs::{DynamicBundle, Entity, Component};
 use ogc_rs::print;
-
+use micromath::F32Ext;
 /**
  * Move the Platform.
  */
@@ -43,12 +43,93 @@ pub fn system_game_start(state: &mut GameState) {
     
             state.world.spawn((tmp_position, tmp_animation));
             state.playmode = PlayMode::Hands; // TODO: BUTTON click
+            let y = -10.0;
+            //Creating fryingpans
+            let fry_0_mesh = MeshInstance { model_name: TexturedModelName::FryPanBlack };
+            let fry_0_position = Position{ x: 0.0, y: y, z: 0.0,};
+            let fry_0_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
+            let fry_0_assignment = FryAssignment{id: 0, score: 0};
+            let fry_0_animation = Animation {
+                duration: 5.0,
+                past_time: 0.0,
+                animation_type: AnimationType::Fryer0,
+                on_animation_finish: OnAnimationFinish::Fryer,
+                target_x: 0.0,
+                target_y: y,
+                target_z: 0.0,
+            };
+            state.world.spawn((fry_0_mesh, fry_0_position, fry_0_rotation, fry_0_assignment, fry_0_animation));
+
+            let fry_1_mesh = MeshInstance { model_name: TexturedModelName::FryPanWhite };
+            let fry_1_position = Position{ x: 0.0, y: y, z: 0.0,};
+            let fry_1_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
+            let fry_1_assignment = FryAssignment{id: 1, score: 0};
+            let fry_1_animation = Animation {
+                duration: 5.0,
+                past_time: 0.0,
+                animation_type: AnimationType::Fryer1,
+                on_animation_finish: OnAnimationFinish::Fryer,
+                target_x: 0.0,
+                target_y: y,
+                target_z: 0.0,
+            };
+            state.world.spawn((fry_1_mesh, fry_1_position, fry_1_rotation, fry_1_assignment, fry_1_animation));
+
+            let fry_2_mesh = MeshInstance { model_name: TexturedModelName::FryPanBlue };
+            let fry_2_position = Position{ x: 0.0, y: y, z: 0.0,};
+            let fry_2_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
+            let fry_2_assignment = FryAssignment{id: 2, score: 0};
+            let fry_2_animation = Animation {
+                duration: 5.0,
+                past_time: 0.0,
+                animation_type: AnimationType::Fryer2,
+                on_animation_finish: OnAnimationFinish::Fryer,
+                target_x: 0.0,
+                target_y: y,
+                target_z: 0.0,
+            };
+            state.world.spawn((fry_2_mesh, fry_2_position, fry_2_rotation, fry_2_assignment, fry_2_animation));
+
+            let fry_3_mesh = MeshInstance { model_name: TexturedModelName::FryPanRed };
+            let fry_3_position = Position{ x: 0.0, y: y, z: 0.0,};
+            let fry_3_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
+            let fry_3_assignment = FryAssignment{id: 3, score: 0};
+            let fry_3_animation = Animation {
+                duration: 5.0,
+                past_time: 0.0,
+                animation_type: AnimationType::Fryer3,
+                on_animation_finish: OnAnimationFinish::Fryer,
+                target_x: 0.0,
+                target_y: y,
+                target_z: 0.0,
+            };
+            state.world.spawn((fry_3_mesh, fry_3_position, fry_3_rotation, fry_3_assignment, fry_3_animation));
         }
     }
 }
 
 pub fn system_game_finish(state: &mut GameState) {
-    
+    let mut winner: bool = false;
+    for (_id, fry) in state.world.query_mut::<(&mut FryAssignment)>() {
+        if fry.score > 20 {
+            state.playmode = PlayMode::Finish; // TODO: BUTTON click
+            winner = true;
+        }
+    }
+
+    if winner {
+        let mut to_remove: Vec<Entity> = Vec::new();
+
+        for (id, fry) in state.world.query_mut::<(&mut FryAssignment)>() {
+            if fry.score < 20 {
+                to_remove.push(id);
+            }
+        }
+
+        for id in to_remove.into_iter() {
+            state.world.despawn(id);
+        }
+    }
 }
 
 pub fn system_camera_movement(state: &mut GameState) {
@@ -80,6 +161,22 @@ pub fn system_animation(state: &mut GameState) {
             AnimationType::Bubble => {
                 pos.y += state.changes.delta_time.as_secs_f32();
             }
+            AnimationType::Fryer0 => {
+                pos.x = (animation.past_time * 0.97 + 0.01).sin() * 10.0 + (animation.past_time * 1.07 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
+                pos.z = (animation.past_time * 0.89 + 0.21).cos() * 10.0 + (animation.past_time * 1.13 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
+            }
+            AnimationType::Fryer1 => {
+                pos.x = (animation.past_time * 1.22 + 0.45).sin() * 10.0 + (animation.past_time * 1.17 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
+                pos.z = (animation.past_time * 0.91 + 0.41).cos() * 10.0 + (animation.past_time * 1.43 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
+            }
+            AnimationType::Fryer2 => {
+                pos.x = (animation.past_time * 0.79 + 0.11).sin() * 10.0 + (animation.past_time * 1.14 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
+                pos.z = (animation.past_time * 0.91 + 0.53).cos() * 10.0 + (animation.past_time * 1.15 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
+            }
+            AnimationType::Fryer3 => {
+                pos.x = (animation.past_time * 0.69 + 0.01).sin() * 10.0 + (animation.past_time * 1.15 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
+                pos.z = (animation.past_time * 0.79 + 0.32).cos() * 10.0 + (animation.past_time * 1.19 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
+            }
             AnimationType::HandIn | AnimationType::HandOut => {
                 let mut t = animation.past_time / animation.duration;
                 pos.x = lerp(pos.x, animation.target_x, t);
@@ -98,6 +195,11 @@ pub fn system_animation(state: &mut GameState) {
                     pos.x = animation.target_x; 
                     pos.y = animation.target_y; 
                     pos.z = animation.target_z; 
+                }
+                OnAnimationFinish::Fryer => { 
+                    animation.past_time -= animation.duration; 
+                    animation.target_x = 10.0; 
+                    animation.target_z = 10.0; 
                 }
                 OnAnimationFinish::RepeatBubble => { 
                     animation.past_time -= animation.duration; 
