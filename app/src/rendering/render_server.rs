@@ -37,6 +37,7 @@ pub struct WiiRenderServer {
     model_factory: ModelFactory,
     display_cache: DisplayCache,
     world_wrapper: WorldWrapper,
+    sim_step: usize,
 }
 
 impl WiiRenderServer {
@@ -57,6 +58,7 @@ impl WiiRenderServer {
             model_factory: ModelFactory::new(),
             display_cache: DisplayCache::new(),
             world_wrapper,
+            sim_step: 0,
         };
         res.init_render();
         res
@@ -258,6 +260,7 @@ impl RenderServer for WiiRenderServer {
     }
 
     fn world_step(&mut self) {
+        const step_scale_velocity: usize = 1;
         for body in self.world_wrapper.bodies_iter() {
             let plate_height = 0.0;
             let pos = body.center_of_mass();
@@ -270,18 +273,29 @@ impl RenderServer for WiiRenderServer {
                 let mut pos = body.center_of_mass();
                 pos.1 = plate_height;
                 // TODO Add friction. using velocity
-                body.move_to(pos)
+                body.move_to(pos);
+                // println!("{:?}", self.world_wrapper.sim_step);
+                // Only scale velocity every n sim_steps
+                if self.sim_step >= step_scale_velocity {
+                    body.scale_velocity(0.99);
+                }
             } else {
                 body.apply_gravity(1.0 / 100.0);
                 if body.center_of_mass().1 < plate_height - 20.0 {
-                    // TODO: set volocity to 0
                     body.move_to(Vec3 {
                         0: 0.0,
                         1: 10.0,
                         2: 0.0,
-                    })
+                    });
+                    body.scale_velocity(0.0);
                 }
             }
+        }
+
+        if self.sim_step >= step_scale_velocity {
+            self.sim_step = 0;
+        } else {
+            self.sim_step += 1;
         }
         self.world_wrapper.step();
     }
@@ -308,7 +322,7 @@ impl RenderServer for WiiRenderServer {
     fn apply_movement(&mut self, obj: &SphereCollider, dir: Direction) {
         let body = self.world_wrapper.get_body(obj.body_index);
         let move_magnitude = 0.1;
-        let move_help_jump_magnitude = 0.05;
+        let move_help_jump_magnitude = 0.1;
         let jump_magnitude = 0.3;
         let jump_down_magnitude = 0.2;
         let rotation = match dir {
