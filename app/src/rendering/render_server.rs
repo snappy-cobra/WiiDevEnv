@@ -7,6 +7,7 @@ use gamelib::data_store::asset_name::AssetName;
 use gamelib::data_store::textured_model_name::TexturedModelName;
 use gamelib::game_state::changes::controls::Direction;
 use gamelib::game_state::components::game::Camera;
+use gamelib::game_state::components::game::FryAssignment;
 use gamelib::game_state::components::motion::Rotation;
 use gamelib::game_state::components::physics::SphereCollider;
 use gamelib::game_state::components::render::MeshInstance;
@@ -362,5 +363,50 @@ impl RenderServer for WiiRenderServer {
 
     fn reset_world(&mut self) {
         self.world_wrapper = WorldWrapper::new();
+    }
+
+    fn teleport_potato(
+        &mut self,
+        objs: &mut Vec<(&mut SphereCollider, &mut Position, &mut Rotation)>,
+    ) {
+        for (potato, _a, _b) in objs {
+            let body = self.world_wrapper.get_body(potato.body_index);
+            if body.center_of_mass().1 < -20.0 {
+                body.move_to(Vec3 {
+                    0: 0.0,
+                    1: 10.0,
+                    2: 0.0,
+                });
+                body.scale_velocity(0.0);
+            }
+        }
+    }
+
+    fn fry_pan_score_increase(
+        &mut self,
+        position: &mut Position,
+        fry_assignment: &mut FryAssignment,
+        potatoes: &Vec<usize>,
+    ) {
+        let fry_pan_radius = 10.0;
+        for potato_body_index in potatoes {
+            let body = self.world_wrapper.get_body(*potato_body_index);
+            if body.center_of_mass().1 < -20.0 {
+                // println!(
+                //     "potato x:{:?} z:{:?}",
+                //     body.center_of_mass().0,
+                //     body.center_of_mass().2
+                // );
+                // println!("x:{:?} z:{:?}", position.x, position.z);
+                let x_dif = body.center_of_mass().0 - position.x;
+                let z_dif = body.center_of_mass().2 - position.z;
+                // let distance = x_dif * x_dif + z_dif * z_dif
+                // println!(distance);
+                if x_dif * x_dif + z_dif * z_dif < fry_pan_radius * fry_pan_radius {
+                    fry_assignment.score += 1;
+                    println!("SCOREEE");
+                }
+            }
+        }
     }
 }

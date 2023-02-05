@@ -5,3 +5,4 @@ mod audio;
 mod render;
 mod physics;
 mod gamemaster;
+mod score;
