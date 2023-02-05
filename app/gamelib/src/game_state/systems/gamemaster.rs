@@ -162,20 +162,20 @@ pub fn system_animation(state: &mut GameState) {
                 pos.y += state.changes.delta_time.as_secs_f32();
             }
             AnimationType::Fryer0 => {
-                pos.x = (animation.past_time * 0.97 + 0.01).sin() * 10.0 + (animation.past_time * 1.07 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
-                pos.z = (animation.past_time * 0.89 + 0.21).cos() * 10.0 + (animation.past_time * 1.13 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
+                pos.x = (animation.past_time * 0.77 + 0.01).sin() * 10.0 + (animation.past_time * 1.07 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
+                pos.z = (animation.past_time * 0.79 + 0.21).cos() * 10.0 + (animation.past_time * 1.13 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
             }
             AnimationType::Fryer1 => {
-                pos.x = (animation.past_time * 1.22 + 0.45).sin() * 10.0 + (animation.past_time * 1.17 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
-                pos.z = (animation.past_time * 0.91 + 0.41).cos() * 10.0 + (animation.past_time * 1.43 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
+                pos.x = (animation.past_time * 0.72 + 0.45).sin() * 10.0 + (animation.past_time * 1.17 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
+                pos.z = (animation.past_time * 0.71 + 8.41).cos() * 10.0 + (animation.past_time * 1.43 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
             }
             AnimationType::Fryer2 => {
-                pos.x = (animation.past_time * 0.79 + 0.11).sin() * 10.0 + (animation.past_time * 1.14 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
-                pos.z = (animation.past_time * 0.91 + 0.53).cos() * 10.0 + (animation.past_time * 1.15 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
+                pos.x = (animation.past_time * 0.79 + 5.11).sin() * 10.0 + (animation.past_time * 1.14 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
+                pos.z = (animation.past_time * 0.81 + 2.53).cos() * 10.0 + (animation.past_time * 1.15 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
             }
             AnimationType::Fryer3 => {
-                pos.x = (animation.past_time * 0.69 + 0.01).sin() * 10.0 + (animation.past_time * 1.15 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
-                pos.z = (animation.past_time * 0.79 + 0.32).cos() * 10.0 + (animation.past_time * 1.19 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
+                pos.x = (animation.past_time * 0.79 + 9.01).sin() * 10.0 + (animation.past_time * 1.15 + 0.03).sin() * 2.0 + (animation.past_time * 1.47 + 5.31).sin();
+                pos.z = (animation.past_time * 0.79 + 2.32).cos() * 10.0 + (animation.past_time * 1.19 + 0.43).cos() * 2.0 + (animation.past_time * 1.83 + 1.84).cos();
             }
             AnimationType::HandIn | AnimationType::HandOut => {
                 let mut t = animation.past_time / animation.duration;
@@ -197,7 +197,6 @@ pub fn system_animation(state: &mut GameState) {
                     pos.z = animation.target_z; 
                 }
                 OnAnimationFinish::Fryer => { 
-                    animation.past_time -= animation.duration; 
                     animation.target_x = 10.0; 
                     animation.target_z = 10.0; 
                 }

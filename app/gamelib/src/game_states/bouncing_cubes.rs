@@ -57,13 +57,13 @@ fn spawn_main_music(world: &mut World) {
 fn batch_spawn_entities(world: &mut World, n: i32) {
     let cam_position = Position {
         x: 0.0,
-        y: 22.5,
-        z: 20.0,
+        y: 27.5,
+        z: 25.0,
     };
     let camera = Camera {
         r: 0x00,        g: 0x00,        b: 0x00,
         up_x: 0.0,      up_y: 1.0,      up_z: 0.0,
-        lookat_x: 0.0,  lookat_y: 0.0,  lookat_z: 0.0,
+        lookat_x: 0.0,  lookat_y: -6.0,  lookat_z: 0.0,
     };
     world.spawn((camera, cam_position));
 
