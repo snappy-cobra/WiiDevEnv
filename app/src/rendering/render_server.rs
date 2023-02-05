@@ -70,7 +70,7 @@ impl WiiRenderServer {
             GRRLIB_Settings.antialias = true;
 
             GRRLIB_SetBackgroundColour(0x00, 0x00, 0x00, 0xFF);
-            GRRLIB_Camera3dSettings(0.0, 35.0, 10.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+            GRRLIB_Camera3dSettings(0.0, 35.0, 10.0, 0.0, 1.0, 0.0, 10.0, 10.0, 0.0);
         }
     }
 
