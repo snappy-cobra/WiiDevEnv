@@ -192,10 +192,10 @@ impl Motion {
         let (total_gforce, corrected_gforce) = process_gforce(neutral_gforce, movement_gforce);
         return if total_gforce >= 1.75 {
             let dir = find_direction(corrected_gforce);
-            println!(
-                "Motion started: {:?} {:?} {}",
-                dir, corrected_gforce, total_gforce
-            );
+            // println!(
+            //     "Motion started: {:?} {:?} {}",
+            //     dir, corrected_gforce, total_gforce
+            // );
             if plots_holder.motion_plot {
                 plots_holder.add_measurement(
                     "movement",
