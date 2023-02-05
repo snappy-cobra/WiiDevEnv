@@ -108,7 +108,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
 
     //Creating fryingpans
     for i in 0..3 {
-        let fry_mesh = MeshInstance { model_name: TexturedModelName::FryPan };
+        let fry_mesh = MeshInstance { model_name: TexturedModelName::FryPanBlack };
         let fry_position = Position{
             x: i as f32 *10.0-15.0,
             y: 0.0,
