@@ -4,7 +4,7 @@ use grrustlib::{DCInvalidateRange, GX_BeginDispList, GX_CallDispList, GX_EndDisp
 use libc::{c_void, free, memalign, realloc};
 
 const ALIGN_SIZE: u32 = 32;
-const DEFAULT_LIST_SIZE: u32 = 1024;
+const DEFAULT_LIST_SIZE: u32 = 2048;
 
 /**
  * Caches display lists based on the textured model name.
