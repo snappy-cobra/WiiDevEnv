@@ -20,3 +20,10 @@ pub fn system_physics_to_position(state: &mut GameState) {
     let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
     server_provider.render_server.physics_to_position(&mut colliders);
 }
+
+pub fn system_teleport_potato(state: &mut GameState) {
+    let mut query = state.world.query::<(&mut SphereCollider, &mut Position, &mut Rotation)>();
+    let mut colliders = query.iter().map(|(_e, c)| c).collect();
+    let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
+    server_provider.render_server.teleport_potato(&mut colliders);
+}

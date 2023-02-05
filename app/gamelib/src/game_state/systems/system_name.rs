@@ -5,6 +5,7 @@ use super::motion::*;
 use super::actions::*;
 use super::render::*;
 use super::gamemaster::*;
+use super::score::*;
 
 /**
  * Enumerates all systems that exist in the project.
@@ -27,6 +28,8 @@ pub enum SystemName {
     PhysicsToPosition,
     PatatoControl,
     ResetLevel,
+    ScoreFryingPan,
+    TeleportPotatoes,
 }
 
 impl SystemName {
@@ -48,6 +51,8 @@ impl SystemName {
             SystemName::PhysicsToPosition => &system_physics_to_position,
             SystemName::PatatoControl => &system_control_potato,
             SystemName::ResetLevel => &system_reset_level,
+            SystemName::ScoreFryingPan => &system_score_frying_pans,
+            SystemName::TeleportPotatoes => &system_teleport_potato,
         }
     }
 }

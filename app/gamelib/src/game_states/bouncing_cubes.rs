@@ -31,10 +31,12 @@ pub fn build() -> GameState {
     // state.add_system(SystemName::ShakeAction);
     // state.add_system(SystemName::IntegrateMotion);
     // state.add_system(SystemName::BounceBounds);
+    state.add_system(SystemName::ScoreFryingPan);
     state.add_system(SystemName::PatatoControl);
     state.add_system(SystemName::PhysicsToPosition);
     state.add_system(SystemName::RenderMeshes);
     state.add_system(SystemName::CameraUpdate);
+    state.add_system(SystemName::TeleportPotatoes);
     state.add_system(SystemName::ResetLevel);
 
     batch_spawn_entities(&mut state.world, 8);
@@ -107,7 +109,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     world.spawn((plate_mesh, plate_position, plate_rotation));
 
     //Creating fryingpans
-    for i in 0..3 {
+    for i in 0..4 {
         let fry_mesh = MeshInstance { model_name: TexturedModelName::FryPan };
         let fry_position = Position{
             x: i as f32 *10.0-15.0,
