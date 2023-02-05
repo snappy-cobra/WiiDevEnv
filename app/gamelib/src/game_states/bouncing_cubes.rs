@@ -149,23 +149,4 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         let bubble_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
         world.spawn((bubble_mesh, bubble_position, bubble_animation, bubble_rotation));
     }
-
-    // HAND
-    let hand_mesh = MeshInstance { model_name: TexturedModelName::HandThree };
-    let hand_position = Position{
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    };
-    let hand_animation = Animation {
-        duration: 1.5,
-        past_time: 0.0,
-        animation_type: AnimationType::HandIn,
-        on_animation_finish: OnAnimationFinish::Hand2,
-        target_x: 0.0,
-        target_y: 10.0,
-        target_z: 10.0,
-    };
-    let hand_rotation = Rotation { x: 0.0, y: 90.0, z: 0.0 };
-    world.spawn((hand_mesh, hand_position, hand_animation, hand_rotation));
 }

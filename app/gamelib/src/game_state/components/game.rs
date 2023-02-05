@@ -18,6 +18,7 @@ pub enum OnAnimationFinish {
     Despawn,
     Repeat,
     RepeatBubble,
+    Hand3,
     Hand2,
     Hand1,
     Hand0,

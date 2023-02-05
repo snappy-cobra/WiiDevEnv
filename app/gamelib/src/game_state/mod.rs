@@ -17,11 +17,19 @@ use changes::Changes;
 use systems::system_name::SystemName;
 use crate::{game_states::GameStateName, servers::ServerProvider};
 
+pub enum PlayMode {
+    Selection,
+    Hands,
+    Playing,
+    Finish,
+}
+
 /// Represents the state of the game
 ///
 /// This includes all entities, as well as potentially score, 'current mode' and other global data
 pub struct GameState {
     pub world: World,
+    pub playmode: PlayMode,
     pub changes: Changes,
     pub next_state: Option<GameStateName>,
     pub is_running: bool,
@@ -36,6 +44,7 @@ impl GameState {
     pub fn new() -> GameState {
         GameState {
             world: World::new(),
+            playmode: PlayMode::Selection,
             changes: Changes::nothing(),
             systems: Vec::new(),
             is_running: true,
