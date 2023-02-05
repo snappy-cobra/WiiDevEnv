@@ -279,7 +279,15 @@ impl RenderServer for WiiRenderServer {
                 // TODO Add friction. using velocity
                 body.move_to(pos)
             } else {
-                body.apply_gravity(1.0 / 100.0)
+                body.apply_gravity(1.0 / 100.0);
+                if body.center_of_mass().1 < plate_height - 20.0 {
+                    // TODO: set volocity to 0
+                    body.move_to(Vec3 {
+                        0: 0.0,
+                        1: 10.0,
+                        2: 0.0,
+                    })
+                }
             }
         }
         self.world_wrapper.step();

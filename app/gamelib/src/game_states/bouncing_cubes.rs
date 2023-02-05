@@ -98,7 +98,7 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     let plate_mesh = MeshInstance { model_name: TexturedModelName::Plate };
     let plate_position = Position{
         x: 0.0,
-        y: 0.0,
+        y: -1.5,
         z: 0.0,
     };
     let plate_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
