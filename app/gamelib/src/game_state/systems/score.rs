@@ -1,6 +1,6 @@
 use alloc::vec;
 use alloc::vec::Vec;
-use crate::game_state::components::controller_assignment::FryAssignment;
+use crate::game_state::components::game::FryAssignment;
 use crate::game_state::components::motion::{Position, Rotation};
 use crate::game_state::components::physics::SphereCollider;
 use crate::game_state::GameState;

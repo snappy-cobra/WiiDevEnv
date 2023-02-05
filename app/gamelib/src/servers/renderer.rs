@@ -6,7 +6,7 @@ use ogc_rs::println;
 #[cfg(not(feature = "wii"))]
 use std::vec::Vec;
 use crate::game_state::changes::controls::Direction;
-use crate::game_state::components::controller_assignment::FryAssignment;
+use crate::game_state::components::game::FryAssignment;
 use crate::game_state::GameState;
 use crate::game_states::GameStateName;
 

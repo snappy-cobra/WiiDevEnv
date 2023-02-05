@@ -16,7 +16,6 @@ use rand::rngs::SmallRng;
 use rand::RngCore;
 use rand::SeedableRng;
 use crate::game_state::components::physics::SphereCollider;
-use crate::game_state::components::controller_assignment::{ControllerAssignment, FryAssignment};
 
 /**
  * Build the bouncing cubes game state.
@@ -60,13 +59,13 @@ fn spawn_main_music(world: &mut World) {
 fn batch_spawn_entities(world: &mut World, n: i32) {
     let cam_position = Position {
         x: 0.0,
-        y: 22.5,
-        z: 20.0,
+        y: 27.5,
+        z: 25.0,
     };
     let camera = Camera {
         r: 0x00,        g: 0x00,        b: 0x00,
         up_x: 0.0,      up_y: 1.0,      up_z: 0.0,
-        lookat_x: 0.0,  lookat_y: 0.0,  lookat_z: 0.0,
+        lookat_x: 0.0,  lookat_y: -6.0,  lookat_z: 0.0,
     };
     world.spawn((camera, cam_position));
 
@@ -108,19 +107,6 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
     let plate_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
     world.spawn((plate_mesh, plate_position, plate_rotation));
 
-    //Creating fryingpans
-    for i in 0..4 {
-        let fry_mesh = MeshInstance { model_name: TexturedModelName::FryPan };
-        let fry_position = Position{
-            x: i as f32 *10.0-15.0,
-            y: 0.0,
-            z: 0.0,
-        };
-        let fry_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
-        let fry_assignment = FryAssignment{id: i, score: 0};
-        world.spawn((fry_mesh, fry_position, fry_rotation, fry_assignment));
-    }
-
     // Oil
     let oil_mesh = MeshInstance { model_name: TexturedModelName::OilSea };
     let oil_position = Position{
@@ -155,23 +141,4 @@ fn batch_spawn_entities(world: &mut World, n: i32) {
         let bubble_rotation = Rotation { x: 0.0, y: 0.0, z: 0.0 };
         world.spawn((bubble_mesh, bubble_position, bubble_animation, bubble_rotation));
     }
-
-    // HAND
-    let hand_mesh = MeshInstance { model_name: TexturedModelName::HandThree };
-    let hand_position = Position{
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    };
-    let hand_animation = Animation {
-        duration: 1.5,
-        past_time: 0.0,
-        animation_type: AnimationType::HandIn,
-        on_animation_finish: OnAnimationFinish::Hand2,
-        target_x: 0.0,
-        target_y: 10.0,
-        target_z: 10.0,
-    };
-    let hand_rotation = Rotation { x: 0.0, y: 90.0, z: 0.0 };
-    world.spawn((hand_mesh, hand_position, hand_animation, hand_rotation));
 }

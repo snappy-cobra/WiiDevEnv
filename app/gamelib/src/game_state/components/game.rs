@@ -18,15 +18,21 @@ pub enum OnAnimationFinish {
     Despawn,
     Repeat,
     RepeatBubble,
+    Hand3,
     Hand2,
     Hand1,
     Hand0,
-    Start
+    Start,
+    Fryer,
 }
 
 pub enum AnimationType {
     None,
     Test,
+    Fryer0,
+    Fryer1,
+    Fryer2,
+    Fryer3,
     Bubble,
     HandIn,
     Hand,
@@ -41,4 +47,15 @@ pub struct Animation {
     pub target_x: f32,
     pub target_y: f32,
     pub target_z: f32,
+}
+
+#[derive(Debug)]
+pub struct ControllerAssignment {
+    pub id: usize,
+}
+
+#[derive(Debug)]
+pub struct FryAssignment {
+    pub id: usize,
+    pub score: usize,
 }

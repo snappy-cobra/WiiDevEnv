@@ -6,8 +6,8 @@ use alloc::vec;
 use gamelib::data_store::asset_name::AssetName;
 use gamelib::data_store::textured_model_name::TexturedModelName;
 use gamelib::game_state::changes::controls::Direction;
-use gamelib::game_state::components::controller_assignment::FryAssignment;
 use gamelib::game_state::components::game::Camera;
+use gamelib::game_state::components::game::FryAssignment;
 use gamelib::game_state::components::motion::Rotation;
 use gamelib::game_state::components::physics::SphereCollider;
 use gamelib::game_state::components::render::MeshInstance;
@@ -388,16 +388,16 @@ impl RenderServer for WiiRenderServer {
         fry_assignment: &mut FryAssignment,
         potatoes: &Vec<usize>,
     ) {
-        let fry_pan_radius = 8.0;
+        let fry_pan_radius = 10.0;
         for potato_body_index in potatoes {
             let body = self.world_wrapper.get_body(*potato_body_index);
             if body.center_of_mass().1 < -20.0 {
-                println!(
-                    "potato x:{:?} z:{:?}",
-                    body.center_of_mass().0,
-                    body.center_of_mass().2
-                );
-                println!("x:{:?} z:{:?}", position.x, position.z);
+                // println!(
+                //     "potato x:{:?} z:{:?}",
+                //     body.center_of_mass().0,
+                //     body.center_of_mass().2
+                // );
+                // println!("x:{:?} z:{:?}", position.x, position.z);
                 let x_dif = body.center_of_mass().0 - position.x;
                 let z_dif = body.center_of_mass().2 - position.z;
                 // let distance = x_dif * x_dif + z_dif * z_dif

@@ -1,4 +1,4 @@
-use crate::game_state::components::controller_assignment::ControllerAssignment;
+use crate::game_state::components::game::*;
 
 #[cfg(feature = "wii")]
 use ogc_rs::prelude::Vec;
