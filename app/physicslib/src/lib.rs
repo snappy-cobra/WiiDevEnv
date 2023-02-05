@@ -158,6 +158,15 @@ impl Body {
         unsafe { TPE_bodyAccelerate(&mut self.0, velocity.to_internal())};
     }
 
+    pub fn velocity(&mut self) -> Vec3 {
+        Vec3::from_internal(unsafe { TPE_bodyGetLinearVelocity(&self.0) })
+    }
+
+    pub fn scale_velocity(&mut self, scale: f32) {
+        let u = Unit{ 0: scale};
+        unsafe { TPE_bodyMultiplyNetSpeed(&mut self.0, u.to_internal())}
+    }
+
     /// Untested...
     pub fn make_box(width: f32, depth: f32, height: f32, joint_size: f32) -> (Vec<Joint>, Vec<Connection>) {
         let mut joints : [MaybeUninit<TPE_Joint>; 8] = unsafe { MaybeUninit::zeroed().assume_init() };

@@ -63,13 +63,16 @@ pub fn system_shake_action(state: &mut GameState) {
 
 pub fn system_control_potato(state: &mut GameState) {
     for (_id, (obj, controller_id)) in state.world.query_mut::<(&mut SphereCollider, & ControllerAssignment)>() {
-        let controller_state = state.changes.controls.get_wii_mote_control(controller_id);
-        match &controller_state.motion {
-            None => (),
-            Some(motion) => {
-                if motion.started {
-                    let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
-                    server_provider.render_server.apply_movement(obj, motion.direction)
+        // let controller_state = state.changes.controls.get_wii_mote_control(controller_id);
+        for i in 0..3 {
+            let player = ControllerAssignment { id: i };
+            match &state.changes.controls.get_wii_mote_control(&player).motion {
+                None => (),
+                Some(motion) => {
+                    if motion.started {
+                        let mut server_provider = state.server_provider.as_ref().unwrap().borrow_mut();
+                        server_provider.render_server.apply_movement(obj, motion.direction)
+                    }
                 }
             }
         }
